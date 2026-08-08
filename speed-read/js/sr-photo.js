@@ -26,29 +26,46 @@
       method: '集中注意力于整个屏幕，身心放松，快速闪过一些点后，立即回忆点的数目。' }
   ];
 
-  /* 曼陀罗生成：对称花瓣图案（variant 0-22 共 23 种变体，对应原版 23 张卡） */
+  /* 曼陀罗生成：白底 + 红黄蓝绿四色对称花瓣（对应原版 6_4 截图）
+   * variant 0-22 共 23 种变体：花瓣数/层数/内部图案变化 */
+  const MANDALA_COLORS = ['#ef4444', '#eab308', '#22c55e', '#3b82f6'];
   function drawMandala(ctx, cx, cy, r, color, filled, seed, variant) {
     const v = variant || 0;
-    const petals = [6, 8, 10, 12, 16][v % 5];
+    const petals = [8, 12, 16][v % 3];
     const layers = 1 + (v % 3);      // 1-3 层花瓣
     const inner = v % 4;             // 0 圆 | 1 星 | 2 菱形 | 3 同心圆
+    // 白底圆卡
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath(); ctx.arc(cx, cy, r * 1.02, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = 'rgba(15,23,42,0.12)';
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(cx, cy, r * 1.02, 0, Math.PI * 2); ctx.stroke();
     ctx.save();
     ctx.translate(cx, cy);
-    // 外环
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 3;
-    ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.stroke();
-    ctx.beginPath(); ctx.arc(0, 0, r * 0.72, 0, Math.PI * 2); ctx.stroke();
-    // 多层花瓣
+    // 外环（用四色分段描边，形成彩色圆环）
+    for (let i = 0; i < 24; i++) {
+      ctx.strokeStyle = MANDALA_COLORS[i % 4];
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.arc(0, 0, r, i / 24 * Math.PI * 2, (i + 1) / 24 * Math.PI * 2);
+      ctx.stroke();
+      ctx.strokeStyle = MANDALA_COLORS[(i + 2) % 4];
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(0, 0, r * 0.72, i / 24 * Math.PI * 2, (i + 1) / 24 * Math.PI * 2);
+      ctx.stroke();
+    }
+    // 多层花瓣（四色轮换，均匀对称分布）
     for (let L = 0; L < layers; L++) {
       const lr = r * (0.58 - L * 0.17);
       const n = petals + L * 2;
       for (let i = 0; i < n; i++) {
         const ang = (i / n) * Math.PI * 2 + seed;
+        const c = MANDALA_COLORS[(i + L) % 4];
         ctx.save();
         ctx.rotate(ang);
-        ctx.fillStyle = filled ? color : 'transparent';
-        ctx.strokeStyle = color;
+        ctx.fillStyle = filled ? c : 'transparent';
+        ctx.strokeStyle = c;
         ctx.lineWidth = 2;
         ctx.beginPath();
         ctx.ellipse(lr, 0, lr * 0.4, lr * 0.13, 0, 0, Math.PI * 2);
@@ -56,25 +73,27 @@
         ctx.restore();
       }
     }
-    // 内部图案
-    ctx.fillStyle = filled ? color : 'transparent';
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 2;
-    if (inner === 0) {
-      ctx.beginPath(); ctx.arc(0, 0, r * 0.14, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-    } else if (inner === 1) {
-      ctx.beginPath();
-      for (let i = 0; i < 10; i++) {
-        const rr = i % 2 === 0 ? r * 0.17 : r * 0.07;
-        const a = (i / 10) * Math.PI * 2 - Math.PI / 2;
-        i === 0 ? ctx.moveTo(Math.cos(a) * rr, Math.sin(a) * rr) : ctx.lineTo(Math.cos(a) * rr, Math.sin(a) * rr);
-      }
-      ctx.closePath(); ctx.fill(); ctx.stroke();
-    } else if (inner === 2) {
-      ctx.beginPath(); ctx.moveTo(0, -r * 0.18); ctx.lineTo(r * 0.18, 0); ctx.lineTo(0, r * 0.18); ctx.lineTo(-r * 0.18, 0); ctx.closePath(); ctx.fill(); ctx.stroke();
-    } else {
-      for (const rr of [r * 0.16, r * 0.1, r * 0.05]) {
-        ctx.beginPath(); ctx.arc(0, 0, rr, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    // 内部图案（四色同心）
+    for (let k = 0; k < 4; k++) {
+      ctx.fillStyle = filled ? MANDALA_COLORS[k] : 'transparent';
+      ctx.strokeStyle = MANDALA_COLORS[k];
+      ctx.lineWidth = 2;
+      if (inner === 0) {
+        ctx.beginPath(); ctx.arc(0, 0, r * (0.16 - k * 0.03), 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+      } else if (inner === 1) {
+        ctx.beginPath();
+        for (let i = 0; i < 10; i++) {
+          const rr = i % 2 === 0 ? r * (0.17 - k * 0.03) : r * 0.06;
+          const a = (i / 10) * Math.PI * 2 - Math.PI / 2 + k * 0.4;
+          i === 0 ? ctx.moveTo(Math.cos(a) * rr, Math.sin(a) * rr) : ctx.lineTo(Math.cos(a) * rr, Math.sin(a) * rr);
+        }
+        ctx.closePath(); ctx.fill(); ctx.stroke();
+      } else if (inner === 2) {
+        ctx.save(); ctx.rotate(k * Math.PI / 4);
+        ctx.beginPath(); ctx.moveTo(0, -r * (0.18 - k * 0.03)); ctx.lineTo(r * (0.18 - k * 0.03), 0); ctx.lineTo(0, r * (0.18 - k * 0.03)); ctx.lineTo(-r * (0.18 - k * 0.03), 0); ctx.closePath(); ctx.fill(); ctx.stroke();
+        ctx.restore();
+      } else {
+        ctx.beginPath(); ctx.arc(0, 0, r * (0.16 - k * 0.035), 0, Math.PI * 2); ctx.fill(); ctx.stroke();
       }
     }
     ctx.restore();
@@ -131,20 +150,23 @@
         return Math.abs(dx) + Math.abs(dy) < starR;
       };
     }
-    // 生成 SIRDS：每行周期随机点，深度区域偏移 shift
-    const rnd = mulberry32((Math.floor(seed * 1e5) + 1) >>> 0);
-    ctx.fillStyle = '#64748b';
+    // 生成 SIRDS：每行周期随机点（周期内点固定颜色，重复时同色 → 双目匹配成立），深度区域偏移 shift
+    // 用红棕色调多色点，还原原版 6_5 截图的暗红棕斑纹质感
+    const SIRDS_COLORS = ['#a03a2e', '#c96a3a', '#7a2e26', '#b5502f', '#8a4a2f'];
     for (let y = 0; y < h; y++) {
       const rowRnd = mulberry32(((Math.floor(seed * 1e5) + y * 131) >>> 0));
       const pts = [];
-      const n = Math.max(4, Math.floor(T / 6));
-      for (let i = 0; i < n; i++) pts.push(rowRnd() * T);
+      const n = Math.max(5, Math.floor(T / 6));
+      for (let i = 0; i < n; i++) {
+        pts.push({ x: rowRnd() * T, c: SIRDS_COLORS[Math.floor(rowRnd() * SIRDS_COLORS.length)] });
+      }
       for (let k = 0; k <= w / T; k++) {
-        for (const px of pts) {
-          const x = k * T + px;
+        for (const p of pts) {
+          const x = k * T + p.x;
           if (x > w) continue;
           const d = region(x, y) ? shift : 0;
-          ctx.fillRect(x + d, y, 2, 2);
+          ctx.fillStyle = p.c;
+          ctx.fillRect(x + d, y, 3, 3);
         }
       }
     }
