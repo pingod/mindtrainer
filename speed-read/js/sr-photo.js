@@ -198,6 +198,8 @@
       this.mandalaFilled = true;
       this.mandalaSeed = 0.3;
       this.mandalaVariant = 0;
+      this.tricolorIdx = 0;        // 三色卡：当前颜色 0红/1黄/2蓝
+      this.geomIdx = 0;            // 几何卡：当前形状 0圆/1方/2三角
       this.picIdx = 0;
       this.picTimer = 0;
       // 记忆训练状态
@@ -460,34 +462,108 @@
     }
 
     drawTricolor(ctx, w, h) {
-      const cw = w / 3, ch = h * 0.8;
-      const y0 = (h - ch) / 2;
-      ctx.fillStyle = '#ef4444'; ctx.fillRect(0, y0, cw, ch);
-      ctx.fillStyle = '#eab308'; ctx.fillRect(cw, y0, cw, ch);
-      ctx.fillStyle = '#3b82f6'; ctx.fillRect(cw * 2, y0, cw, ch);
+      // 原版：主区一张大纯色卡（当前颜色），点击切换红/黄/蓝
+      const p = this.params;
+      const colors = ['#ef4444', '#eab308', '#3b82f6'];
+      const color = p.tricolorColor || colors[this.tricolorIdx % colors.length];
+      // 主卡片（大色块，近似原版右侧大卡）
+      ctx.fillStyle = color;
+      ctx.fillRect(w * 0.06, h * 0.1, w * 0.88, h * 0.66);
+      // 卡片边框
+      ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(w * 0.06, h * 0.1, w * 0.88, h * 0.66);
+      // 底部小卡（切换预览：红黄蓝三个小色块）
+      const sw = w * 0.1, sh = h * 0.09;
+      const y0 = h * 0.84;
+      const total = sw * 3 + 12 * 2;
+      let x0 = (w - total) / 2;
+      colors.forEach((c, i) => {
+        ctx.fillStyle = c;
+        ctx.fillRect(x0, y0, sw, sh);
+        if (i === this.tricolorIdx % colors.length) {
+          ctx.strokeStyle = '#fff';
+          ctx.lineWidth = 3;
+          ctx.strokeRect(x0 - 2, y0 - 2, sw + 4, sh + 4);
+        }
+        x0 += sw + 12;
+      });
       this.drawCardFrame(ctx, w, h, this.elapsed);
+      ctx.font = '14px sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+      ctx.fillStyle = 'rgba(148,163,184,0.85)';
+      ctx.fillText('点击下方小卡或按空格切换颜色', w / 2, h * 0.95 - 6);
     }
 
     drawGeom(ctx, w, h) {
-      const cw = w / 3, cy = h / 2, r = Math.min(cw, h) * 0.25;
-      ctx.fillStyle = '#eab308';
-      ctx.beginPath(); ctx.arc(cw / 2, cy, r, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = '#ef4444';
-      ctx.fillRect(cw * 1.5 - r * 0.8, cy - r * 0.8, r * 1.6, r * 1.6);
-      ctx.fillStyle = '#22c55e';
-      ctx.beginPath();
-      ctx.moveTo(cw * 2.5, cy - r);
-      ctx.lineTo(cw * 2.5 - r * 0.87, cy + r * 0.75);
-      ctx.lineTo(cw * 2.5 + r * 0.87, cy + r * 0.75);
-      ctx.closePath(); ctx.fill();
+      // 原版：主区一张大图形卡（当前形状），点击切换圆/方/三角
+      const p = this.params;
+      const shapes = ['circle', 'square', 'triangle'];
+      const shape = p.geomShape || shapes[this.geomIdx % shapes.length];
+      const cx = w / 2, cy = h * 0.44;
+      const r = Math.min(w, h) * 0.2;
+      // 白卡背景
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(w * 0.12, h * 0.1, w * 0.76, h * 0.66);
+      ctx.strokeStyle = 'rgba(15,23,42,0.12)';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(w * 0.12, h * 0.1, w * 0.76, h * 0.66);
+      // 图形（深色）
+      ctx.fillStyle = '#1e293b';
+      ctx.strokeStyle = '#1e293b';
+      if (shape === 'circle') {
+        ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
+      } else if (shape === 'square') {
+        ctx.fillRect(cx - r, cy - r, r * 2, r * 2);
+      } else {
+        ctx.beginPath(); ctx.moveTo(cx, cy - r);
+        ctx.lineTo(cx - r * 0.87, cy + r * 0.75);
+        ctx.lineTo(cx + r * 0.87, cy + r * 0.75);
+        ctx.closePath(); ctx.fill();
+      }
+      // 底部小形状预览（切换）
+      const names = ['圆形', '方形', '三角'];
+      const sw = w * 0.12, sh = h * 0.1;
+      const y0 = h * 0.82;
+      const total = sw * 3 + 12 * 2;
+      let x0 = (w - total) / 2;
+      shapes.forEach((s, i) => {
+        ctx.fillStyle = '#f1f5f9';
+        ctx.fillRect(x0, y0, sw, sh);
+        if (i === this.geomIdx % shapes.length) {
+          ctx.strokeStyle = '#0f172a';
+          ctx.lineWidth = 3;
+          ctx.strokeRect(x0 - 2, y0 - 2, sw + 4, sh + 4);
+        }
+        const sxp = x0 + sw / 2, syp = y0 + sh / 2, sr = Math.min(sw, sh) * 0.28;
+        ctx.fillStyle = '#0f172a';
+        if (s === 'circle') {
+          ctx.beginPath(); ctx.arc(sxp, syp, sr, 0, Math.PI * 2); ctx.fill();
+        } else if (s === 'square') {
+          ctx.fillRect(sxp - sr, syp - sr, sr * 2, sr * 2);
+        } else {
+          ctx.beginPath(); ctx.moveTo(sxp, syp - sr);
+          ctx.lineTo(sxp - sr * 0.87, syp + sr * 0.75);
+          ctx.lineTo(sxp + sr * 0.87, syp + sr * 0.75);
+          ctx.closePath(); ctx.fill();
+        }
+        x0 += sw + 12;
+      });
+      ctx.font = '13px sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+      ctx.fillStyle = 'rgba(148,163,184,0.85)';
+      ctx.fillText(`当前：${names[this.geomIdx % shapes.length]} · 点击小图或按空格切换`, w / 2, h * 0.94 - 6);
       this.drawCardFrame(ctx, w, h, this.elapsed);
     }
 
     drawYellow(ctx, w, h) {
       const p = this.params;
-      const r = Math.min(w, h) * 0.3;
-      ctx.fillStyle = p.yellow || '#fde047';
-      ctx.beginPath(); ctx.arc(w / 2, h / 2, r, 0, Math.PI * 2); ctx.fill();
+      // 原版黄卡：黄色方卡（大卡片）
+      ctx.fillStyle = p.yellow || '#ffaa01';
+      ctx.fillRect(w * 0.1, h * 0.1, w * 0.8, h * 0.68);
+      ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(w * 0.1, h * 0.1, w * 0.8, h * 0.68);
       this.drawCardFrame(ctx, w, h, this.elapsed);
     }
 
@@ -679,8 +755,21 @@
     }
 
     handleClick(e) {
-      if (!this.running) return;
       const t = this.training.type;
+      // 三色卡/几何卡：训练中也可点击切换（换一种颜色/形状继续练习）
+      if (t === 'tricolor') {
+        this.tricolorIdx++;
+        Sound.flip();
+        if (!this.running) this.draw();
+        return;
+      }
+      if (t === 'geom') {
+        this.geomIdx++;
+        Sound.flip();
+        if (!this.running) this.draw();
+        return;
+      }
+      if (!this.running) return;
       if (t === 'memory') {
         if (this.memMode === 'pos' && this.memReveal) return;
         if (this.memDone) {
