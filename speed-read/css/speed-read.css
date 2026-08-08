@@ -5,10 +5,12 @@
 
 /* ---------- 训练中心（speed-read/index.html） ---------- */
 /* 原站 <main> 是 flex+wrap 容器（margin-top:128px 为 fixed header 让位），
-   所有直接子元素必须占满整行，否则会横向并排错位 */
+   所有直接子元素必须占满整行；用 flex-basis:100% 随窗口收缩（窄窗口不溢出），
+   max-width 封顶（宽窗口与原站 1200 对齐） */
 .sr-hero {
-  flex: 0 0 1200px;
+  flex: 0 0 100%;
   max-width: 1200px;
+  box-sizing: border-box;
   padding: 40px 20px;
   text-align: center;
 }
@@ -22,8 +24,9 @@
 .sr-hero p { color: #64748b; font-size: 17px; }
 
 .sr-module-grid {
-  flex: 0 0 1200px;
+  flex: 0 0 100%;
   max-width: 1200px;
+  box-sizing: border-box;
   margin: 0 auto;
   padding: 10px 20px 60px;
   display: grid;
@@ -55,8 +58,9 @@
 
 /* ---------- 训练页布局 ---------- */
 .sr-layout {
-  flex: 0 0 1200px;
+  flex: 0 0 100%;
   max-width: 1200px;
+  box-sizing: border-box;
   margin: 0 auto;
   padding: 28px 20px 60px;
   display: grid;

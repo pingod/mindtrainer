@@ -4,14 +4,15 @@
 
 ## 项目组成
 
-### 1. PickTests 复刻（认知测试，9 页 × 中英双语）
+### 1. PickTests 复刻（认知测试，全中文 10 页）
 - **Reaction Time** 反应时间（1/5 轮模式、柱状图、历史记录 localStorage）
 - **Aim Trainer** 瞄准训练
 - **Sequence Memory** 序列记忆（Simon 式）
 - **Number Memory** 数字记忆（难度递进）
 - **Multiple Object Tracking** 多目标追踪
 - **Stroop** 斯特鲁普色词干扰
-- 首页 / 关于 / 隐私政策 / 使用条款（中英双语）
+- 首页 / 关于 / 隐私政策 / 使用条款
+- 站点为**纯中文**（根路径即中文，无英文版）
 
 ### 2. 飞克视读 Web 重写（速读训练，`/speed-read/`）
 > 原「飞克视读」（上海 fiercelc 团队，2009–2023）为 Delphi 速读训练软件，含基础训练 26 项、闪视训练、速读训练、照相记忆、冥想、训练计划。此处用 HTML5 Canvas + Web Audio 全量重写。
@@ -53,8 +54,7 @@ cd mindtrainer && python3 -m http.server 8082
 
 ## 目录结构
 ```
-├── index.html               # 英文首页
-├── zh/                      # 中文版
+├── index.html               # 中文首页
 ├── about/ privacy-policy/ terms-of-use/
 ├── reaction-time-test/ aim-trainer/ sequence-memory-test/
 ├── number-memory-test/ multiple-object-tracking-test/ stroop-test/
