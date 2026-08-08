@@ -4,8 +4,12 @@
  * ============================================================ */
 
 /* ---------- 训练中心（speed-read/index.html） ---------- */
+/* 原站 <main> 是 flex+wrap 容器（margin-top:128px 为 fixed header 让位），
+   所有直接子元素必须占满整行，否则会横向并排错位 */
 .sr-hero {
-  padding: 72px 20px 40px;
+  flex: 0 0 1200px;
+  max-width: 1200px;
+  padding: 40px 20px;
   text-align: center;
 }
 .sr-hero h1 {
@@ -18,7 +22,8 @@
 .sr-hero p { color: #64748b; font-size: 17px; }
 
 .sr-module-grid {
-  max-width: 1080px;
+  flex: 0 0 1200px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 10px 20px 60px;
   display: grid;
@@ -50,6 +55,7 @@
 
 /* ---------- 训练页布局 ---------- */
 .sr-layout {
+  flex: 0 0 1200px;
   max-width: 1200px;
   margin: 0 auto;
   padding: 28px 20px 60px;

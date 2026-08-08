@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 20" preserveAspectRatio="none">
+    <style>
+        path {
+            vector-effect: non-scaling-stroke;
+        }
+    </style>
+    <g fill="none" stroke="#35b682" stroke-linecap="round">
+        <path d="M3 11 C44 6 85 13 126 9 C173 5 212 12 258 7 C279 5 299 6 317 4" stroke-opacity=".42" stroke-width="2.2"/>
+        <path d="M7 15 C55 10 96 16 143 12 C192 8 236 13 302 8" stroke-opacity=".18" stroke-width="1.15" stroke-dasharray="41 3 69 2"/>
+        <path d="M22 7 C63 3 99 8 136 4" stroke-opacity=".13" stroke-width=".9"/>
+    </g>
+</svg>

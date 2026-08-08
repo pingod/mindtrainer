@@ -36,7 +36,8 @@
     <link rel="stylesheet" href="../assets/css/style.min.css">
 
     <style>
-        .speed-reading-banner { padding: 8px 20px 0; }
+        /* main 是 flex+wrap，banner 必须占满整行 */
+        .speed-reading-banner { flex: 0 0 1200px; max-width: 1200px; padding: 8px 20px 0; box-sizing: border-box; }
         .speed-reading-entry {
             display: block; text-decoration: none;
             background: linear-gradient(120deg, #0f172a, #1e3a8a);
