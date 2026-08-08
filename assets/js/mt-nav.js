@@ -128,6 +128,21 @@
     '<nav class="mt-menu" aria-label="主导航">' + itemsHtml + '</nav>' +
     '<a class="mt-cta" href="/speed-read/">开始训练 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"></path></svg></a>';
 
+  /* 下拉菜单防抖关闭：mouseenter 打开、mouseleave 延迟 250ms 关闭，
+   * 快速或斜向移动鼠标时有缓冲，不会中途自动关闭（配合 CSS hover 桥） */
+  document.querySelectorAll('.mt-dropdown').forEach(function (dd) {
+    var timer = null;
+    function open() { if (timer) clearTimeout(timer); dd.classList.add('open'); }
+    function close() { if (timer) clearTimeout(timer); timer = setTimeout(function () { dd.classList.remove('open'); }, 250); }
+    dd.addEventListener('mouseenter', open);
+    dd.addEventListener('mouseleave', close);
+    var panel = dd.querySelector('.mt-dropdown-panel');
+    if (panel) {
+      panel.addEventListener('mouseenter', open);
+      panel.addEventListener('mouseleave', close);
+    }
+  });
+
   /* 移动端：点击展开下拉 */
   document.addEventListener('click', function (e) {
     var dd = e.target.closest ? e.target.closest('.mt-dropdown') : null;
