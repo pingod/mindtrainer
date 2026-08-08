@@ -26,70 +26,135 @@
       method: '集中注意力于整个屏幕，身心放松，快速闪过一些点后，立即回忆点的数目。' }
   ];
 
-  /* 曼陀罗生成：对称花瓣图案 */
-  function drawMandala(ctx, cx, cy, r, color, filled, seed) {
+  /* 曼陀罗生成：对称花瓣图案（variant 0-22 共 23 种变体，对应原版 23 张卡） */
+  function drawMandala(ctx, cx, cy, r, color, filled, seed, variant) {
+    const v = variant || 0;
+    const petals = [6, 8, 10, 12, 16][v % 5];
+    const layers = 1 + (v % 3);      // 1-3 层花瓣
+    const inner = v % 4;             // 0 圆 | 1 星 | 2 菱形 | 3 同心圆
     ctx.save();
     ctx.translate(cx, cy);
-    // 外圆环
+    // 外环
     ctx.strokeStyle = color;
     ctx.lineWidth = 3;
     ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.stroke();
     ctx.beginPath(); ctx.arc(0, 0, r * 0.72, 0, Math.PI * 2); ctx.stroke();
-    // 花瓣（12 瓣）
-    const petals = 12;
-    for (let i = 0; i < petals; i++) {
-      const ang = (i / petals) * Math.PI * 2 + seed;
-      ctx.save();
-      ctx.rotate(ang);
-      ctx.fillStyle = filled ? color : 'transparent';
-      ctx.strokeStyle = color;
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.ellipse(r * 0.36, 0, r * 0.34, r * 0.16, 0, 0, Math.PI * 2);
-      ctx.fill(); ctx.stroke();
-      ctx.restore();
+    // 多层花瓣
+    for (let L = 0; L < layers; L++) {
+      const lr = r * (0.58 - L * 0.17);
+      const n = petals + L * 2;
+      for (let i = 0; i < n; i++) {
+        const ang = (i / n) * Math.PI * 2 + seed;
+        ctx.save();
+        ctx.rotate(ang);
+        ctx.fillStyle = filled ? color : 'transparent';
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.ellipse(lr, 0, lr * 0.4, lr * 0.13, 0, 0, Math.PI * 2);
+        ctx.fill(); ctx.stroke();
+        ctx.restore();
+      }
     }
-    // 内圆
+    // 内部图案
     ctx.fillStyle = filled ? color : 'transparent';
     ctx.strokeStyle = color;
     ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.arc(0, 0, r * 0.14, 0, Math.PI * 2);
-    ctx.fill(); ctx.stroke();
+    if (inner === 0) {
+      ctx.beginPath(); ctx.arc(0, 0, r * 0.14, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    } else if (inner === 1) {
+      ctx.beginPath();
+      for (let i = 0; i < 10; i++) {
+        const rr = i % 2 === 0 ? r * 0.17 : r * 0.07;
+        const a = (i / 10) * Math.PI * 2 - Math.PI / 2;
+        i === 0 ? ctx.moveTo(Math.cos(a) * rr, Math.sin(a) * rr) : ctx.lineTo(Math.cos(a) * rr, Math.sin(a) * rr);
+      }
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+    } else if (inner === 2) {
+      ctx.beginPath(); ctx.moveTo(0, -r * 0.18); ctx.lineTo(r * 0.18, 0); ctx.lineTo(0, r * 0.18); ctx.lineTo(-r * 0.18, 0); ctx.closePath(); ctx.fill(); ctx.stroke();
+    } else {
+      for (const rr of [r * 0.16, r * 0.1, r * 0.05]) {
+        ctx.beginPath(); ctx.arc(0, 0, rr, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+      }
+    }
     ctx.restore();
   }
 
-  /* 3D 图：随机点 + 中央图案视差偏移（简易 SIRDS 风格，纯绘制实现） */
+  /* 伪随机数（SIRDS 点阵每行稳定） */
+  function mulberry32(a) {
+    return function () {
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  /* 3D 图：真 SIRDS（单幅随机点立体图）
+   * 原理：每行随机点以周期 T 重复（背景），图案区域的点额外偏移 shift，
+   * 平行视线（两眼注视图后方）时背景重合、图案区域因视差浮起。
+   * 模式：pic 图片（中央圆+星） | txt 文字（"3D"） | anim 动画（移动小球） */
   function draw3D(ctx, w, h, mode, seed, t) {
-    // 背景随机点
-    const pts = [];
-    const n = Math.floor(w * h / 350);
-    for (let i = 0; i < n; i++) {
-      pts.push({ x: Math.floor(Math.random() * w), y: Math.floor(Math.random() * h) });
-    }
-    ctx.fillStyle = '#94a3b8';
-    pts.forEach(p => ctx.fillRect(p.x, p.y, 2, 2));
-    // 中央区域视差：区域内点向右偏移 depth，制造"浮起"感
+    const shift = 26, T = 72;
     const cx = w / 2, cy = h / 2;
-    const boxW = Math.min(w * 0.5, 420), boxH = Math.min(h * 0.6, 320);
-    const x0 = cx - boxW / 2, y0 = cy - boxH / 2;
-    ctx.fillStyle = '#e2e8f0';
-    pts.forEach(p => {
-      if (p.x >= x0 && p.x <= x0 + boxW && p.y >= y0 && p.y <= y0 + boxH) {
-        ctx.fillRect(p.x + 14, p.y, 2, 2);  // 右移 14px 的点形成视差
-      }
-    });
-    // 中央区域边框
-    ctx.strokeStyle = 'rgba(148,163,184,0.25)';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(x0, y0, boxW, boxH);
+    let region;
     if (mode === 'txt') {
-      // 3D 文字叠加
-      ctx.font = `bold ${Math.min(80, w * 0.12)}px sans-serif`;
-      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-      ctx.fillStyle = '#fbbf24';
-      ctx.fillText('立 体', cx, cy);
-      ctx.fillStyle = '#3b82f6';
-      ctx.fillText('3D', cx, cy + 60);
+      // 离屏 canvas 画文字，取笔画区域做深度
+      const off = document.createElement('canvas');
+      off.width = w; off.height = h;
+      const octx = off.getContext('2d');
+      octx.clearRect(0, 0, w, h);
+      octx.fillStyle = '#fff';
+      octx.font = `bold ${Math.min(150, w * 0.22)}px "PingFang SC", "Microsoft YaHei", sans-serif`;
+      octx.textAlign = 'center'; octx.textBaseline = 'middle';
+      octx.fillText('3D', w / 2, h / 2 - 30);
+      octx.font = `bold ${Math.min(44, w * 0.07)}px "PingFang SC", "Microsoft YaHei", sans-serif`;
+      octx.fillText('视线平行 · 看后方虚像', w / 2, h / 2 + 95);
+      const data = octx.getImageData(0, 0, w, h).data;
+      region = (x, y) => data[((y * w + x) | 0) * 4 + 3] > 128;
+    } else if (mode === 'anim') {
+      // 移动小球区域做深度（凝视时球浮起并移动）
+      const bx = cx + Math.sin(t / 900) * w * 0.2;
+      const by = cy + Math.cos(t / 1300) * h * 0.15;
+      const br = Math.min(w, h) * 0.13;
+      region = (x, y) => {
+        const dx = x - bx, dy = y - by;
+        return dx * dx + dy * dy < br * br;
+      };
+    } else {
+      // 图片模式：中央圆 + 菱形星浮起
+      const rr = Math.min(w, h) * 0.17;
+      const starR = Math.min(w, h) * 0.11;
+      region = (x, y) => {
+        const dx = x - cx, dy = y - cy;
+        if (dx * dx + dy * dy < rr * rr) return true;
+        return Math.abs(dx) + Math.abs(dy) < starR;
+      };
+    }
+    // 生成 SIRDS：每行周期随机点，深度区域偏移 shift
+    const rnd = mulberry32((Math.floor(seed * 1e5) + 1) >>> 0);
+    ctx.fillStyle = '#64748b';
+    for (let y = 0; y < h; y++) {
+      const rowRnd = mulberry32(((Math.floor(seed * 1e5) + y * 131) >>> 0));
+      const pts = [];
+      const n = Math.max(4, Math.floor(T / 6));
+      for (let i = 0; i < n; i++) pts.push(rowRnd() * T);
+      for (let k = 0; k <= w / T; k++) {
+        for (const px of pts) {
+          const x = k * T + px;
+          if (x > w) continue;
+          const d = region(x, y) ? shift : 0;
+          ctx.fillRect(x + d, y, 2, 2);
+        }
+      }
+    }
+    if (mode === 'anim') {
+      // 动画模式：在球位置画一个小圆点做参考（可选）
+      const bx = cx + Math.sin(t / 900) * w * 0.2;
+      const by = cy + Math.cos(t / 1300) * h * 0.15;
+      ctx.strokeStyle = 'rgba(251,191,36,0.9)';
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(bx, by, 4, 0, Math.PI * 2); ctx.stroke();
     }
   }
 
@@ -132,6 +197,7 @@
       this.training = null;
       this.mandalaFilled = true;
       this.mandalaSeed = 0.3;
+      this.mandalaVariant = 0;
       this.picIdx = 0;
       this.picTimer = 0;
       // 记忆训练状态
@@ -143,7 +209,9 @@
       this.memReveal = false;      // 展示阶段
       this.memRevealT = 0;
       this.memFlip = [];           // 当前翻开
-      this.memShown = [];          // 已匹配
+      this.memShown = [];          // 已匹配/已答对
+      this.memTarget = -1;         // 图片位置记忆：当前要点的格子索引
+      this.memDone = false;
       // 瞬间计算
       this.fcCount = 0;
       this.fcShow = false;
@@ -178,6 +246,7 @@
       const t = this.training.type;
       this.mandalaSeed = Math.random() * Math.PI * 2;
       this.mandalaFilled = true;
+      this.mandalaVariant = Math.floor(Math.random() * 23); // 23 张曼陀罗卡变体
       if (t === 'memory') this.initMemory();
       if (t === 'fastcalc') { this.fcPhase = 'idle'; this.fcShow = false; this.fcMsg = ''; }
     }
@@ -204,21 +273,25 @@
         this.memShown = [];
         this.memSelected = null;
       } else {
-        // 图片位置记忆：4x3 网格，成对图案，先展示 3 秒
-        const rows = 3, cols = 4, n = rows * cols;
-        const half = n / 2;
-        let seeds = [];
-        for (let i = 0; i < half; i++) seeds.push(i + 1);
-        seeds = seeds.concat(seeds.slice());
+        // 图片位置记忆：难度 rows×cols（原版 2*2 → 8*4），每格一张不同图案
+        // 流程：展示 N 秒记住位置 → 隐藏 → 逐张出图，点击其所在位置
+        const rows = this.params.memRows || 3;
+        const cols = this.params.memCols || 4;
+        const n = Math.min(rows * cols, 32);
+        const seeds = [];
+        for (let i = 0; i < n; i++) seeds.push(i + 1);
+        // 洗牌（位置随机）
         for (let i = seeds.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
           [seeds[i], seeds[j]] = [seeds[j], seeds[i]];
         }
         this.memGrid = seeds.map((s, i) => ({ seed: s, i, matched: false }));
-        this.memPairs = half;
+        this.memPairs = n;
         this.memFound = 0;
         this.memFlip = [];
         this.memShown = [];
+        this.memDone = false;
+        this.memTarget = -1;
         this.memReveal = true;
         this.memRevealT = 0;
       }
@@ -282,27 +355,26 @@
           }
         }
       } else {
-        // 图片位置
-        if (this.memFlip.length === 0) {
-          this.memFlip = [idx];
-          Sound.click();
-        } else if (this.memFlip.length === 1) {
-          this.memFlip.push(idx);
-          const a = this.memGrid[this.memFlip[0]], b = this.memGrid[idx];
-          if (a.seed === b.seed) {
-            Sound.good();
-            this.memFound++;
-            this.memShown.push(this.memFlip[0], idx);
-            this.memFlip = [];
-            if (this.memFound >= this.memPairs) {
-              Sound.done();
-              this.memFlip = null;
-              this.memDone = true;
-            }
+        // 图片位置记忆：点击格子，判断是否为当前目标图案的位置
+        const g = this.memGrid[idx];
+        if (!g || g.matched) return;
+        if (idx === this.memTarget) {
+          g.matched = true;
+          this.memShown.push(idx);
+          Sound.good();
+          this.memFound++;
+          this.memTarget = -1;
+          const remain = this.memGrid.filter(x => !x.matched);
+          if (remain.length === 0) {
+            this.memDone = true;
+            Sound.done();
           } else {
-            Sound.err();
-            setTimeout(() => { this.memFlip = []; this.draw(); }, 500);
+            this.memTarget = remain[Math.floor(Math.random() * remain.length)].i;
+            Sound.flip();
           }
+        } else {
+          Sound.err();
+          this.memWrong = (this.memWrong || 0) + 1;
         }
       }
       if (!this.running) this.draw();
@@ -332,6 +404,9 @@
           this.memRevealT += dt * 1000;
           if (this.memRevealT >= (this.params.revealTime || 3000)) {
             this.memReveal = false;
+            const remain = this.memGrid.filter(x => !x.matched);
+            this.memTarget = remain.length ? remain[Math.floor(Math.random() * remain.length)].i : -1;
+            this.memWrong = 0;
             Sound.flip();
           }
         }
@@ -420,7 +495,7 @@
       const p = this.params;
       const r = Math.min(w, h) * 0.36;
       const color = p.mandalaColor || '#f97316';
-      drawMandala(ctx, w / 2, h / 2, r, color, this.mandalaFilled, this.mandalaSeed);
+      drawMandala(ctx, w / 2, h / 2, r, color, this.mandalaFilled, this.mandalaSeed, this.mandalaVariant);
       ctx.font = '14px sans-serif';
       ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
       ctx.fillStyle = 'rgba(148,163,184,0.8)';
@@ -449,8 +524,8 @@
 
     drawMemory(ctx, w, h) {
       const p = this.params;
-      const rows = this.memMode === 'find' ? 4 : 3;
-      const cols = this.memMode === 'find' ? 6 : 4;
+      const rows = this.memMode === 'find' ? 4 : (this.params.memRows || 3);
+      const cols = this.memMode === 'find' ? 6 : (this.params.memCols || 4);
       const cellW = w / cols, cellH = h / rows;
       if (!this.memGrid || this.memGrid.length === 0) return;
 
@@ -487,11 +562,11 @@
           ctx.fillText('点击任意位置重新开始', w / 2, h / 2 + 26);
         }
       } else {
-        // 图片位置记忆
+        // 图片位置记忆：展示 → 隐藏 → 逐张出图点位置
         this.memGrid.forEach((g) => {
           const ci = g.i % cols, cj = Math.floor(g.i / cols);
           const x = ci * cellW, y = cj * cellH;
-          const shown = this.memReveal || this.memShown.includes(g.i) || this.memFlip.includes(g.i);
+          const shown = this.memReveal || g.matched;
           if (shown) {
             genPattern(ctx, x + cellW / 2, y + cellH / 2, Math.min(cellW, cellH) * 0.3, g.seed * 0.7);
           } else {
@@ -502,10 +577,35 @@
           ctx.lineWidth = 1;
           ctx.strokeRect(x + 3, y + 3, cellW - 6, cellH - 6);
         });
-        ctx.font = '13px sans-serif';
-        ctx.textAlign = 'center'; ctx.textBaseline = 'top';
-        ctx.fillStyle = this.memReveal ? 'rgba(250,204,21,0.9)' : 'rgba(148,163,184,0.8)';
-        ctx.fillText(this.memReveal ? '记住每张图片的位置…' : `已找到 ${this.memFound}/${this.memPairs} 对`, w / 2, 10);
+        ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+        if (this.memReveal) {
+          ctx.fillStyle = 'rgba(250,204,21,0.95)';
+          ctx.font = '15px sans-serif';
+          ctx.fillText(`记住每张图片的位置…（${Math.max(0, Math.ceil((this.params.revealTime || 3000) / 1000 - this.memRevealT / 1000))}s）`, 14, 12);
+        } else if (this.memDone) {
+          ctx.fillStyle = 'rgba(0,0,0,0.65)';
+          ctx.fillRect(0, 0, w, h);
+          ctx.fillStyle = '#4ade80';
+          ctx.font = 'bold 28px sans-serif';
+          ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+          ctx.fillText('全部答对！用时 ' + Math.floor(this.elapsed) + 's', w / 2, h / 2 - 16);
+          ctx.fillStyle = '#94a3b8';
+          ctx.font = '15px sans-serif';
+          ctx.fillText('点击任意位置重新开始', w / 2, h / 2 + 26);
+        } else if (this.memTarget >= 0) {
+          const tg = this.memGrid[this.memTarget];
+          genPattern(ctx, 42, 38, 26, tg.seed * 0.7);
+          ctx.fillStyle = '#e2e8f0';
+          ctx.font = '14px sans-serif';
+          ctx.fillText('这张图在哪个位置？点击格子作答', 78, 26);
+          ctx.fillStyle = 'rgba(148,163,184,0.8)';
+          ctx.font = '13px sans-serif';
+          ctx.fillText(`已答对 ${this.memFound}/${this.memPairs} · 点错 ${this.memWrong || 0} 次`, 78, 48);
+        } else {
+          ctx.fillStyle = 'rgba(148,163,184,0.8)';
+          ctx.font = '13px sans-serif';
+          ctx.fillText('准备出题…', 14, 12);
+        }
       }
     }
 
@@ -589,8 +689,8 @@
         }
         const rect = this.canvas.getBoundingClientRect();
         const x = e.clientX - rect.left, y = e.clientY - rect.top;
-        const rows = this.memMode === 'find' ? 4 : 3;
-        const cols = this.memMode === 'find' ? 6 : 4;
+        const rows = this.memMode === 'find' ? 4 : (this.params.memRows || 3);
+        const cols = this.memMode === 'find' ? 6 : (this.params.memCols || 4);
         const cellW = this.cw / cols, cellH = this.ch / rows;
         const ci = Math.floor(x / cellW), cj = Math.floor(y / cellH);
         if (ci < 0 || ci >= cols || cj < 0 || cj >= rows) return;
@@ -640,12 +740,14 @@
         base.push({ key: 'mandalaColor', label: '曼陀罗颜色', type: 'color', def: '#f97316' });
         break;
       case 'card3d':
-        base.push({ key: 'mode3d', label: '显示方式', type: 'select', def: 'pic', options: [['pic', '图片'], ['txt', '3D文字']] });
+        base.push({ key: 'mode3d', label: '显示方式', type: 'select', def: 'pic', options: [['pic', '图片'], ['txt', '3D文字'], ['anim', '动画']] });
         break;
       case 'memory':
         base.push(
           { key: 'memMode', label: '训练类型', type: 'select', def: 'find', options: [['find', '文字找同'], ['pos', '图片位置记忆']] },
-          { key: 'revealTime', label: '位置记忆展示时间(ms)', type: 'range', min: 1000, max: 8000, step: 500, def: 3000 }
+          { key: 'revealTime', label: '位置记忆展示时间(ms)', type: 'range', min: 1000, max: 8000, step: 500, def: 3000 },
+          { key: 'memRows', label: '网格行数(2-8)', type: 'range', min: 2, max: 8, step: 1, def: 3 },
+          { key: 'memCols', label: '网格列数(2-4)', type: 'range', min: 2, max: 4, step: 1, def: 4 }
         );
         break;
       case 'fastcalc':
