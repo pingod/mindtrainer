@@ -120,7 +120,7 @@
     '<span class="mt-brand-icon">⚡</span>' +
     '<span class="mt-brand-text">MindTrainer</span>' +
     '</a>' +
-    '<nav class="mt-menu" aria-label="主导航">' + itemsHtml + '</nav>' +
+    '<nav class="mt-menu" aria-label="主导航">' + itemsHtml + '</nav>';
 
   /* 下拉菜单防抖关闭：mouseenter 打开、mouseleave 延迟 250ms 关闭，
    * 快速或斜向移动鼠标时有缓冲，不会中途自动关闭（配合 CSS hover 桥） */
