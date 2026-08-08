@@ -103,6 +103,16 @@
                 </label>
             </fieldset>
             <p class="number-mode-help" id="numberModeHelp">查看完整数字，再按原样输入。</p>
+            <style>
+                /* 增强模式选项的可点击视觉反馈（未选中项 hover 明显可点） */
+                .number-mode-picker span { transition: color 180ms ease-out, background 180ms ease-out, box-shadow 180ms ease-out; }
+                .number-mode-picker:not(:disabled) label:hover span {
+                    background: rgba(35, 122, 94, .09);
+                    box-shadow: inset 0 0 0 1.5px rgba(35, 122, 94, .35);
+                    color: var(--number-green-dark);
+                }
+                .number-mode-picker input:checked+span { font-weight: 750; }
+            </style>
 
             <div class="number-stage-shell" id="numberStageShell" data-fullscreen="false">
                 <div class="number-stage-tools">

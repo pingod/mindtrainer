@@ -37,6 +37,15 @@
 
     <link rel="stylesheet" href="../assets/css/stroop-test.min.css">
     <script src="/assets/js/mt-nav.js" defer></script>
+    <style>
+        /* 模式选择器可点击反馈：未选中项 hover 明显可点（避免灰色误认为禁用） */
+        [class*="mode-picker"] span { transition: color 180ms ease-out, background 180ms ease-out, box-shadow 180ms ease-out; }
+        [class*="mode-picker"]:not(:disabled) label:hover span {
+            background: rgba(35, 122, 94, .09);
+            box-shadow: inset 0 0 0 1.5px rgba(35, 122, 94, .35);
+        }
+        [class*="mode-picker"] input:checked+span { font-weight: 750; }
+    </style>
 </head>
 <body class="test-page">
 <header id="mt-header"></header>
