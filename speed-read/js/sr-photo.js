@@ -222,6 +222,8 @@
       this.mandalaVariant = 0;
       this.tricolorIdx = 0;        // 三色卡：当前颜色 0红/1黄/2蓝
       this.geomIdx = 0;            // 几何卡：当前形状 0圆/1方/2三角
+      this.sirdsIdx = 0;           // 3D 卡：当前图序号
+      this.sirdsTxtCache = null;   // 3D 文字缓存
       this.picIdx = 0;
       this.picTimer = 0;
       // 记忆训练状态
@@ -297,19 +299,18 @@
         this.memShown = [];
         this.memSelected = null;
       } else {
-        // 图片位置记忆：难度 rows×cols（原版 2*2 → 8*4），每格一张不同图案
+        // 图片位置记忆：难度 rows×cols（原版 2*2 → 8*4），每格一张原版 PicMemory 图
         // 流程：展示 N 秒记住位置 → 隐藏 → 逐张出图，点击其所在位置
         const rows = this.params.memRows || 3;
         const cols = this.params.memCols || 4;
-        const n = Math.min(rows * cols, 32);
-        const seeds = [];
-        for (let i = 0; i < n; i++) seeds.push(i + 1);
+        const n = Math.min(rows * cols, ASSETS.picmemory.length);
+        const imgs = ASSETS.picmemory.slice(0, n);
         // 洗牌（位置随机）
-        for (let i = seeds.length - 1; i > 0; i--) {
+        for (let i = imgs.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
-          [seeds[i], seeds[j]] = [seeds[j], seeds[i]];
+          [imgs[i], imgs[j]] = [imgs[j], imgs[i]];
         }
-        this.memGrid = seeds.map((s, i) => ({ seed: s, i, matched: false }));
+        this.memGrid = imgs.map((img, i) => ({ img, seed: i + 1, i, matched: false }));
         this.memPairs = n;
         this.memFound = 0;
         this.memFlip = [];
@@ -605,32 +606,116 @@
     drawMandala(ctx, w, h) {
       const p = this.params;
       const r = Math.min(w, h) * 0.36;
-      const color = p.mandalaColor || '#f97316';
-      drawMandala(ctx, w / 2, h / 2, r, color, this.mandalaFilled, this.mandalaSeed, this.mandalaVariant);
+      const cx = w / 2, cy = h / 2;
+      // 用原版曼陀罗卡素材（23 张）
+      const img = ASSETS.mandala[this.mandalaVariant % ASSETS.mandala.length];
+      if (img && img.complete && img.naturalWidth > 0) {
+        if (this.mandalaFilled) {
+          // 填充模式：显示真实曼陀罗卡（方图，等比缩放）
+          drawImageCover(ctx, img, r * 2, r * 2);
+        } else {
+          // 回忆模式：白底（回忆颜色）
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(cx - r, cy - r, r * 2, r * 2);
+          ctx.strokeStyle = 'rgba(15,23,42,0.18)';
+          ctx.lineWidth = 2;
+          ctx.strokeRect(cx - r, cy - r, r * 2, r * 2);
+        }
+      } else {
+        // 素材未加载完：程序生成兜底
+        drawMandala(ctx, cx, cy, r, p.mandalaColor || '#f97316', this.mandalaFilled, this.mandalaSeed, this.mandalaVariant);
+      }
       ctx.font = '14px sans-serif';
       ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
       ctx.fillStyle = 'rgba(148,163,184,0.8)';
-      ctx.fillText(this.mandalaFilled ? '单击切换为 不填充（回忆颜色）' : '单击切换为 填充（原色）', w / 2, h - 14);
+      ctx.fillText(this.mandalaFilled ? '单击切换为 不填充（回忆颜色）' : '单击切换为 填充', w / 2, h - 14);
     }
 
     drawCard3D(ctx, w, h) {
       const p = this.params;
-      draw3D(ctx, w, h, p.mode3d || 'pic', this.mandalaSeed, this.elapsed);
+      const mode = p.mode3d || 'pic';
+      const idx = this.sirdsIdx || 0;
+      if (mode === 'pic') {
+        // 图片模式：用原版 3D 立体图素材（18 张）
+        const img = ASSETS.sirds[idx % ASSETS.sirds.length];
+        if (img && img.complete && img.naturalWidth > 0) {
+          drawImageCover(ctx, img, w, h - 20);
+          ctx.font = '14px sans-serif';
+          ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+          ctx.fillStyle = 'rgba(148,163,184,0.9)';
+          ctx.fillText(`3D 立体图 ${(idx % ASSETS.sirds.length) + 1}/${ASSETS.sirds.length} · 视线平行，注视图后方虚像 · 点击换图`, w / 2, h - 14);
+        } else {
+          draw3D(ctx, w, h, 'pic', this.mandalaSeed, this.elapsed);
+          ctx.fillText('视线平行，注视图后方虚像', w / 2, h - 14);
+        }
+      } else if (mode === 'txt') {
+        // 文字模式：用原版 3D 文字素材（等宽字体渲染 ASCII 纹理）
+        const txtUrl = ASSETS.sirdsTxt[idx % ASSETS.sirdsTxt.length];
+        if (this.sirdsTxtCache && this.sirdsTxtCache.url === txtUrl && this.sirdsTxtCache.text) {
+          this._drawSirdsTxt(ctx, w, h, this.sirdsTxtCache.text, idx);
+        } else {
+          const that = this;
+          fetch(txtUrl).then(r => r.text()).then(t => {
+            that.sirdsTxtCache = { url: txtUrl, text: t };
+            if (that.training && that.training.type === 'card3d') that.draw();
+          }).catch(() => {});
+          ctx.fillStyle = 'rgba(148,163,184,0.6)';
+          ctx.font = '14px sans-serif';
+          ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+          ctx.fillText('加载 3D 文字中…', w / 2, h / 2);
+        }
+      } else {
+        // 动画模式：程序生成 SIRDS + 移动小球
+        draw3D(ctx, w, h, 'anim', this.mandalaSeed, this.elapsed);
+        ctx.font = '14px sans-serif';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+        ctx.fillStyle = 'rgba(148,163,184,0.9)';
+        ctx.fillText('凝视三维图同时观察移动小球 · 点击换图', w / 2, h - 14);
+      }
+    }
+
+    /* 3D 文字：等宽字体渲染 ASCII 纹理（SIRDS 文本模式） */
+    _drawSirdsTxt(ctx, w, h, text, idx) {
+      const lines = text.split(/\r?\n/).filter(l => l.trim().length > 0);
+      if (!lines.length) return;
+      const maxLen = Math.max(...lines.map(l => l.length));
+      const fs = Math.min(w / maxLen * 1.15, h / lines.length * 1.6);
+      ctx.fillStyle = '#8a4a2f';
+      ctx.font = `${fs}px "Courier New", monospace`;
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      const totalH = lines.length * fs * 1.15;
+      let y0 = (h - totalH) / 2;
+      for (const line of lines) {
+        const lw = line.length * fs * 0.62;
+        ctx.fillText(line, (w - lw) / 2, y0 + fs * 0.5);
+        y0 += fs * 1.15;
+      }
+      ctx.fillStyle = 'rgba(148,163,184,0.9)';
       ctx.font = '14px sans-serif';
       ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
-      ctx.fillStyle = 'rgba(148,163,184,0.9)';
-      ctx.fillText('视线平行，注视图后方虚像', w / 2, h - 14);
+      ctx.fillText(`3D 文字 ${(idx % ASSETS.sirdsTxt.length) + 1}/${ASSETS.sirdsTxt.length} · 视线平行看立体 · 点击换图`, w / 2, h - 14);
     }
 
     drawPicView(ctx, w, h) {
       const p = this.params;
-      const cx = w / 2, cy = h / 2;
-      const size = Math.min(w, h) * 0.28;
-      genPattern(ctx, cx, cy, size, this.picIdx + 0.5);
+      // 用原版 1000 大图素材（24 张轮播）
+      const idx = this.picIdx % ASSETS.pics.length;
+      const img = ASSETS.pics[idx];
+      if (img && img.complete && img.naturalWidth > 0) {
+        drawImageCover(ctx, img, w, h - 30);
+      } else {
+        const cx = w / 2, cy = h / 2;
+        const size = Math.min(w, h) * 0.28;
+        genPattern(ctx, cx, cy, size, idx + 0.5);
+      }
+      // 底部进度条
+      ctx.fillStyle = 'rgba(0,0,0,0.55)';
+      ctx.fillRect(0, h - 30, w, 30);
+      ctx.fillStyle = '#fff';
       ctx.font = '14px sans-serif';
-      ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
-      ctx.fillStyle = 'rgba(148,163,184,0.8)';
-      ctx.fillText('图案 ' + (this.picIdx + 1), w / 2, h - 14);
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(`${idx + 1} / ${ASSETS.pics.length} · 集中注意力记住图片内容`, w / 2, h - 15);
     }
 
     drawMemory(ctx, w, h) {
@@ -679,7 +764,11 @@
           const x = ci * cellW, y = cj * cellH;
           const shown = this.memReveal || g.matched;
           if (shown) {
-            genPattern(ctx, x + cellW / 2, y + cellH / 2, Math.min(cellW, cellH) * 0.3, g.seed * 0.7);
+            if (g.img && g.img.complete && g.img.naturalWidth > 0) {
+              drawImageCover(ctx, g.img, cellW - 6, cellH - 6);
+            } else {
+              genPattern(ctx, x + cellW / 2, y + cellH / 2, Math.min(cellW, cellH) * 0.3, g.seed * 0.7);
+            }
           } else {
             ctx.fillStyle = 'rgba(51,65,85,0.3)';
             ctx.fillRect(x + 3, y + 3, cellW - 6, cellH - 6);
@@ -705,7 +794,11 @@
           ctx.fillText('点击任意位置重新开始', w / 2, h / 2 + 26);
         } else if (this.memTarget >= 0) {
           const tg = this.memGrid[this.memTarget];
-          genPattern(ctx, 42, 38, 26, tg.seed * 0.7);
+          if (tg.img && tg.img.complete && tg.img.naturalWidth > 0) {
+            drawImageCover(ctx, tg.img, 52, 52);
+          } else {
+            genPattern(ctx, 42, 38, 26, tg.seed * 0.7);
+          }
           ctx.fillStyle = '#e2e8f0';
           ctx.font = '14px sans-serif';
           ctx.fillText('这张图在哪个位置？点击格子作答', 78, 26);
@@ -804,6 +897,14 @@
         if (!this.running) this.draw();
         return;
       }
+      // 3D 卡：点击换图（图片/文字/动画模式都换）
+      if (t === 'card3d') {
+        this.sirdsIdx = (this.sirdsIdx || 0) + 1;
+        this.sirdsTxtCache = null;
+        Sound.flip();
+        if (!this.running) this.draw();
+        return;
+      }
       if (!this.running) return;
       if (t === 'memory') {
         if (this.memMode === 'pos' && this.memReveal) return;
@@ -884,8 +985,41 @@
     return base;
   }
 
+  /* ---------------- 素材（从原版飞克视读 data 目录复用） ---------------- */
+  const ASSETS = {
+    mandala: [],    // 曼陀罗 M01-M23.jpg
+    picmemory: [],  // 图片位置记忆 PM0001-38.jpg
+    pics: [],       // 1000 大图浏览 PM0001-24.jpg
+    sirds: [],      // 3D 立体图 3D0001-18.jpg
+    sirdsTxt: [],   // 3D 文字 3D0001-16.txt
+  };
+  function preloadAssets() {
+    const make = (n, prefix, pad, ext) => Array.from({ length: n }, (_, i) => {
+      const num = String(i + 1).padStart(pad, '0');
+      const img = new Image();
+      img.src = 'assets/' + prefix + num + ext;
+      return img;
+    });
+    ASSETS.mandala = make(23, 'mandala/M', 2, '.jpg');
+    ASSETS.picmemory = make(38, 'picmemory/PM', 4, '.jpg');
+    ASSETS.pics = make(24, 'pics/PM', 4, '.jpg');
+    ASSETS.sirds = make(18, 'sirds/3D', 4, '.jpg');
+    for (let i = 1; i <= 16; i++) {
+      ASSETS.sirdsTxt.push('assets/sirds-txt/3D' + String(i).padStart(4, '0') + '.txt');
+    }
+  }
+  /* 图片 cover 填充绘制（等比缩放铺满画布） */
+  function drawImageCover(ctx, img, w, h) {
+    const iw = img.naturalWidth, ih = img.naturalHeight;
+    if (!iw || !ih) return;
+    const scale = Math.max(w / iw, h / ih);
+    const dw = iw * scale, dh = ih * scale;
+    ctx.drawImage(img, (w - dw) / 2, (h - dh) / 2, dw, dh);
+  }
+
   /* ---------------- 页面初始化 ---------------- */
   function init() {
+    preloadAssets();
     const canvas = $('#canvas');
     const stage = $('#stage');
     const trainer = new PhotoTrainer({ canvas });
