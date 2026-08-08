@@ -39,14 +39,17 @@ cd mindtrainer && python3 -m http.server 8082
 # 打开 http://127.0.0.1:8082/
 ```
 
-## 生产部署（与 unitale 共用 openresty 容器）
-已配置为 openresty（`unitale` 容器）的 **`/mindtrainer/` 子路径**，与 unitale 根路径隔离：
+## 生产部署（与 unitale 共用 openresty 容器，独立端口）
+已配置为 openresty（`unitale` 容器）的**独立端口**站点，与 unitale 端口完全隔离：
 
-- 访问：`http://192.168.1.5:8081/mindtrainer/`（HTTP）或 `https://192.168.1.5:8443/mindtrainer/`（HTTPS）
-- 实现：`unitale/nginx/nginx.conf` 新增 `location /mindtrainer/`（root 指向容器 `/usr/share/nginx/mindtrainer`）；`unitale/nginx/start.sh` 挂载 `~/githome/mindtrainer -> /usr/share/nginx/mindtrainer:ro`
-- 页面内绝对链接已统一加 `/mindtrainer/` 前缀（318 处）；speed-read 用相对路径天然兼容子路径
-- 更新部署：改完代码后只需 `docker restart unitale`（nginx.conf 改动需 `cd unitale && ./nginx/start.sh start` 重建以刷新挂载）
-- HTTPS 提供安全上下文，速读训练的「读取剪贴板」可用
+| 站点 | HTTP | HTTPS |
+|---|---|---|
+| unitale | `http://192.168.1.5:8081` | `https://192.168.1.5:8443` |
+| **MindTrainer** | `http://192.168.1.5:8082` | `https://192.168.1.5:8444` |
+
+- 实现：`unitale/nginx/nginx.conf` 新增独立 `server` 块（listen 8082 / 8444 ssl，root 指向容器 `/usr/share/nginx/mindtrainer`）；`unitale/nginx/start.sh` 挂载 `~/githome/mindtrainer -> /usr/share/nginx/mindtrainer:ro` 并映射 `-p 8082:8082 -p 8444:8444`
+- HTTPS（8444）提供安全上下文，速读训练的「读取剪贴板」可用
+- 更新部署：改完代码后 `docker restart unitale` 即可（nginx.conf 改动需 `cd unitale && ./nginx/start.sh start` 重建刷新挂载）
 
 ## 目录结构
 ```
