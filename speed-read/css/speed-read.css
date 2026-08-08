@@ -1,0 +1,169 @@
+/* ============================================================
+ * MindTrainer — 飞克视读 Web 重写 · 训练区样式
+ * 页面框架沿用 PickTests 浅色风格；训练舞台为深色沉浸式
+ * ============================================================ */
+
+/* ---------- 训练中心（speed-read/index.html） ---------- */
+.sr-hero {
+  padding: 72px 20px 40px;
+  text-align: center;
+}
+.sr-hero h1 {
+  font-size: clamp(34px, 5vw, 52px);
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: -0.025em;
+  margin-bottom: 12px;
+}
+.sr-hero p { color: #64748b; font-size: 17px; }
+
+.sr-module-grid {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 10px 20px 60px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 18px;
+}
+.sr-module-card {
+  display: block;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 22px;
+  text-decoration: none;
+  color: inherit;
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+}
+.sr-module-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgb(15 23 42 / 10%);
+  border-color: #b7c4d8;
+}
+.sr-module-card .sr-module-icon { font-size: 30px; display: block; margin-bottom: 10px; }
+.sr-module-card h3 { font-size: 18px; margin: 0 0 6px; color: #0f172a; }
+.sr-module-card p { margin: 0; font-size: 14px; line-height: 1.55; color: #64748b; }
+.sr-module-card .sr-module-count {
+  display: inline-block; margin-top: 12px; font-size: 12px; color: #475569;
+  background: #f1f5f9; border-radius: 999px; padding: 3px 10px;
+}
+
+/* ---------- 训练页布局 ---------- */
+.sr-layout {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 28px 20px 60px;
+  display: grid;
+  grid-template-columns: 240px 1fr 260px;
+  gap: 18px;
+  align-items: start;
+}
+.sr-list-panel, .sr-param-panel {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 14px;
+}
+.sr-list-panel h2, .sr-param-panel h2 {
+  font-size: 13px; font-weight: 700; color: #94a3b8;
+  text-transform: uppercase; letter-spacing: .06em;
+  margin: 4px 4px 10px;
+}
+.sr-train-list { display: flex; flex-direction: column; gap: 2px; max-height: 70vh; overflow-y: auto; }
+.sr-train-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 10px; border-radius: 8px; cursor: pointer;
+  font-size: 14px; color: #334155; border: 0; background: transparent;
+  text-align: left; width: 100%;
+}
+.sr-train-item:hover { background: #f1f5f9; }
+.sr-train-item.active { background: #0f172a; color: #fff; }
+.sr-train-item .sr-train-num {
+  font-size: 11px; color: #94a3b8; min-width: 18px;
+}
+.sr-train-item.active .sr-train-num { color: #cbd5e1; }
+
+.sr-stage-wrap { min-width: 0; }
+.sr-stage {
+  position: relative;
+  background: #0b0f14;
+  border-radius: 14px;
+  overflow: hidden;
+  aspect-ratio: 16 / 10;
+  min-height: 420px;
+}
+.sr-stage canvas { display: block; width: 100%; height: 100%; }
+.sr-stage-hint {
+  position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+  color: rgb(148 163 184 / 70%); font-size: 12px; white-space: nowrap;
+  pointer-events: none;
+}
+
+/* ---------- 参数面板 ---------- */
+.sr-params { display: flex; flex-direction: column; gap: 10px; }
+.sr-param-row { display: flex; flex-direction: column; gap: 4px; }
+.sr-param-label { font-size: 12px; color: #64748b; }
+.sr-param-ctl { display: flex; align-items: center; gap: 8px; }
+.sr-param-ctl input[type="range"] { flex: 1; accent-color: #0f172a; }
+.sr-param-ctl input[type="color"] { width: 100%; height: 30px; border: 0; padding: 0; background: none; cursor: pointer; }
+.sr-param-ctl input[type="text"] {
+  width: 100%; padding: 5px 8px; border: 1px solid #e2e8f0; border-radius: 6px;
+  font-size: 13px;
+}
+.sr-param-ctl input[type="checkbox"] { width: 18px; height: 18px; accent-color: #0f172a; }
+.sr-param-ctl select {
+  width: 100%; padding: 5px 8px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 13px;
+}
+.sr-param-val { font-size: 12px; color: #475569; min-width: 28px; text-align: right; }
+
+/* ---------- 控制条 ---------- */
+.sr-control-bar {
+  display: flex; align-items: center; gap: 10px;
+  margin-top: 14px; flex-wrap: wrap;
+}
+.sr-btn {
+  padding: 9px 16px; border-radius: 9px; border: 1px solid #e2e8f0;
+  background: #fff; color: #0f172a; font-size: 14px; font-weight: 600;
+  cursor: pointer; transition: background .12s ease, transform .05s ease;
+}
+.sr-btn:hover { background: #f1f5f9; }
+.sr-btn:active { transform: scale(.97); }
+.sr-btn-start { background: #0f172a; color: #fff; border-color: #0f172a; }
+.sr-btn-start:hover { background: #1e293b; }
+.sr-state {
+  margin-left: auto; display: flex; gap: 14px;
+  font-size: 13px; color: #475569; font-variant-numeric: tabular-nums;
+}
+
+/* ---------- 训练内文字/状态 ---------- */
+.sr-inline-status {
+  position: absolute; top: 12px; left: 14px; right: 14px;
+  display: flex; justify-content: space-between;
+  color: rgb(148 163 184 / 65%); font-size: 12px;
+  pointer-events: none;
+}
+
+/* 训练方法说明 */
+.sr-method {
+  margin-top: 14px; padding: 12px 14px;
+  background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px;
+  font-size: 13px; line-height: 1.7; color: #475569;
+}
+.sr-method b { color: #0f172a; }
+
+/* ---------- 响应式 ---------- */
+@media (max-width: 1024px) {
+  .sr-layout { grid-template-columns: 1fr; }
+  .sr-list-panel { order: 2; }
+  .sr-list-panel h2, .sr-param-panel h2 { margin-top: 4px; }
+  .sr-train-list { max-height: none; flex-direction: row; flex-wrap: wrap; }
+  .sr-train-item { width: auto; }
+}
+@media (max-width: 640px) {
+  .sr-stage { aspect-ratio: auto; min-height: 320px; }
+  .sr-param-panel { order: 3; }
+}
+
+/* 冥想页特殊 */
+.sr-meditation-stage { aspect-ratio: 16 / 9; min-height: 480px; }
+.sr-meditation-stage canvas { width: 100%; height: 100%; display: block; }

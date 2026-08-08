@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>飞克视读训练中心 – MindTrainer 速读训练</title>
+    <meta name="description" content="速读训练与右脑开发训练中心：基础训练 26 项、闪视训练、速读训练、照相记忆、冥想、训练计划。用 Web 技术完整重写飞克视读。">
+    <link rel="icon" type="image/png" sizes="32x32" href="../assets/images/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../assets/images/icons/favicon-16x16.png">
+    <link rel="stylesheet" href="../assets/css/global.min.css">
+    <link rel="stylesheet" href="../assets/css/style.min.css">
+    <link rel="stylesheet" href="css/speed-read.css">
+</head>
+<body>
+<header>
+    <div class="header-left-box">
+        <div class="header-left-content-box">
+            <a href="../">
+                <div class="header-mark-box">MindTrainer</div>
+            </a>
+        </div>
+    </div>
+    <div class="header-center-box">
+        <img alt="MindTrainer logo" src="../assets/images/logo.png" width="192" height="192" decoding="async">
+    </div>
+    <div class="header-right-box">
+        <div class="header-right-content-box">
+            <nav class="nav-links" aria-label="Main navigation">
+                <a href="../">认知测试</a>
+                <a href="index.html" aria-current="page">速读训练</a>
+                <a href="#modules">训练模块</a>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<main>
+    <section class="sr-hero">
+        <h1>飞克视读 · 速读训练中心</h1>
+        <p>原「飞克视读」速读与右脑开发训练软件，用 Web 技术完整重写。一目十行，过目不忘。</p>
+    </section>
+
+    <section id="modules" class="sr-module-grid">
+        <a class="sr-module-card" href="basic.html">
+            <span class="sr-module-icon">👁️</span>
+            <h3>基础训练</h3>
+            <p>视野扩展与眼球运动训练：发散箭头、扩大方框、左右/上下/四周拓宽、移动路线、定点凝视等。</p>
+            <span class="sr-module-count">26 项训练</span>
+        </a>
+        <a class="sr-module-card" href="flash.html">
+            <span class="sr-module-icon">⚡</span>
+            <h3>闪视训练</h3>
+            <p>数字/字母/汉字/组合/文章/图片快速闪现，训练短时记忆，附测试题与回放，抑制音读。</p>
+            <span class="sr-module-count">7 项训练</span>
+        </a>
+        <a class="sr-module-card" href="speed.html">
+            <span class="sr-module-icon">📖</span>
+            <h3>速读训练</h3>
+            <p>字块移动、视野扩展、阅读训练、实战训练（模拟书刊排版），眼停眼跳节奏控制。</p>
+            <span class="sr-module-count">4 大模块</span>
+        </a>
+        <a class="sr-module-card" href="photo.html">
+            <span class="sr-module-icon">🧠</span>
+            <h3>照相记忆</h3>
+            <p>黄卡残像、三色卡、曼陀罗卡、3D 卡、图片浏览、找同训练、位置记忆、瞬间计算。</p>
+            <span class="sr-module-count">8 项训练</span>
+        </a>
+        <a class="sr-module-card" href="meditation.html">
+            <span class="sr-module-icon">🌙</span>
+            <h3>冥想训练</h3>
+            <p>双脑同步声频（双耳节拍）、呼吸引导与曼陀罗动画，激活右脑，放松身心。</p>
+            <span class="sr-module-count">3.0 新增</span>
+        </a>
+        <a class="sr-module-card" href="plan.html">
+            <span class="sr-module-icon">🗓️</span>
+            <h3>训练计划</h3>
+            <p>自定义训练步骤与时长，一键按序执行整套训练教程。</p>
+            <span class="sr-module-count">自定义</span>
+        </a>
+    </section>
+</main>
+
+<footer>
+    <div class="footer-center-box">
+        <div class="footer-center-content-box">
+            <p>
+                <span class="footer-brand-line">&copy;&nbsp;<span id="currentYear"></span>&nbsp;MindTrainer · 飞克视读 Web 重写版</span>
+                <span class="footer-link-line">
+                    <a href="../about/">关于</a>
+                    <a href="index.html">速读训练</a>
+                    <a href="../">认知测试</a>
+                </span>
+            </p>
+        </div>
+    </div>
+</footer>
+
+<script src="../assets/js/global.min.js" defer></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const y = document.getElementById('currentYear');
+    if (y) y.textContent = new Date().getFullYear();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>冥想训练 – 飞克视读训练中心</title>
+    <meta name="description" content="冥想训练：双脑同步声频（双耳节拍）、呼吸引导与曼陀罗动画，激活右脑，放松身心。">
+    <link rel="icon" type="image/png" sizes="32x32" href="../assets/images/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../assets/images/icons/favicon-16x16.png">
+    <link rel="stylesheet" href="../assets/css/global.min.css">
+    <link rel="stylesheet" href="../assets/css/style.min.css">
+    <link rel="stylesheet" href="css/speed-read.css">
+    <style>
+        .wave-panel { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+        .wave-btn { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 10px 14px; border-radius: 10px; }
+        .wave-btn small { font-size: 11px; color: #94a3b8; font-weight: 400; }
+        .wave-btn.active { background: #0f172a; color: #fff; border-color: #0f172a; }
+        .wave-btn.active small { color: #cbd5e1; }
+    </style>
+</head>
+<body>
+<header>
+    <div class="header-left-box">
+        <div class="header-left-content-box">
+            <a href="../">
+                <div class="header-mark-box">MindTrainer</div>
+            </a>
+        </div>
+    </div>
+    <div class="header-center-box">
+        <img alt="MindTrainer logo" src="../assets/images/logo.png" width="192" height="192" decoding="async">
+    </div>
+    <div class="header-right-box">
+        <div class="header-right-content-box">
+            <nav class="nav-links" aria-label="Main navigation">
+                <a href="../">认知测试</a>
+                <a href="index.html">速读训练</a>
+                <a href="basic.html">基础训练</a>
+                <a href="flash.html">闪视</a>
+                <a href="speed.html">速读</a>
+                <a href="photo.html">照相记忆</a>
+                <a href="meditation.html" aria-current="page">冥想</a>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<main>
+    <section class="sr-hero" id="sr-hero">
+        <h1>冥想训练</h1>
+        <p>双脑同步声频（双耳节拍）· 呼吸引导 · 曼陀罗动画——放松身心，激活右脑。</p>
+    </section>
+
+    <div class="sr-layout">
+        <aside class="sr-list-panel">
+            <h2>脑波档位</h2>
+            <div class="wave-panel" id="wavePanel"></div>
+            <div class="sr-method">
+                <b>使用方法：</b>佩戴耳机，选择脑波档位，跟随呼吸节奏（吸气→屏息→呼气）。建议每天 10-20 分钟。
+            </div>
+        </aside>
+
+        <div class="sr-stage-wrap">
+            <div class="sr-stage sr-meditation-stage" id="stage">
+                <canvas id="canvas"></canvas>
+                <div class="sr-stage-hint">佩戴耳机效果最佳 · 点击页面任意处可恢复声音</div>
+            </div>
+            <div class="sr-control-bar" id="controls"></div>
+        </div>
+
+        <aside class="sr-param-panel">
+            <h2>参数设置</h2>
+            <div id="paramPanel"></div>
+        </aside>
+    </div>
+</main>
+
+<footer>
+    <div class="footer-center-box">
+        <div class="footer-center-content-box">
+            <p>
+                <span class="footer-brand-line">&copy;&nbsp;<span id="currentYear"></span>&nbsp;MindTrainer · 飞克视读 Web 重写版</span>
+                <span class="footer-link-line">
+                    <a href="../about/">关于</a>
+                    <a href="index.html">速读训练</a>
+                </span>
+            </p>
+        </div>
+    </div>
+</footer>
+
+<script src="../assets/js/global.min.js" defer></script>
+<script src="js/sr-common.js" defer></script>
+<script src="js/sr-meditation.js" defer></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const y = document.getElementById('currentYear');
+    if (y) y.textContent = new Date().getFullYear();
+});
+</script>
+</body>
+</html>

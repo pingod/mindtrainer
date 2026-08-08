@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>速读训练 – 飞克视读训练中心</title>
+    <meta name="description" content="速读训练 4 大模块：字块移动、视野扩展、阅读训练、实战训练（模拟书刊排版）。">
+    <link rel="icon" type="image/png" sizes="32x32" href="../assets/images/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../assets/images/icons/favicon-16x16.png">
+    <link rel="stylesheet" href="../assets/css/global.min.css">
+    <link rel="stylesheet" href="../assets/css/style.min.css">
+    <link rel="stylesheet" href="css/speed-read.css">
+    <style>
+        .sr-article-select { width: 100%; padding: 7px 9px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 13px; margin-bottom: 8px; }
+        .sr-article-text { width: 100%; box-sizing: border-box; padding: 9px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 13px; resize: vertical; font-family: inherit; }
+        .sr-article-clip { width: 100%; margin-top: 8px; }
+    </style>
+</head>
+<body>
+<header>
+    <div class="header-left-box">
+        <div class="header-left-content-box">
+            <a href="../">
+                <div class="header-mark-box">MindTrainer</div>
+            </a>
+        </div>
+    </div>
+    <div class="header-center-box">
+        <img alt="MindTrainer logo" src="../assets/images/logo.png" width="192" height="192" decoding="async">
+    </div>
+    <div class="header-right-box">
+        <div class="header-right-content-box">
+            <nav class="nav-links" aria-label="Main navigation">
+                <a href="../">认知测试</a>
+                <a href="index.html">速读训练</a>
+                <a href="basic.html">基础训练</a>
+                <a href="flash.html">闪视</a>
+                <a href="speed.html" aria-current="page">速读</a>
+                <a href="photo.html">照相记忆</a>
+            </nav>
+        </div>
+    </div>
+</header>
+
+<main>
+    <section class="sr-hero" id="sr-hero">
+        <h1>速读训练</h1>
+        <p>字块移动、视野扩展、阅读训练、实战训练——让眼睛更有效率，让理解更迅速。</p>
+    </section>
+
+    <div class="sr-layout">
+        <aside class="sr-list-panel">
+            <h2>训练模块</h2>
+            <div class="sr-train-list" id="trainList"></div>
+            <div class="sr-method" style="margin-top:12px" id="articlePanel"></div>
+        </aside>
+
+        <div class="sr-stage-wrap">
+            <div class="sr-stage" id="stage">
+                <canvas id="canvas"></canvas>
+                <div class="sr-inline-status">
+                    <span id="statusName"></span>
+                    <span id="statusInfo"></span>
+                </div>
+                <div class="sr-stage-hint">空格 开始/暂停 · ↑↓ 调速 · 文章可自选/粘贴/读取剪贴板 · Esc 退出全屏</div>
+            </div>
+            <div class="sr-control-bar" id="controls"></div>
+            <div class="sr-method" id="methodBox"></div>
+        </div>
+
+        <aside class="sr-param-panel">
+            <h2>参数设置</h2>
+            <div id="paramPanel"></div>
+        </aside>
+    </div>
+</main>
+
+<footer>
+    <div class="footer-center-box">
+        <div class="footer-center-content-box">
+            <p>
+                <span class="footer-brand-line">&copy;&nbsp;<span id="currentYear"></span>&nbsp;MindTrainer · 飞克视读 Web 重写版</span>
+                <span class="footer-link-line">
+                    <a href="../about/">关于</a>
+                    <a href="index.html">速读训练</a>
+                </span>
+            </p>
+        </div>
+    </div>
+</footer>
+
+<script src="../assets/js/global.min.js" defer></script>
+<script src="js/sr-common.js" defer></script>
+<script src="js/sr-speed.js" defer></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const y = document.getElementById('currentYear');
+    if (y) y.textContent = new Date().getFullYear();
+});
+</script>
+</body>
+</html>
