@@ -9,13 +9,13 @@
 
   const TRAININGS = [
     { id: 'tricolor', name: '三色卡片', type: 'tricolor', num: 1,
-      method: '将卡片全部纳入视野，集中注意力目不转睛地注视卡片 30 秒左右，时间到后立即闭眼，眼前出现残像。残像消失后继续睁眼注视。当一种颜色的残像停留时间足够长时，换一种颜色继续练习。' },
+      method: '红黄蓝三色卡片（残像训练）。将卡片全部纳入视野，集中注意力目不转睛地注视卡片 30 秒左右，时间到后立即闭眼，眼前出现该颜色的互补色残像。残像消失后继续睁眼注视。当一种颜色的残像停留时间足够长时，换一种颜色继续练习。' },
     { id: 'geom', name: '几何卡片', type: 'geom', num: 2,
       method: '同三色卡片，注视几何图形产生残像。当一种形状的残像停留时间足够长时，换一种形状继续练习。' },
     { id: 'yellow', name: '黄卡', type: 'yellow', num: 3,
-      method: '集中注意力目不转睛地注视黄卡 30 秒左右，时间到后立即闭眼，眼前出现残像（一般为反色）。此时开动想象力，使反色残像消失，代之以原色图像。每天不间断练习。' },
+      method: '标准黄卡：黄色卡片，中心为蓝色圆点。集中注意力目不转睛地注视 30 秒左右，时间到后立即闭眼，眼前出现残像——一般为互补色（中心蓝点变黄、黄底变蓝）。此时开动想象力，使反色残像消失，代之以原色图像。此过程的艰难程度视个人情况而定；熟练后可有意识地改变残像的形状和颜色。每天不间断练习。' },
     { id: 'mandala', name: '曼陀罗卡片', type: 'mandala', num: 4,
-      method: '集中注意力注视卡片 5 秒后立即闭眼 5 秒并单击鼠标，保持原色在眼前更久的停留。睁开眼后观看无填充色的曼陀罗卡片，力求将它的颜色回忆出来。单击屏幕可在填充/不填充间切换。' },
+      method: '曼陀罗卡为红黄蓝绿四色对称图形（有中心点）。集中注意力注视卡片 5 秒后立即闭眼 5 秒并单击鼠标，保持原色在眼前更久的停留。睁开眼后观看无填充色的曼陀罗卡片，力求将它的颜色回忆出来。单击屏幕可在填充/不填充间切换。' },
     { id: 'card3d', name: '3D 卡片', type: 'card3d', num: 5,
       method: '尽量用视线平行的方法，注视三维图后方的虚拟物体，将会看到立体的图像。图片练熟后可以改成文字三维继续练习。' },
     { id: 'picview', name: '图片浏览', type: 'picview', num: 6,
@@ -580,13 +580,26 @@
 
     drawYellow(ctx, w, h) {
       const p = this.params;
-      // 原版黄卡：黄色方卡（大卡片）
+      // 标准黄卡（七田真《右脑革命》）：黄色方卡 + 中心蓝色圆点
+      // 残像互补色：中心蓝点变黄、周围黄底变蓝（训练五阶段第一阶段）
       ctx.fillStyle = p.yellow || '#ffaa01';
       ctx.fillRect(w * 0.1, h * 0.1, w * 0.8, h * 0.68);
       ctx.strokeStyle = 'rgba(255,255,255,0.25)';
       ctx.lineWidth = 3;
       ctx.strokeRect(w * 0.1, h * 0.1, w * 0.8, h * 0.68);
+      // 中心蓝色圆点
+      const dotR = Math.min(w, h) * 0.065;
+      ctx.fillStyle = '#0000ff';
+      ctx.beginPath(); ctx.arc(w / 2, h * 0.44, dotR, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,0.45)';
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(w / 2, h * 0.44, dotR, 0, Math.PI * 2); ctx.stroke();
       this.drawCardFrame(ctx, w, h, this.elapsed);
+      // 黄卡专属训练引导（五阶段）
+      ctx.font = '14px sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'bottom';
+      ctx.fillStyle = 'rgba(148,163,184,0.85)';
+      ctx.fillText(`注视 ${Math.max(0, Math.ceil(30 - this.elapsed))} 秒后闭眼：想象蓝点变黄、黄底变蓝（互补色残像）`, w / 2, h - 14);
     }
 
     drawMandala(ctx, w, h) {
