@@ -64,10 +64,15 @@
   margin: 0 auto;
   padding: 28px 20px 60px;
   display: grid;
-  grid-template-columns: 240px 1fr 260px;
+  grid-template-columns: 240px minmax(0, 1fr) 260px;
   gap: 18px;
   align-items: start;
 }
+/* 关键：grid 列默认 minmax(auto,1fr) 会被 canvas 默认宽(300px)/长内容撑开，
+   必须 minmax(0,1fr) + 列容器 min-width:0 才能防横向溢出与列间错位 */
+.sr-list-panel, .sr-param-panel, .sr-stage-wrap { min-width: 0; }
+.sr-stage-wrap { width: 100%; }
+.sr-stage { width: 100%; }
 .sr-list-panel, .sr-param-panel {
   background: #fff;
   border: 1px solid #e2e8f0;
