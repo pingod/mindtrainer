@@ -59,12 +59,12 @@
 /* ---------- 训练页布局 ---------- */
 .sr-layout {
   flex: 0 0 100%;
-  max-width: 1200px;
+  max-width: 1650px;
   box-sizing: border-box;
   margin: 0 auto;
   padding: 28px 20px 60px;
   display: grid;
-  grid-template-columns: 240px minmax(0, 1fr) 260px;
+  grid-template-columns: 220px minmax(0, 1fr) 240px;
   gap: 18px;
   align-items: start;
 }
