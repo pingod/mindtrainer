@@ -32,24 +32,15 @@
     <meta name="twitter:description" content="免费在线测试你的反应速度、瞄准能力、记忆力、专注力和视觉追踪表现。无需注册，选一个测试即可开始。">
     <meta name="twitter:image" content="https://picktests.com/assets/images/og/og-image.png">
 
-    <link rel="stylesheet" href="assets/css/global.min.css?v=20260813">
-    <link rel="stylesheet" href="assets/css/style.min.css?v=20260813">
+    <link rel="stylesheet" href="assets/css/global.min.css?v=20260814">
+    <link rel="stylesheet" href="assets/css/style.min.css?v=20260814">
 
     <style>
-        /* main 是 flex+wrap，banner 必须占满整行 */
-        .speed-reading-banner { flex: 0 0 1200px; max-width: 1200px; padding: 8px 20px 0; box-sizing: border-box; }
-        .speed-reading-entry {
-            display: block; text-decoration: none;
-            background: linear-gradient(120deg, #0f172a, #1e3a8a);
-            border-radius: 14px; padding: 18px 22px;
-            transition: transform .15s ease, box-shadow .15s ease;
-        }
-        .speed-reading-entry:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgb(15 23 42 / 22%); }
-        .speed-reading-copy { display: flex; flex-direction: column; gap: 4px; }
-        .speed-reading-copy strong { color: #fff; font-size: 17px; }
-        .speed-reading-copy span { color: rgb(203 213 225 / .85); font-size: 13px; }
+        /* 飞克视读：与「人类基准测试」同款独立框 */
+        .speed-reading-section { flex: 0 0 1200px; max-width: 1200px; box-sizing: border-box; padding-top: 56px; padding-bottom: 56px; margin-bottom: 0; }
+        .speed-entry-card { grid-column: 1 / -1; min-height: 148px; }
     </style>
-    <script src="/assets/js/mt-nav.js?v=20260813" defer></script>
+    <script src="/assets/js/mt-nav.js?v=20260814" defer></script>
 </head>
 <body>
 <header id="mt-header"></header>
@@ -64,12 +55,16 @@
         </div>
     </section>
 
-    <section class="speed-reading-banner">
-        <div class="common-container">
-            <a class="speed-reading-entry" href="speed-read/">
-                <span class="speed-reading-copy">
-                    <strong>⚡ 速读训练中心 · 飞克视读 Web 重写版</strong>
-                    <span>基础训练 26 项 · 闪视 · 速读 · 照相记忆 · 冥想 · 训练计划</span>
+    <section class="main-tests speed-reading-section" aria-label="速读训练中心">
+        <div class="test-directory-heading">
+            <h2>⚡ 速读训练中心 · 飞克视读 Web 重写版</h2>
+            <p>基础训练 26 项 · 闪视 · 速读 · 照相记忆 · 冥想 · 训练计划</p>
+        </div>
+        <div class="test-directory-grid">
+            <a class="test-entry-card speed-entry-card" href="speed-read/" aria-label="打开速读训练中心">
+                <span class="test-entry-copy">
+                    <strong>进入速读训练中心</strong>
+                    <span>字块闪视 · 视野扩展 · 阅读训练 · 实战训练 · 照相记忆 · 冥想</span>
                 </span>
             </a>
         </div>
@@ -77,7 +72,7 @@
 
     <section id="tests" class="main-tests">
         <div class="test-directory-heading">
-            <h2>人类基准测试</h2>
+            <h2>Mind基准测试</h2>
             <p>每项测试只关注一种能力，完成后留下清楚的结果。</p>
         </div>
 
@@ -223,7 +218,7 @@
     </div>
 </footer>
 
-<script src="assets/js/global.min.js?v=20260813" defer></script>
+<script src="assets/js/global.min.js?v=20260814" defer></script>
 
 
 
