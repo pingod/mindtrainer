@@ -19,7 +19,6 @@
       { label: '斯特鲁普', href: '/stroop-test/' }
     ]},
     { label: '飞克视读', children: [
-      { label: '训练中心', href: '/speed-read/' },
       { label: '基础训练', href: '/speed-read/basic.html' },
       { label: '闪视训练', href: '/speed-read/flash.html' },
       { label: '速读训练', href: '/speed-read/speed.html' },
