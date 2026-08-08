@@ -96,6 +96,8 @@
     '  opacity:0;visibility:hidden;transition:opacity .16s ease,transform .16s ease,visibility .16s;z-index:20480;flex-direction:column;}',
     '.mt-dropdown-panel::before{content:"";position:absolute;top:-5px;left:50%;transform:translateX(-50%) rotate(45deg);',
     '  width:10px;height:10px;background:rgba(255,255,255,.95);border-left:1px solid rgba(226,232,240,.85);border-top:1px solid rgba(226,232,240,.85);}',
+    /* hover 桥：覆盖按钮与面板之间的 10px 缝隙，鼠标移过缝隙时 hover 不中断 */
+    '.mt-dropdown-panel::after{content:"";position:absolute;top:-10px;left:0;right:0;height:10px}',
     '.mt-dropdown:hover .mt-dropdown-panel,.mt-dropdown.open .mt-dropdown-panel{display:flex;opacity:1;visibility:visible;transform:translateX(-50%) translateY(0)}',
     '.mt-sub{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;font-size:14px;color:#334155;',
     '  text-decoration:none;white-space:nowrap;transition:background .12s ease,color .12s ease;font-weight:500}',
