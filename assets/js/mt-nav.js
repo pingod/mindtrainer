@@ -107,15 +107,11 @@
     '.mt-sub-active{background:rgba(99,102,241,.1);color:#4f46e5;font-weight:700}',
     '.mt-sub-active .mt-sub-dot{background:#6366f1}',
     /* CTA 按钮 */
-    '.mt-cta{flex-shrink:0;display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border-radius:999px;',
     '  font-size:14px;font-weight:700;color:#fff;text-decoration:none;',
     '  background:linear-gradient(120deg,#0f172a,#1e293b);',
     '  box-shadow:0 8px 20px -8px rgba(15,23,42,.5);transition:transform .12s ease,box-shadow .2s ease;}',
-    '.mt-cta:hover{transform:translateY(-1px);box-shadow:0 12px 26px -8px rgba(15,23,42,.55)}',
-    '.mt-cta:active{transform:scale(.97)}',
     /* 响应式 */
     '@media (max-width:900px){#mt-header{padding:0 16px}.mt-menu{gap:2px}.mt-menu-link,.mt-menu-btn{padding:8px 10px;font-size:13.5px}.mt-brand-text{font-size:16px}}',
-    '@media (max-width:640px){.mt-brand-text{display:none}.mt-cta{padding:9px 14px;font-size:13px}.mt-menu{margin-right:8px}}'
   ].join('\n');
   document.head.appendChild(style);
 
@@ -126,7 +122,6 @@
     '<span class="mt-brand-text">MindTrainer</span>' +
     '</a>' +
     '<nav class="mt-menu" aria-label="主导航">' + itemsHtml + '</nav>' +
-    '<a class="mt-cta" href="/speed-read/">开始训练 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"></path></svg></a>';
 
   /* 下拉菜单防抖关闭：mouseenter 打开、mouseleave 延迟 250ms 关闭，
    * 快速或斜向移动鼠标时有缓冲，不会中途自动关闭（配合 CSS hover 桥） */
