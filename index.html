@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Mind 认知基准测试与速读训练</title>
+    <script type="importmap">
+    { "imports": { "three": "/vendor/three.module.min.js" } }
+    </script>
 
     <meta name="description" content="6 项认知基准测试：反应时间、瞄准、序列记忆、数字记忆、多物体追踪、斯特鲁普；另有速读、闪视、照相记忆、冥想等训练。选一个即可开始。">
 
@@ -32,20 +35,33 @@
     <meta name="twitter:description" content="6 项认知基准测试：反应时间、瞄准、序列记忆、数字记忆、多物体追踪、斯特鲁普；另有速读、闪视、照相记忆、冥想等训练。">
     <meta name="twitter:image" content="https://picktests.com/assets/images/og/og-image.png">
 
-    <link rel="stylesheet" href="assets/css/global.min.css?v=20260830">
-    <link rel="stylesheet" href="assets/css/style.min.css?v=20260830">
+    <link rel="stylesheet" href="assets/css/global.min.css?v=20260832">
+    <link rel="stylesheet" href="assets/css/style.min.css?v=20260832">
 
     <style>
+        /* hero 3D：深色场景 + 内容浮层（Three.js） */
+        .hero {
+            position: relative; overflow: hidden; isolation: isolate;
+            display: flex; align-items: center;
+            background: linear-gradient(160deg, #0b0f14 0%, #131a2e 55%, #1a1030 100%);
+            min-height: 460px;
+        }
+        #hero3d { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; display: block; }
+        .hero-content { position: relative; z-index: 1; padding: 48px 20px; }
+        .hero-content h1 { color: #f1f5f9; }
+        .hero-subtitle { color: rgba(226,232,240,.88); }
+        .hero-subtitle a { color: #a5b4fc; }
         /* 飞克视读：与「Mind基准测试」同款独立框 */
         .speed-reading-section { flex: 0 0 1200px; max-width: 1200px; box-sizing: border-box; padding-top: 56px; padding-bottom: 56px; margin-bottom: 0; }
     </style>
-    <script src="/assets/js/mt-nav.js?v=20260830" defer></script>
+    <script src="/assets/js/mt-nav.js?v=20260832" defer></script>
 </head>
 <body>
 <header id="mt-header"></header>
 
 <main>
     <section class="hero">
+        <canvas id="hero3d" aria-hidden="true"></canvas>
         <div class="common-container">
             <div class="hero-content">
                 <h1><span class="hero-title-text">选一个测试</span></h1>
@@ -249,7 +265,8 @@
     </div>
 </footer>
 
-<script src="assets/js/global.min.js?v=20260830" defer></script>
+<script src="assets/js/global.min.js?v=20260832" defer></script>
+<script type="module" src="assets/js/hero-3d.js?v=20260832"></script>
 
 
 
