@@ -16,28 +16,29 @@ import * as THREE from 'three';
   const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
   camera.position.set(0, 0, 8);
 
-  /* 灯光：紫 + 蓝双点光 + 环境光（浅色背景需更亮） */
-  const amb = new THREE.AmbientLight(0xffffff, 0.55);
-  const key = new THREE.PointLight(0x8b5cf6, 70, 30);
+  /* 灯光：红主光 + 白光（samsy 红黑风格） */
+  const amb = new THREE.AmbientLight(0xffffff, 0.5);
+  const key = new THREE.PointLight(0xff0033, 90, 30);
   key.position.set(4, 3, 5);
-  const rim = new THREE.PointLight(0x6366f1, 50, 30);
+  const rim = new THREE.PointLight(0xffffff, 35, 30);
   rim.position.set(-4, -2, -3);
   scene.add(amb, key, rim);
 
-  /* 中央：金属环面结 + 线框叠加（深紫，浅色背景可见） */
+  /* 中央：金属环面结（亮红）+ 线框叠加 */
   const knotGeo = new THREE.TorusKnotGeometry(1.1, 0.34, 140, 18);
   const knot = new THREE.Mesh(knotGeo, new THREE.MeshStandardMaterial({
-    color: 0x7c3aed, metalness: 0.7, roughness: 0.28, emissive: 0x4c1d95
+    color: 0xff0033, metalness: 0.65, roughness: 0.3, emissive: 0x7f0019
   }));
   scene.add(knot);
   const wire = new THREE.Mesh(knotGeo, new THREE.MeshBasicMaterial({
-    color: 0x6d28d9, wireframe: true, transparent: true, opacity: 0.28
+    color: 0xff4d66, wireframe: true, transparent: true, opacity: 0.32
   }));
   scene.add(wire);
 
-  /* 粒子星云：球壳分布（深紫，浅色背景可见） */
+  /* 粒子星云：红 + 白混合 */
   const N = 700;
   const pos = new Float32Array(N * 3);
+  const col = new Float32Array(N * 3);
   for (let i = 0; i < N; i++) {
     const r = 3 + Math.random() * 4;
     const theta = Math.random() * Math.PI * 2;
@@ -45,22 +46,27 @@ import * as THREE from 'three';
     pos[i * 3] = r * Math.sin(phi) * Math.cos(theta);
     pos[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
     pos[i * 3 + 2] = r * Math.cos(phi);
+    const isRed = Math.random() < 0.55;
+    col[i * 3] = isRed ? 1 : 1;
+    col[i * 3 + 1] = isRed ? 0 : 1;
+    col[i * 3 + 2] = isRed ? 0.2 : 1;
   }
   const starGeo = new THREE.BufferGeometry();
   starGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  starGeo.setAttribute('color', new THREE.BufferAttribute(col, 3));
   const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({
-    color: 0x6d28d9, size: 0.06, transparent: true, opacity: 0.7
+    vertexColors: true, size: 0.06, transparent: true, opacity: 0.85
   }));
   scene.add(stars);
 
-  /* 漂浮小几何体（环 + 多面体交替，深色） */
+  /* 漂浮小几何体（红/粉） */
   const floaters = [];
   for (let i = 0; i < 6; i++) {
     const geo = i % 2 ? new THREE.IcosahedronGeometry(0.22, 0) : new THREE.OctahedronGeometry(0.22, 0);
     const m = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({
-      color: i % 2 ? 0x4f46e5 : 0xdb2777,
-      metalness: 0.6, roughness: 0.3,
-      emissive: i % 2 ? 0x312e81 : 0x831843
+      color: i % 2 ? 0xff0033 : 0xff4d66,
+      metalness: 0.55, roughness: 0.35,
+      emissive: i % 2 ? 0x7f0019 : 0x99222e
     }));
     const a = (i / 6) * Math.PI * 2;
     m.position.set(Math.cos(a) * 2.6, Math.sin(a) * 1.4 - 0.5, (Math.random() - 0.5) * 1.5);
