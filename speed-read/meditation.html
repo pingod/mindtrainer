@@ -40,8 +40,6 @@
         <div class="sr-stage-wrap">
             <div class="sr-stage sr-meditation-stage" id="stage">
                 <canvas id="canvas"></canvas>
-                <div class="sr-breath-label" id="breathLabel"></div>
-                <div class="sr-meditation-status" id="statusInfo"></div>
                 <div class="sr-stage-hint">佩戴耳机效果最佳 · 点击页面任意处可恢复声音</div>
             </div>
             <div class="sr-control-bar" id="controls"></div>
@@ -68,12 +66,9 @@
     </div>
 </footer>
 
-<script type="importmap">
-{ "imports": { "three": "../vendor/three.module.min.js" } }
-</script>
-<script src="../assets/js/global.min.js?v=20260829" defer></script>
-<script src="js/sr-common.js?v=20260829" defer></script>
-<script type="module" src="js/sr-meditation.js?v=20260829"></script>
+<script src="../assets/js/global.min.js?v=20260821" defer></script>
+<script src="js/sr-common.js?v=20260821" defer></script>
+<script src="js/sr-meditation.js?v=20260821" defer></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const y = document.getElementById('currentYear');
