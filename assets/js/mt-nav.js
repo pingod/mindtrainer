@@ -111,21 +111,6 @@
     '  box-shadow:0 8px 20px -8px rgba(15,23,42,.5);transition:transform .12s ease,box-shadow .2s ease;}',
     /* 响应式 */
     '@media (max-width:900px){#mt-header{padding:0 16px}.mt-menu{gap:2px}.mt-menu-link,.mt-menu-btn{padding:8px 10px;font-size:13.5px}.mt-brand-text{font-size:16px}}',
-    /* 黑红主题（samsy）：body[data-mt-dark] 时覆盖（首页） */
-    'body[data-mt-dark] #mt-header{background:rgba(10,10,10,.82);border-bottom:1px solid rgba(255,0,51,.22);box-shadow:0 1px 2px rgba(0,0,0,.6),0 12px 32px -16px rgba(0,0,0,.8);}',
-    'body[data-mt-dark] .mt-brand-icon{background:linear-gradient(135deg,#ff0033,#ff4d66);box-shadow:0 6px 16px -6px rgba(255,0,51,.6);}',
-    'body[data-mt-dark] .mt-brand-text{background:linear-gradient(120deg,#fff,#ff0033);-webkit-background-clip:text;background-clip:text;color:transparent;}',
-    'body[data-mt-dark] .mt-menu-link,body[data-mt-dark] .mt-menu-btn{color:rgba(255,255,255,.78);}',
-    'body[data-mt-dark] .mt-menu-link:hover,body[data-mt-dark] .mt-menu-btn:hover{background:rgba(255,0,51,.14);color:#fff;}',
-    'body[data-mt-dark] .mt-menu-link.mt-active,body[data-mt-dark] .mt-menu-btn.mt-active,body[data-mt-dark] .mt-menu-item.mt-active .mt-menu-btn{color:#ff0033;background:rgba(255,0,51,.1);}',
-    'body[data-mt-dark] .mt-dropdown-panel{background:rgba(16,16,18,.94);border:1px solid rgba(255,255,255,.1);box-shadow:0 18px 48px -12px rgba(0,0,0,.7);}',
-    'body[data-mt-dark] .mt-dropdown-panel::before{background:rgba(16,16,18,.95);border-left:1px solid rgba(255,255,255,.1);border-top:1px solid rgba(255,255,255,.1);}',
-    'body[data-mt-dark] .mt-sub{color:rgba(255,255,255,.78);}',
-    'body[data-mt-dark] .mt-sub:hover{background:rgba(255,0,51,.14);color:#fff;}',
-    'body[data-mt-dark] .mt-sub-active{background:rgba(255,0,51,.16);color:#fff;font-weight:700;}',
-    'body[data-mt-dark] .mt-sub-dot{background:rgba(255,255,255,.35);}',
-    'body[data-mt-dark] .mt-sub:hover .mt-sub-dot,body[data-mt-dark] .mt-sub-active .mt-sub-dot{background:#ff0033;transform:scale(1.3);}',
-    'body[data-mt-dark] .mt-caret{opacity:.7}',
   ].join('\n');
   document.head.appendChild(style);
 

@@ -1,27 +1,28 @@
 /* ============================================================
- * MindTrainer 全局黑红主题（samsy.ninja 风格）— 应用到所有页面
- * 纯黑 #0a0a0a + 亮红 #ff0033 + 白字
+ * MindTrainer 全局浅色主题（高级现代：淡紫蓝粉渐变 + 白玻璃）
+ * 布局保留 samsy 结构（全屏 3D hero + 大字），配色回归浅色
  * 注意：保守覆盖——不动功能色元素（stroop 颜色按钮/aim 目标等）
  * ============================================================ */
 body, html {
-  background-color: #0a0a0a !important;
-  color: #e5e7eb !important;
+  background: linear-gradient(180deg, #f7f6ff 0%, #eef2ff 50%, #fdf4ff 100%) !important;
+  background-color: #f7f6ff !important;
+  color: #1e293b !important;
 }
 
 h1, h2, h3, h4, h5 {
-  color: #ffffff !important;
+  color: #0f172a !important;
 }
 p, li, dd, dt, figcaption, blockquote, label, small {
-  color: rgba(255, 255, 255, .78) !important;
+  color: #526075 !important;
 }
 a {
-  color: #ff0033;
+  color: #6d28d9;
 }
 a:hover {
-  color: #ff4d66;
+  color: #4c1d95;
 }
 
-/* 通用容器：白底卡/面板变深色卡（hero 排除——首页 3D 背景需透明） */
+/* 通用容器：白玻璃卡 */
 main > section:not(.hero),
 main > div,
 article,
@@ -29,45 +30,47 @@ article,
 [class*="-card"],
 [class*="panel"],
 [class*="box"] {
-  background: #101012 !important;
-  border-color: rgba(255, 255, 255, .1) !important;
-  box-shadow: 0 20px 50px -30px rgba(0, 0, 0, .8) !important;
-  color: #e5e7eb;
+  background: rgba(255, 255, 255, .72) !important;
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  border-color: rgba(99, 102, 241, .16) !important;
+  box-shadow: 0 20px 50px -30px rgba(79, 70, 229, .3) !important;
+  color: #1e293b;
 }
 
-/* 输入框/选择器：深色（按钮背景保留功能色） */
+/* 输入框/选择器 */
 input, select, textarea {
-  background: #18181b !important;
-  border-color: rgba(255, 255, 255, .14) !important;
-  color: #fff !important;
+  background: #fff !important;
+  border-color: rgba(99, 102, 241, .22) !important;
+  color: #0f172a !important;
 }
 input::placeholder, textarea::placeholder {
-  color: rgba(255, 255, 255, .4) !important;
+  color: rgba(100, 116, 139, .55) !important;
 }
 
 /* 分割线/表格 */
 hr {
-  border-color: rgba(255, 255, 255, .12) !important;
+  border-color: rgba(99, 102, 241, .15) !important;
 }
 table {
-  color: #e5e7eb;
+  color: #1e293b;
 }
 thead th {
-  background: #161618 !important;
-  color: #fff !important;
+  background: #eef2ff !important;
+  color: #0f172a !important;
 }
 tr:nth-child(even) {
-  background: #101012 !important;
+  background: #f8f8fc !important;
 }
 
 /* 页脚 */
 footer {
-  background: #0a0a0a !important;
-  border-color: rgba(255, 255, 255, .08) !important;
+  background: rgba(255, 255, 255, .72) !important;
+  border-color: rgba(99, 102, 241, .14) !important;
 }
 footer a {
-  color: rgba(255, 255, 255, .7) !important;
+  color: #526075 !important;
 }
 footer a:hover {
-  color: #ff0033 !important;
+  color: #6d28d9 !important;
 }

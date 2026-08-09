@@ -35,104 +35,109 @@
     <meta name="twitter:description" content="6 项认知基准测试：反应时间、瞄准、序列记忆、数字记忆、多物体追踪、斯特鲁普；另有速读、闪视、照相记忆、冥想等训练。">
     <meta name="twitter:image" content="https://picktests.com/assets/images/og/og-image.png">
 
-    <link rel="stylesheet" href="assets/css/global.min.css?v=20260841">
-    <link rel="stylesheet" href="assets/css/style.min.css?v=20260841">
+    <link rel="stylesheet" href="assets/css/global.min.css?v=20260842">
+    <link rel="stylesheet" href="assets/css/style.min.css?v=20260842">
 
     <style>
         /* 全局黑底（samsy 风格） */
-        body, html { background-color: #0a0a0a !important; }
+        body, html { background-color: #f7f6ff !important; }
         main { position: relative; z-index: 1; }
         /* 全屏 3D 背景（samsy 风格：3D 铺满视口，内容滚动叠加） */
         #hero3d { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; display: block; }
         /* 预加载器 */
         #preloader {
-            position: fixed; inset: 0; z-index: 100000; background: #000;
+            position: fixed; inset: 0; z-index: 100000; background: #f7f6ff;
             display: flex; align-items: center; justify-content: center;
             transition: opacity .6s ease;
         }
         #preloader.preloader-hide { opacity: 0; pointer-events: none; }
         .preloader-text {
-            color: #fff; font-size: clamp(22px, 4vw, 44px); font-weight: 800;
+            color: #0f172a; font-size: clamp(22px, 4vw, 44px); font-weight: 800;
             letter-spacing: .25em; text-transform: uppercase; text-indent: .25em;
         }
-        .preloader-text span { color: #f03; }
+        .preloader-text span { color: #6d28d9; }
         /* hero：中央超大标题（samsy 大字排版） */
         .hero {
             position: relative; min-height: 100vh;
             display: flex; align-items: center; justify-content: center;
-            background: none; border: none; overflow: hidden;
+            background:
+                radial-gradient(1100px 560px at 72% -8%, rgba(139,92,246,.16), transparent 60%),
+                radial-gradient(800px 480px at 8% 112%, rgba(99,102,241,.12), transparent 55%),
+                linear-gradient(160deg, #f7f6ff 0%, #eef2ff 50%, #fdf4ff 100%);
+            border: none; overflow: hidden;
         }
         .hero-content { padding: 110px 20px 40px; text-align: center; }
         .hero-content h1 {
-            color: #fff; font-weight: 800; text-transform: uppercase;
+            color: #0f172a; font-weight: 800; text-transform: uppercase;
             font-size: clamp(48px, 9vw, 139px); line-height: 1.04; letter-spacing: .01em;
-            text-shadow: 0 0 90px rgba(255,0,51,.45), 0 2px 40px rgba(0,0,0,.6);
+            text-shadow: 0 0 80px rgba(139,92,246,.35), 0 2px 30px rgba(79,70,229,.18);
             margin-bottom: 22px;
         }
         .hero-title-text {
-            background: none; -webkit-text-fill-color: #fff; color: #fff;
+            background: none; -webkit-text-fill-color: #0f172a; color: #0f172a;
             animation: none;
         }
         .hero-subtitle {
-            color: rgba(255,255,255,.62); max-width: 720px; margin: 0 auto;
+            color: #526075; max-width: 720px; margin: 0 auto;
             font-size: clamp(15px, 1.3vw, 20px); line-height: 1.7;
         }
-        .hero-subtitle a { color: #ff0033; font-weight: 600; text-decoration: none; border-bottom: 1px solid rgba(255,0,51,.4); }
-        .hero-subtitle a:hover { border-bottom-color: #ff0033; }
+        .hero-subtitle a { color: #6d28d9; font-weight: 600; text-decoration: none; border-bottom: 1px solid rgba(109,40,217,.4); }
+        .hero-subtitle a:hover { border-bottom-color: #6d28d9; }
         /* samsy 角标：左上红色徽章（hero 顶部） */
         .samsy-corner {
             position: absolute; top: 76px; left: 28px; z-index: 5; text-align: left;
         }
         .samsy-title-notification {
-            display: inline-block; background: #f03; color: #fff;
+            display: inline-block; background: linear-gradient(135deg,#6d28d9,#8b5cf6); color: #fff;
             padding: 3px 10px; border-radius: 5px; font-size: 12px;
             letter-spacing: .14em; font-weight: 700; margin-bottom: 6px;
         }
         .samsy-title-copy {
-            display: block; color: #fff; font-size: 15px;
+            display: block; color: #0f172a; font-size: 15px;
             text-transform: uppercase; letter-spacing: .08em; opacity: .85;
         }
         /* 飞克视读：与「Mind基准测试」同款独立框 */
 
 
-        body, html { background-color: #0a0a0a !important; }
+        body, html { background-color: #f7f6ff !important; }
         /* 飞克视读：与「Mind基准测试」同款独立框 */
         .speed-reading-section { flex: 0 0 1200px; max-width: 1200px; box-sizing: border-box; padding-top: 56px; padding-bottom: 56px; margin-bottom: 0; }
 
         /* ===== Mind / 飞克视读 区域：黑玻璃（samsy 风格） ===== */
         .main-tests {
             flex: 0 0 1200px; max-width: 1200px; box-sizing: border-box;
-            background: #0c0c0e !important;
-            border: 1px solid rgba(255,255,255,.09);
+            background: rgba(255,255,255,.74) !important;
+            -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px);
+            border: 1px solid rgba(99,102,241,.16);
             border-radius: 32px;
             padding-top: 64px; padding-bottom: 64px;
             margin-bottom: 24px;
-            box-shadow: 0 30px 70px -40px rgba(255,0,51,.25);
+            box-shadow: 0 28px 64px -36px rgba(79,70,229,.3);
         }
-        .speed-reading-section { background: #0c0c0e !important; }
-        footer { background: #0a0a0a !important; position: relative; z-index: 1; }
+        .speed-reading-section { background: rgba(255,255,255,.74) !important; }
+        footer { background: rgba(255,255,255,.72) !important; position: relative; z-index: 1; }
         .test-directory-grid {
             background: none !important;
             background-image:
-                linear-gradient(rgba(255,0,51,.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255,0,51,.05) 1px, transparent 1px) !important;
+                linear-gradient(rgba(99,102,241,.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(99,102,241,.05) 1px, transparent 1px) !important;
             background-size: 34px 34px !important;
             background-position: center !important;
         }
-        .test-directory-heading h2 { color: #fff !important; }
+        .test-directory-heading h2 { color: #0f172a !important; }
         .test-directory-heading h2::after {
             content: ""; display: block; width: 64px; height: 3px; margin: 14px auto 0;
-            background: #ff0033; border-radius: 2px;
+            background: linear-gradient(90deg,#6d28d9,#8b5cf6); border-radius: 2px;
         }
-        .test-directory-heading p { color: rgba(255,255,255,.55) !important; }
+        .test-directory-heading p { color: #64748b !important; }
 
         /* ===== 卡片：黑底 + 红 accent + 发光 hover ===== */
         .test-entry-card {
             position: relative; display: flex; align-items: center; gap: 16px;
             padding: 24px 22px; border-radius: 18px; text-decoration: none;
-            background: linear-gradient(145deg, rgba(255,255,255,.045), rgba(255,255,255,.015));
-            border: 1px solid rgba(255,255,255,.1);
-            box-shadow: 0 10px 30px -18px rgba(0,0,0,.8);
+            background: #fff;
+            border: 1px solid rgba(99,102,241,.16);
+            box-shadow: 0 10px 30px -16px rgba(79,70,229,.22);
             overflow: hidden;
             animation: t-rise .55s ease backwards;
             min-height: 92px;
@@ -156,7 +161,7 @@
         /* 渐变描边（hover 红） */
         .test-entry-card::before {
             content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1px;
-            background: linear-gradient(135deg, #ff0033, transparent 45%, #ff0033);
+            background: linear-gradient(135deg, #6d28d9, transparent 45%, #8b5cf6);
             -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
             -webkit-mask-composite: xor; mask-composite: exclude;
             opacity: 0; transition: opacity .3s ease; pointer-events: none;
@@ -164,11 +169,11 @@
         .test-entry-card:hover::before { opacity: 1; }
         .test-entry-card:hover {
             border-color: transparent;
-            box-shadow: 0 24px 50px -18px rgba(255,0,51,.5);
+            box-shadow: 0 24px 48px -18px rgba(109,40,217,.4);
         }
         .test-entry-card::after {
             content: ""; position: absolute; inset: 0; border-radius: inherit;
-            background: radial-gradient(420px circle at var(--gx,50%) var(--gy,50%), rgba(255,0,51,.14), transparent 45%);
+            background: radial-gradient(420px circle at var(--gx,50%) var(--gy,50%), rgba(109,40,217,.13), transparent 45%);
             opacity: 0; transition: opacity .25s ease; pointer-events: none;
         }
         .test-entry-card:hover::after { opacity: 1; }
@@ -177,19 +182,19 @@
             flex: none; width: 52px; height: 52px; border-radius: 15px;
             display: flex; align-items: center; justify-content: center;
             font-size: 24px; line-height: 1;
-            background: linear-gradient(135deg, var(--t-accent,#ff0033), var(--t-accent2,#ff6b4a));
-            box-shadow: 0 10px 24px -10px var(--t-glow, rgba(255,0,51,.6));
+            background: linear-gradient(135deg, var(--t-accent,#6d28d9), var(--t-accent2,#8b5cf6));
+            box-shadow: 0 10px 24px -10px var(--t-glow, rgba(109,40,217,.55));
         }
         /* 文字 */
         .t-card-copy { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
-        .t-card-copy strong { font-size: 16px; font-weight: 700; color: #fff; letter-spacing: -.01em; }
-        .t-card-copy span { font-size: 13px; line-height: 1.5; color: rgba(255,255,255,.55); }
+        .t-card-copy strong { font-size: 16px; font-weight: 700; color: #0f172a; letter-spacing: -.01em; }
+        .t-card-copy span { font-size: 13px; line-height: 1.5; color: #64748b; }
         /* 箭头 */
         .t-card-arrow {
             margin-left: auto; flex: none; font-size: 18px; color: rgba(255,255,255,.4);
             transition: transform .25s ease, color .25s ease;
         }
-        .test-entry-card:hover .t-card-arrow { transform: translateX(5px); color: #ff0033; }
+        .test-entry-card:hover .t-card-arrow { transform: translateX(5px); color: #6d28d9; }
         /* 3D tilt */
         .test-entry-card { transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease; }
         .test-entry-card.tilt-active { transform: perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(-4px) scale(1.02); }
@@ -203,13 +208,13 @@
             opacity: 0; pointer-events: none;
         }
         .glitch:hover::before {
-            opacity: .85; color: #ff0033;
+            opacity: .85; color: #6d28d9;
             transform: translate(-2px, 1px);
             clip-path: polygon(0 12%, 100% 12%, 100% 34%, 0 34%, 0 62%, 100% 62%, 100% 88%, 0 88%);
             animation: glitch-a .3s steps(2) infinite;
         }
         .glitch:hover::after {
-            opacity: .85; color: #4da6ff;
+            opacity: .85; color: #06b6d4;
             transform: translate(2px, -1px);
             clip-path: polygon(0 38%, 100% 38%, 100% 56%, 0 56%, 0 70%, 100% 70%, 100% 95%, 0 95%);
             animation: glitch-b .3s steps(2) infinite reverse;
@@ -225,8 +230,8 @@
             100% { clip-path: polygon(0 48%, 100% 48%, 100% 66%, 0 66%, 0 78%, 100% 78%, 100% 96%, 0 96%); }
         }
     </style>
-    <script src="/assets/js/mt-nav.js?v=20260841" defer></script>
-    <link rel="stylesheet" href="assets/css/dark-theme.css?v=20260841">
+    <script src="/assets/js/mt-nav.js?v=20260842" defer></script>
+    <link rel="stylesheet" href="assets/css/dark-theme.css?v=20260842">
 </head>
 <body data-mt-dark>
 <div id="preloader"><div class="preloader-text">MIND<span>TRAINER</span></div></div>
@@ -256,7 +261,7 @@
         </div>
 
         <div class="test-directory-grid">
-            <a class="test-entry-card" href="/reaction-time-test/" aria-label="打开反应时间测试" style="--t-accent:#ff0033;--t-accent2:#ff4d66;--t-glow:rgba(255,0,51,.55)">
+            <a class="test-entry-card" href="/reaction-time-test/" aria-label="打开反应时间测试" style="--t-accent:#6d28d9;--t-accent2:#8b5cf6;--t-glow:rgba(109,40,217,.5)">
                     <span class="t-card-icon">🎯</span>
                     <span class="t-card-copy">
                         <strong>反应时间</strong>
@@ -264,7 +269,7 @@
                     </span>
                     <span class="t-card-arrow" aria-hidden="true">→</span>
                 </a>
-            <a class="test-entry-card" href="/aim-trainer/" aria-label="打开瞄准训练" style="--t-accent:#ff2d55;--t-accent2:#ff6b4a;--t-glow:rgba(255,45,85,.55)">
+            <a class="test-entry-card" href="/aim-trainer/" aria-label="打开瞄准训练" style="--t-accent:#7c3aed;--t-accent2:#a78bfa;--t-glow:rgba(124,58,237,.5)">
                     <span class="t-card-icon">📍</span>
                     <span class="t-card-copy">
                         <strong>瞄准训练</strong>
@@ -272,7 +277,7 @@
                     </span>
                     <span class="t-card-arrow" aria-hidden="true">→</span>
                 </a>
-            <a class="test-entry-card" href="/sequence-memory-test/" aria-label="打开序列记忆测试" style="--t-accent:#ff0033;--t-accent2:#ff3355;--t-glow:rgba(255,0,51,.55)">
+            <a class="test-entry-card" href="/sequence-memory-test/" aria-label="打开序列记忆测试" style="--t-accent:#4f46e5;--t-accent2:#818cf8;--t-glow:rgba(79,70,229,.5)">
                     <span class="t-card-icon">🧩</span>
                     <span class="t-card-copy">
                         <strong>序列记忆</strong>
@@ -280,7 +285,7 @@
                     </span>
                     <span class="t-card-arrow" aria-hidden="true">→</span>
                 </a>
-            <a class="test-entry-card" href="/number-memory-test/" aria-label="打开数字记忆测试" style="--t-accent:#ff1a4d;--t-accent2:#ff4d66;--t-glow:rgba(255,26,77,.55)">
+            <a class="test-entry-card" href="/number-memory-test/" aria-label="打开数字记忆测试" style="--t-accent:#6d28d9;--t-accent2:#a855f7;--t-glow:rgba(109,40,217,.5)">
                     <span class="t-card-icon">🔢</span>
                     <span class="t-card-copy">
                         <strong>数字记忆</strong>
@@ -288,7 +293,7 @@
                     </span>
                     <span class="t-card-arrow" aria-hidden="true">→</span>
                 </a>
-            <a class="test-entry-card" href="/multiple-object-tracking-test/" aria-label="打开多目标追踪测试" style="--t-accent:#ff2d55;--t-accent2:#ff5c7a;--t-glow:rgba(255,45,85,.55)">
+            <a class="test-entry-card" href="/multiple-object-tracking-test/" aria-label="打开多目标追踪测试" style="--t-accent:#7c3aed;--t-accent2:#818cf8;--t-glow:rgba(124,58,237,.5)">
                     <span class="t-card-icon">👀</span>
                     <span class="t-card-copy">
                         <strong>多目标追踪</strong>
@@ -296,7 +301,7 @@
                     </span>
                     <span class="t-card-arrow" aria-hidden="true">→</span>
                 </a>
-            <a class="test-entry-card" href="/stroop-test/" aria-label="打开斯特鲁普测试" style="--t-accent:#ff0033;--t-accent2:#ff6b4a;--t-glow:rgba(255,0,51,.55)">
+            <a class="test-entry-card" href="/stroop-test/" aria-label="打开斯特鲁普测试" style="--t-accent:#4f46e5;--t-accent2:#8b5cf6;--t-glow:rgba(79,70,229,.5)">
                     <span class="t-card-icon">🎨</span>
                     <span class="t-card-copy">
                         <strong>斯特鲁普</strong>
@@ -313,7 +318,7 @@
             <p>基础训练 26 项 · 闪视 · 速读 · 照相记忆 · 冥想 · 训练计划</p>
         </div>
         <div class="test-directory-grid">
-            <a class="test-entry-card" href="speed-read/basic.html" aria-label="打开基础训练" style="--t-accent:#ff3355;--t-accent2:#ff0033;--t-glow:rgba(255,51,85,.55)">
+            <a class="test-entry-card" href="speed-read/basic.html" aria-label="打开基础训练" style="--t-accent:#6d28d9;--t-accent2:#7c3aed;--t-glow:rgba(109,40,217,.5)">
                     <span class="t-card-icon">👁️</span>
                     <span class="t-card-copy">
                         <strong>基础训练</strong>
@@ -321,7 +326,7 @@
                     </span>
                     <span class="t-card-arrow" aria-hidden="true">→</span>
                 </a>
-            <a class="test-entry-card" href="speed-read/flash.html" aria-label="打开闪视训练" style="--t-accent:#ff5c33;--t-accent2:#ff0033;--t-glow:rgba(255,92,51,.55)">
+            <a class="test-entry-card" href="speed-read/flash.html" aria-label="打开闪视训练" style="--t-accent:#a855f7;--t-accent2:#6d28d9;--t-glow:rgba(168,85,247,.5)">
                     <span class="t-card-icon">⚡</span>
                     <span class="t-card-copy">
                         <strong>闪视训练</strong>
@@ -329,7 +334,7 @@
                     </span>
                     <span class="t-card-arrow" aria-hidden="true">→</span>
                 </a>
-            <a class="test-entry-card" href="speed-read/speed.html" aria-label="打开速读训练" style="--t-accent:#ff0033;--t-accent2:#ff4d66;--t-glow:rgba(255,0,51,.55)">
+            <a class="test-entry-card" href="speed-read/speed.html" aria-label="打开速读训练" style="--t-accent:#6d28d9;--t-accent2:#8b5cf6;--t-glow:rgba(109,40,217,.5)">
                     <span class="t-card-icon">📖</span>
                     <span class="t-card-copy">
                         <strong>速读训练</strong>
@@ -337,7 +342,7 @@
                     </span>
                     <span class="t-card-arrow" aria-hidden="true">→</span>
                 </a>
-            <a class="test-entry-card" href="speed-read/photo.html" aria-label="打开照相记忆" style="--t-accent:#ff2d55;--t-accent2:#ff0033;--t-glow:rgba(255,45,85,.55)">
+            <a class="test-entry-card" href="speed-read/photo.html" aria-label="打开照相记忆" style="--t-accent:#7c3aed;--t-accent2:#a78bfa;--t-glow:rgba(124,58,237,.5)">
                     <span class="t-card-icon">📸</span>
                     <span class="t-card-copy">
                         <strong>照相记忆</strong>
@@ -345,7 +350,7 @@
                     </span>
                     <span class="t-card-arrow" aria-hidden="true">→</span>
                 </a>
-            <a class="test-entry-card" href="speed-read/meditation.html" aria-label="打开冥想训练" style="--t-accent:#ff1a4d;--t-accent2:#ff5c7a;--t-glow:rgba(255,26,77,.55)">
+            <a class="test-entry-card" href="speed-read/meditation.html" aria-label="打开冥想训练" style="--t-accent:#4f46e5;--t-accent2:#8b5cf6;--t-glow:rgba(79,70,229,.5)">
                     <span class="t-card-icon">🧘</span>
                     <span class="t-card-copy">
                         <strong>冥想训练</strong>
@@ -353,7 +358,7 @@
                     </span>
                     <span class="t-card-arrow" aria-hidden="true">→</span>
                 </a>
-            <a class="test-entry-card" href="speed-read/plan.html" aria-label="打开训练计划" style="--t-accent:#ff1a4d;--t-accent2:#ff4d66;--t-glow:rgba(255,26,77,.55)">
+            <a class="test-entry-card" href="speed-read/plan.html" aria-label="打开训练计划" style="--t-accent:#6d28d9;--t-accent2:#a855f7;--t-glow:rgba(109,40,217,.5)">
                     <span class="t-card-icon">📅</span>
                     <span class="t-card-copy">
                         <strong>训练计划</strong>
@@ -466,9 +471,9 @@
     </div>
 </footer>
 
-<script src="assets/js/global.min.js?v=20260841" defer></script>
-<script src="assets/js/cards-3d.js?v=20260841" defer></script>
-<script type="module" src="assets/js/hero-3d.js?v=20260841"></script>
+<script src="assets/js/global.min.js?v=20260842" defer></script>
+<script src="assets/js/cards-3d.js?v=20260842" defer></script>
+<script type="module" src="assets/js/hero-3d.js?v=20260842"></script>
 
 
 
