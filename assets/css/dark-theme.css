@@ -17,14 +17,21 @@ body, html {
   color: #1e293b !important;
 }
 
-/* 统一玻璃变量 */
+/* 统一玻璃变量：所有面板/卡片/舞台容器/控制条/导航一致 */
 main > section:not(.hero),
 main > div,
 article,
 .common-container,
+#mt-header,
 [class*="-card"],
 [class*="panel"],
-[class*="box"] {
+[class*="box"],
+[class*="stage-wrap"],
+[class*="stage"],
+[class*="control-bar"],
+[class*="train-list"],
+[class*="params"],
+[class*="param-row"] {
   background: rgba(255, 255, 255, .62) !important;
   -webkit-backdrop-filter: blur(20px) saturate(1.5);
   backdrop-filter: blur(20px) saturate(1.5);
