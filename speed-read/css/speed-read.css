@@ -56,19 +56,6 @@
   background: #f1f5f9; border-radius: 999px; padding: 3px 10px;
 }
 
-/* 冥想 3D：呼吸提示 + 状态条（Three.js 版，DOM 覆盖层） */
-.sr-breath-label {
-  position: absolute; left: 50%; bottom: 13%; transform: translateX(-50%);
-  color: rgba(226,232,240,.92); font-size: 22px; font-weight: 700;
-  letter-spacing: .12em; text-shadow: 0 2px 14px rgba(0,0,0,.5);
-  pointer-events: none; z-index: 5;
-}
-.sr-meditation-status {
-  position: absolute; top: 12px; left: 14px;
-  color: rgba(148,163,184,.85); font-size: 13px;
-  pointer-events: none; z-index: 5;
-}
-
 /* ---------- 训练页布局 ---------- */
 .sr-layout {
   flex: 0 0 100%;
