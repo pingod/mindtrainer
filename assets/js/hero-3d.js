@@ -107,27 +107,35 @@ import * as THREE from 'three';
   }, { passive: true });
   canvas.style.cursor = 'grab';
 
-  /* 尺寸自适应 */
+  /* 尺寸自适应：全屏视口 */
   function resize() {
-    const w = canvas.clientWidth, h = canvas.clientHeight;
+    const w = window.innerWidth, h = window.innerHeight;
     if (!w || !h) return;
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
   }
-  if (window.ResizeObserver) {
-    new ResizeObserver(resize).observe(canvas.parentElement || canvas);
-  } else {
-    window.addEventListener('resize', resize);
-  }
+  window.addEventListener('resize', resize);
   resize();
   window.__h3d = { renderer, scene, camera }; // 调试钩子
+
+  /* 预加载器：首次渲染后淡出（samsy 风格） */
+  let preloaderDone = false;
+  function hidePreloader() {
+    if (preloaderDone) return;
+    preloaderDone = true;
+    const pre = document.getElementById('preloader');
+    if (pre) {
+      pre.classList.add('preloader-hide');
+      setTimeout(() => { if (pre.parentNode) pre.parentNode.removeChild(pre); }, 700);
+    }
+  }
 
   /* 渲染循环 */
   const clock = new THREE.Clock();
   function loop() {
     // 兜底：尺寸变化自动 resize
-    const cw = canvas.clientWidth, ch = canvas.clientHeight;
+    const cw = window.innerWidth, ch = window.innerHeight;
     if (cw && ch && (cw !== renderer.domElement.width || ch !== renderer.domElement.height)) resize();
     const t = clock.getElapsedTime();
     knot.rotation.y = rotY + t * 0.15;
@@ -141,6 +149,7 @@ import * as THREE from 'three';
     });
     camera.position.z = zoom;
     renderer.render(scene, camera);
+    if (t > 0.35) hidePreloader();
     requestAnimationFrame(loop);
   }
   loop();
