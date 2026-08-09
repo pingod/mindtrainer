@@ -16,26 +16,26 @@ import * as THREE from 'three';
   const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
   camera.position.set(0, 0, 8);
 
-  /* 灯光：紫 + 蓝双点光 + 环境光 */
-  const amb = new THREE.AmbientLight(0xffffff, 0.4);
-  const key = new THREE.PointLight(0x8b5cf6, 60, 30);
+  /* 灯光：紫 + 蓝双点光 + 环境光（浅色背景需更亮） */
+  const amb = new THREE.AmbientLight(0xffffff, 0.55);
+  const key = new THREE.PointLight(0x8b5cf6, 70, 30);
   key.position.set(4, 3, 5);
-  const rim = new THREE.PointLight(0x6366f1, 40, 30);
+  const rim = new THREE.PointLight(0x6366f1, 50, 30);
   rim.position.set(-4, -2, -3);
   scene.add(amb, key, rim);
 
-  /* 中央：金属环面结 + 线框叠加 */
+  /* 中央：金属环面结 + 线框叠加（深紫，浅色背景可见） */
   const knotGeo = new THREE.TorusKnotGeometry(1.1, 0.34, 140, 18);
   const knot = new THREE.Mesh(knotGeo, new THREE.MeshStandardMaterial({
-    color: 0x8b5cf6, metalness: 0.85, roughness: 0.25, emissive: 0x2a1b5e
+    color: 0x7c3aed, metalness: 0.7, roughness: 0.28, emissive: 0x4c1d95
   }));
   scene.add(knot);
   const wire = new THREE.Mesh(knotGeo, new THREE.MeshBasicMaterial({
-    color: 0xa78bfa, wireframe: true, transparent: true, opacity: 0.18
+    color: 0x6d28d9, wireframe: true, transparent: true, opacity: 0.28
   }));
   scene.add(wire);
 
-  /* 粒子星云：球壳分布 */
+  /* 粒子星云：球壳分布（深紫，浅色背景可见） */
   const N = 700;
   const pos = new Float32Array(N * 3);
   for (let i = 0; i < N; i++) {
@@ -49,18 +49,18 @@ import * as THREE from 'three';
   const starGeo = new THREE.BufferGeometry();
   starGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
   const stars = new THREE.Points(starGeo, new THREE.PointsMaterial({
-    color: 0xc4b5fd, size: 0.05, transparent: true, opacity: 0.8
+    color: 0x6d28d9, size: 0.06, transparent: true, opacity: 0.7
   }));
   scene.add(stars);
 
-  /* 漂浮小几何体（环 + 多面体交替） */
+  /* 漂浮小几何体（环 + 多面体交替，深色） */
   const floaters = [];
   for (let i = 0; i < 6; i++) {
     const geo = i % 2 ? new THREE.IcosahedronGeometry(0.22, 0) : new THREE.OctahedronGeometry(0.22, 0);
     const m = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({
-      color: i % 2 ? 0x6366f1 : 0xd946ef,
-      metalness: 0.7, roughness: 0.3,
-      emissive: i % 2 ? 0x1e1b4b : 0x3b0764
+      color: i % 2 ? 0x4f46e5 : 0xdb2777,
+      metalness: 0.6, roughness: 0.3,
+      emissive: i % 2 ? 0x312e81 : 0x831843
     }));
     const a = (i / 6) * Math.PI * 2;
     m.position.set(Math.cos(a) * 2.6, Math.sin(a) * 1.4 - 0.5, (Math.random() - 0.5) * 1.5);
