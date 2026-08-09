@@ -98,19 +98,20 @@ import * as THREE from 'three';
       return group;
     }
 
-    /* GPU 粒子：平面分布（按画布尺寸），固定像素大小 */
+    /* GPU 粒子：平面分布（场景尺度），固定像素大小 */
     _buildParticles() {
+      const vw = this._vw || 5.2, vh = this._vh || 3.0;
       const N = 1400;
       const pos = new Float32Array(N * 3);
       for (let i = 0; i < N; i++) {
-        pos[i * 3] = (Math.random() - 0.5) * (this.cw || 1200);
-        pos[i * 3 + 1] = (Math.random() - 0.5) * (this.ch || 700);
+        pos[i * 3] = (Math.random() - 0.5) * vw;
+        pos[i * 3 + 1] = (Math.random() - 0.5) * vh;
         pos[i * 3 + 2] = 0;
       }
       const geo = new THREE.BufferGeometry();
       geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
       const mat = new THREE.PointsMaterial({
-        color: 0x94a3b8, size: 3, sizeAttenuation: false,
+        color: 0x94a3b8, size: 4, sizeAttenuation: false,
         transparent: true, opacity: 0.5
       });
       return new THREE.Points(geo, mat);
@@ -125,10 +126,13 @@ import * as THREE from 'three';
     _applySize(w, h) {
       this.cw = w; this.ch = h;
       this.renderer.setSize(w, h, false);
-      this.camera.left = -w / 2; this.camera.right = w / 2;
-      this.camera.top = h / 2; this.camera.bottom = -h / 2;
+      // 正交相机视口：场景尺度（±2.6 单位），曼陀罗外环 2.4 完整显示且占满画布
+      const vw = 5.2, vh = vw * h / w;
+      this._vw = vw; this._vh = vh;
+      this.camera.left = -vw / 2; this.camera.right = vw / 2;
+      this.camera.top = vh / 2; this.camera.bottom = -vh / 2;
       this.camera.updateProjectionMatrix();
-      // 粒子按新尺寸重新分布
+      // 粒子按当前视口重新分布
       this.scene.remove(this.particles);
       this.particles = this._buildParticles();
       this.scene.add(this.particles);
@@ -349,6 +353,7 @@ import * as THREE from 'three';
     ro.observe(stage);
     engine.resize();
     engine.draw();
+    window.__med = engine; // 调试钩子（读场景/像素用）
 
     const y = SR.$('#currentYear');
     if (y) y.textContent = new Date().getFullYear();
