@@ -3,10 +3,36 @@
  * 布局保留 samsy 结构（全屏 3D hero + 大字），配色回归浅色
  * 注意：保守覆盖——不动功能色元素（stroop 颜色按钮/aim 目标等）
  * ============================================================ */
+/* 全局浅色主题（高级现代：淡紫蓝粉渐变 + 白玻璃）
+ * 统一玻璃语言：半透明 rgba(255,255,255,.62) + blur(20px) saturate(1.5)
+ * + 亮边框 + 内高光 —— 所有容器/卡片/面板一致
+ */
 body, html {
-  background: linear-gradient(180deg, #f7f6ff 0%, #eef2ff 50%, #fdf4ff 100%) !important;
+  background:
+    radial-gradient(1000px 600px at 15% 10%, rgba(139,92,246,.10), transparent 55%),
+    radial-gradient(900px 700px at 85% 30%, rgba(99,102,241,.08), transparent 55%),
+    radial-gradient(700px 500px at 50% 90%, rgba(217,70,239,.06), transparent 50%),
+    linear-gradient(180deg, #f7f6ff 0%, #eef2ff 50%, #fdf4ff 100%) !important;
   background-color: #f7f6ff !important;
   color: #1e293b !important;
+}
+
+/* 统一玻璃变量 */
+main > section:not(.hero),
+main > div,
+article,
+.common-container,
+[class*="-card"],
+[class*="panel"],
+[class*="box"] {
+  background: rgba(255, 255, 255, .62) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(1.5);
+  backdrop-filter: blur(20px) saturate(1.5);
+  border: 1px solid rgba(255, 255, 255, .72) !important;
+  box-shadow:
+    0 8px 32px rgba(31, 38, 135, .14),
+    inset 0 1px 0 rgba(255, 255, 255, .65) !important;
+  color: #1e293b;
 }
 
 h1, h2, h3, h4, h5 {
