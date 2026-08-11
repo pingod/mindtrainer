@@ -32,8 +32,8 @@
     <meta name="twitter:description" content="6 项认知基准测试：反应时间、瞄准、序列记忆、数字记忆、多物体追踪、斯特鲁普；另有速读、闪视、照相记忆、冥想等训练。">
     <meta name="twitter:image" content="https://picktests.com/assets/images/og/og-image.png">
 
-    <link rel="stylesheet" href="assets/css/global.min.css?v=20260849">
-    <link rel="stylesheet" href="assets/css/style.min.css?v=20260849">
+    <link rel="stylesheet" href="assets/css/global.min.css?v=20260850">
+    <link rel="stylesheet" href="assets/css/style.min.css?v=20260850">
 
     <style>
         /* ParticleReveal 标题粒子效果（Canvas UI） */
@@ -71,7 +71,7 @@
         /* 飞克视读：与「Mind基准测试」同款独立框 */
         .speed-reading-section { flex: 0 0 1200px; max-width: 1200px; box-sizing: border-box; padding-top: 56px; padding-bottom: 56px; margin-bottom: 0; }
     </style>
-    <script src="/assets/js/mt-nav.js?v=20260849" defer></script>
+    <script src="/assets/js/mt-nav.js?v=20260850" defer></script>
 </head>
 <body>
 <header id="mt-header"></header>
@@ -311,17 +311,17 @@
     </a>
 </section>
 
-<script src="assets/js/global.min.js?v=20260849" defer></script>
+<script src="assets/js/global.min.js?v=20260850" defer></script>
 <script src="assets/js/feedback-marker.js?v=20260848" defer></script>
 
 <script type="module">
     // 首页标题特效（Canvas UI，无构建）
     import { createParticleReveal } from './assets/js/canvasui/particle-reveal.js';
-    import { createBend } from './assets/js/canvasui/bend.js';
-    import { createGlitch } from './assets/js/canvasui/glitch.js';
+    import { createForceField } from './assets/js/canvasui/forcefield.js';
+    import { createDecryptReveal } from './assets/js/canvasui/decryptreveal.js';
     import { createRipple } from './assets/js/canvasui/ripple.js';
-    import { createGlyphRain } from './assets/js/canvasui/glyphrain.js';
-    import { createFrost } from './assets/js/canvasui/frost.js';
+    import { createBubble } from './assets/js/canvasui/bubble.js';
+    import { createGrid } from './assets/js/canvasui/grid.js';
 
     // 通用：把元素文字画到 source canvas
     function setupSource(source, content, opts) {
@@ -374,7 +374,7 @@
         window.addEventListener('resize', () => { draw(); if (window.__prInst) { try { window.__prInst.resize(); } catch (e) {} } });
     })();
 
-    // 2. Mind 标题：Bend 弯曲
+    // 2. Mind 标题：ForceField 力场
     (function () {
         const source = document.getElementById('dr-source');
         const output = document.getElementById('dr-output');
@@ -384,18 +384,19 @@
         let inst = null;
         function init() {
             draw();
-            inst = createBend(
+            inst = createForceField(
                 { source, content, output },
-                { zone: 260, angle: 90, rounding: 160, perspective: 720, direction: 'in', ease: 260, smoothing: 0.12, top: true, bottom: true, tumble: 0.6, tilt: 0.6 }
+                { shape: 'hexagon', color: [0.42, 0.28, 0.95], edgeColor: [0.6, 0.45, 1], opacity: 0.85,
+                  cellScale: 16, lineWidth: 0.03, gridOpacity: 0.12, gridReveal: 'click', gridRevealRadius: 250 }
             );
             window.__drInst = inst;
-            // 初始触发一次弯曲（进入页面即见效果）
+            // 初始触发一次力场（点击揭示）
             if (inst) {
                 setTimeout(() => {
                     try {
                         const rect = output.getBoundingClientRect();
-                        output.dispatchEvent(new PointerEvent('pointermove', {
-                            clientX: rect.left + rect.width * 0.75,
+                        output.dispatchEvent(new MouseEvent('click', {
+                            clientX: rect.left + rect.width / 2,
                             clientY: rect.top + rect.height / 2,
                             bubbles: true
                         }));
@@ -407,7 +408,7 @@
         window.addEventListener('resize', () => { draw(); if (window.__drInst) { try { window.__drInst.resize(); } catch (e) {} } });
     })();
 
-    // 3. 飞克标题：Glitch 故障
+    // 3. 飞克标题：DecryptReveal 解密显现（文字完整可见）
     (function () {
         const source = document.getElementById('gl-source');
         const output = document.getElementById('gl-output');
@@ -417,11 +418,25 @@
         let inst = null;
         function init() {
             draw();
-            inst = createGlitch(
+            inst = createDecryptReveal(
                 { source, content, output },
-                { intensity: 1, interval: 3, duration: 0.4, slices: 24, shift: 30, rgbShift: 4, blocks: 0.5, noise: 0.3 }
+                { radius: 320, cell: 10, colored: 0.6, color: '#6d28d9', brightness: 1.1,
+                  scramble: 0.1, scrambleSpeed: 5, legibility: 1.2 }
             );
             window.__glInst = inst;
+            // 初始解密（进入页面即显示完整文字）
+            if (inst) {
+                setTimeout(() => {
+                    try {
+                        const rect = output.getBoundingClientRect();
+                        output.dispatchEvent(new PointerEvent('pointermove', {
+                            clientX: rect.left + rect.width / 2,
+                            clientY: rect.top + rect.height / 2,
+                            bubbles: true
+                        }));
+                    } catch (e) {}
+                }, 400);
+            }
         }
         init();
         window.addEventListener('resize', () => { draw(); if (window.__glInst) { try { window.__glInst.resize(); } catch (e) {} } });
@@ -460,7 +475,7 @@
         window.addEventListener('resize', () => { draw(); if (window.__rpInst) { try { window.__rpInst.resize(); } catch (e) {} } });
     })();
 
-    // 5. faq 标题：GlyphRain 字符雨
+    // 5. faq 标题：Bubble 气泡
     (function () {
         const source = document.getElementById('ft-source');
         const output = document.getElementById('ft-output');
@@ -470,10 +485,10 @@
         let inst = null;
         function init() {
             draw();
-            inst = createGlyphRain(
+            inst = createBubble(
                 { source, content, output },
-                { cell: 14, color: [0.3, 0.45, 1], headColor: [0.2, 0.4, 1], speed: 0.25, speedVariance: 0.5,
-                  density: 0.18, trail: 0.6, glow: 1.5, layers: 2, dim: 0.5, light: 2.5, lightRadius: 240 }
+                { size: 26, trail: 20, follow: 0.5, blend: 14, speed: 2, refraction: 80, dispersion: 1,
+                  frost: 0.1, shine: 0.3, rim: 0.5, iridescence: 1, intensity: 0.9 }
             );
             window.__ftInst = inst;
         }
@@ -481,7 +496,7 @@
         window.addEventListener('resize', () => { draw(); if (window.__ftInst) { try { window.__ftInst.resize(); } catch (e) {} } });
     })();
 
-    // 6. 导航 Frost 磨砂特效（背景装饰，不干扰菜单点击）
+    // 6. 导航 Grid 网格特效（背景装饰，不干扰菜单点击）
     (function () {
         const header = document.getElementById('mt-header');
         if (!header) return;
@@ -514,10 +529,11 @@
         }
         draw();
         try {
-            const inst = createFrost(
+            const inst = createGrid(
                 { source, content: source, output },
-                { frost: 0.05, strength: 0.6, contrast: 3, highlight: 0.3, highlightStrength: 0.7,
-                  haze: 0.4, brightness: 0.95, saturation: 1.1, refraction: 1 }
+                { tileSize: 110, amplitude: 2.2, waveSpeed: 0.45, frequency: 14, waveWidth: 0.05,
+                  fadeTime: 0.2, maxLift: 0.8, jitter: 0, liftHeight: 50, perspective: 1200, tilt: 1,
+                  shading: 0.05, tint: [0.42, 0.28, 0.95], tintStrength: 0.08, idleRipple: 0.4 }
             );
             window.__navInst = inst;
         } catch (e) {
