@@ -32,8 +32,8 @@
     <meta name="twitter:description" content="6 项认知基准测试：反应时间、瞄准、序列记忆、数字记忆、多物体追踪、斯特鲁普；另有速读、闪视、照相记忆、冥想等训练。">
     <meta name="twitter:image" content="https://picktests.com/assets/images/og/og-image.png">
 
-    <link rel="stylesheet" href="assets/css/global.min.css?v=20260848">
-    <link rel="stylesheet" href="assets/css/style.min.css?v=20260848">
+    <link rel="stylesheet" href="assets/css/global.min.css?v=20260849">
+    <link rel="stylesheet" href="assets/css/style.min.css?v=20260849">
 
     <style>
         /* ParticleReveal 标题粒子效果（Canvas UI） */
@@ -43,6 +43,14 @@
         #pr-source, #dr-source, #gl-source, #rp-source, #ft-source { opacity: 0; }
         #pr-output, #dr-output, #gl-output, #rp-output, #ft-output { z-index: 2; }
         .pr-title-wrap h1, .fx-title-wrap h2 { position: relative; z-index: 1; margin: 0; }
+        /* features/faq 标题特效 wrap 居中（父容器 text-align 居中） */
+        #features .common-container, #faq .common-container { text-align: center; }
+        #features .features-grid, #faq .faq-grid { text-align: left; }
+        /* 导航 Frost 特效 */
+        #mt-header { position: relative; overflow: hidden; }
+        #nav-source, #nav-output { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+        #nav-source { opacity: 0; }
+        #mt-header .mt-header-inner, #mt-header nav, #mt-header .mt-menu, #mt-header .mt-brand { position: relative; z-index: 1; }
         /* 特效画廊入口（页面底部） */
         .gallery-entry { max-width: 1200px; margin: 0 auto 32px; }
         .gallery-entry-card {
@@ -63,7 +71,7 @@
         /* 飞克视读：与「Mind基准测试」同款独立框 */
         .speed-reading-section { flex: 0 0 1200px; max-width: 1200px; box-sizing: border-box; padding-top: 56px; padding-bottom: 56px; margin-bottom: 0; }
     </style>
-    <script src="/assets/js/mt-nav.js?v=20260848" defer></script>
+    <script src="/assets/js/mt-nav.js?v=20260849" defer></script>
 </head>
 <body>
 <header id="mt-header"></header>
@@ -303,15 +311,16 @@
     </a>
 </section>
 
-<script src="assets/js/global.min.js?v=20260848" defer></script>
-<script src="assets/js/feedback-marker.js?v=20260847" defer></script>
+<script src="assets/js/global.min.js?v=20260849" defer></script>
+<script src="assets/js/feedback-marker.js?v=20260848" defer></script>
 
 <script type="module">
     // 首页标题特效（Canvas UI，无构建）
     import { createParticleReveal } from './assets/js/canvasui/particle-reveal.js';
-    import { createDecryptReveal } from './assets/js/canvasui/decryptreveal.js';
+    import { createBend } from './assets/js/canvasui/bend.js';
     import { createGlitch } from './assets/js/canvasui/glitch.js';
     import { createRipple } from './assets/js/canvasui/ripple.js';
+    import { createGlyphRain } from './assets/js/canvasui/glyphrain.js';
     import { createFrost } from './assets/js/canvasui/frost.js';
 
     // 通用：把元素文字画到 source canvas
@@ -365,30 +374,33 @@
         window.addEventListener('resize', () => { draw(); if (window.__prInst) { try { window.__prInst.resize(); } catch (e) {} } });
     })();
 
-    // 2. Mind 标题：DecryptReveal 解密显现
+    // 2. Mind 标题：Bend 弯曲
     (function () {
         const source = document.getElementById('dr-source');
         const output = document.getElementById('dr-output');
-        const content = document.querySelector('.fx-title-wrap h2');
+        const content = document.querySelector('#tests .fx-title-wrap h2');
         if (!source || !output || !content) return;
         const draw = setupSource(source, content, { bg: '#ffffff', color: '#1e293b' });
         let inst = null;
         function init() {
             draw();
-            inst = createDecryptReveal(
+            inst = createBend(
                 { source, content, output },
-                { radius: 300, cell: 12, colored: 0.6, color: '#6d28d9', brightness: 1.1,
-                  scramble: 0.12, scrambleSpeed: 5, legibility: 1 }
+                { zone: 260, angle: 90, rounding: 160, perspective: 720, direction: 'in', ease: 260, smoothing: 0.12, top: true, bottom: true, tumble: 0.6, tilt: 0.6 }
             );
             window.__drInst = inst;
-            // 初始解密动画
+            // 初始触发一次弯曲（进入页面即见效果）
             if (inst) {
-                const rect = output.getBoundingClientRect();
-                output.dispatchEvent(new PointerEvent('pointermove', {
-                    clientX: rect.left + rect.width / 2,
-                    clientY: rect.top + rect.height / 2,
-                    bubbles: true
-                }));
+                setTimeout(() => {
+                    try {
+                        const rect = output.getBoundingClientRect();
+                        output.dispatchEvent(new PointerEvent('pointermove', {
+                            clientX: rect.left + rect.width * 0.75,
+                            clientY: rect.top + rect.height / 2,
+                            bubbles: true
+                        }));
+                    } catch (e) {}
+                }, 400);
             }
         }
         init();
@@ -448,7 +460,7 @@
         window.addEventListener('resize', () => { draw(); if (window.__rpInst) { try { window.__rpInst.resize(); } catch (e) {} } });
     })();
 
-    // 5. faq 标题：Frost 磨砂
+    // 5. faq 标题：GlyphRain 字符雨
     (function () {
         const source = document.getElementById('ft-source');
         const output = document.getElementById('ft-output');
@@ -458,14 +470,60 @@
         let inst = null;
         function init() {
             draw();
-            inst = createFrost(
+            inst = createGlyphRain(
                 { source, content, output },
-                { frost: 0.06, strength: 0.8, contrast: 3, highlight: 0.3, highlightStrength: 0.8, haze: 0.5, brightness: 0.9, saturation: 1.2 }
+                { cell: 14, color: [0.3, 0.45, 1], headColor: [0.2, 0.4, 1], speed: 0.25, speedVariance: 0.5,
+                  density: 0.18, trail: 0.6, glow: 1.5, layers: 2, dim: 0.5, light: 2.5, lightRadius: 240 }
             );
             window.__ftInst = inst;
         }
         init();
         window.addEventListener('resize', () => { draw(); if (window.__ftInst) { try { window.__ftInst.resize(); } catch (e) {} } });
+    })();
+
+    // 6. 导航 Frost 磨砂特效（背景装饰，不干扰菜单点击）
+    (function () {
+        const header = document.getElementById('mt-header');
+        if (!header) return;
+        const source = document.createElement('canvas');
+        source.id = 'nav-source';
+        const output = document.createElement('canvas');
+        output.id = 'nav-output';
+        header.appendChild(source);
+        header.appendChild(output);
+        const ctx = source.getContext('2d');
+        function draw() {
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            const w = header.clientWidth, h = header.clientHeight;
+            if (!w || !h) return;
+            source.width = Math.round(w * dpr);
+            source.height = Math.round(h * dpr);
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            ctx.clearRect(0, 0, w, h);
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, w, h);
+            ctx.fillStyle = 'rgba(15,23,42,.9)';
+            ctx.font = '700 16px -apple-system, sans-serif';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('MindTrainer', 22, h / 2);
+            ctx.font = '500 13px -apple-system, sans-serif';
+            ctx.fillStyle = 'rgba(15,23,42,.55)';
+            ctx.textAlign = 'right';
+            ctx.fillText('测试 · 训练 · 冥想', w - 24, h / 2);
+        }
+        draw();
+        try {
+            const inst = createFrost(
+                { source, content: source, output },
+                { frost: 0.05, strength: 0.6, contrast: 3, highlight: 0.3, highlightStrength: 0.7,
+                  haze: 0.4, brightness: 0.95, saturation: 1.1, refraction: 1 }
+            );
+            window.__navInst = inst;
+        } catch (e) {
+            window.__navErr = e.message;
+        }
+        window.addEventListener('resize', () => { draw(); if (window.__navInst) { try { window.__navInst.resize(); } catch (e) {} } });
     })();
 </script>
 

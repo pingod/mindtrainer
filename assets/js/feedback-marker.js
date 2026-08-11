@@ -282,7 +282,11 @@
     copyAll.style.cssText = 'background:linear-gradient(135deg,#6d28d9,#8b5cf6);color:#fff;';
     copyAll.onclick = () => {
       const txt = items.map((it, i) => `【${i + 1}】${it.time}  ${it.url}\n选择器: ${it.selector}\n问题: ${it.question}`).join('\n\n');
-      navigator.clipboard.writeText(txt).then(() => toast('✅ 已复制 ' + items.length + ' 条反馈'), () => toast('复制失败——请手动选择'));
+      navigator.clipboard.writeText(txt).then(() => {
+        save([]);
+        closeAll();
+        toast('✅ 已复制 ' + items.length + ' 条反馈并清空');
+      }, () => toast('复制失败——请手动选择'));
     };
     head.appendChild(copyAll);
     list.appendChild(head);
@@ -350,6 +354,12 @@
     el.classList.add('mt-fb-marker');
   });
   document.addEventListener('click', (e) => {
+    // 菜单/面板/列表打开时：点击外部关闭（点击内部不关）
+    const anyOpen = menu.style.display === 'flex' || panel.style.display === 'flex' || list.style.display === 'flex';
+    if (anyOpen && !e.target.closest('#mt-fb-menu, #mt-fb-panel, #mt-fb-list, #mt-fb-fab')) {
+      closeAll();
+      return;
+    }
     if (!mode) return;
     const el = e.target.closest('body *');
     if (!el || el.closest('#mt-fb-menu, #mt-fb-panel, #mt-fb-list, #mt-fb-fab')) return;
