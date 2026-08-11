@@ -27,7 +27,7 @@
         .list button small { font-size: 11px; color: rgba(255,255,255,.35); }
         /* 右侧 demo */
         .demo { flex: 1; display: flex; flex-direction: column; min-width: 0; }
-        .demo-stage { position: relative; flex: 1; margin: 16px; border: 1px solid rgba(255,255,255,.09); border-radius: 16px; overflow: hidden; background: #000; }
+        .demo-stage { position: relative; flex: 1; margin: 16px; border: 1px solid rgba(99,102,241,.12); border-radius: 16px; overflow: hidden; background: #f5f3ff; }
         #source-canvas { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; pointer-events: none; }
         #content { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
                    font-size: clamp(30px, 6vw, 84px); font-weight: 800; letter-spacing: .05em; color: #fff; text-align: center; line-height: 1.15;
@@ -121,16 +121,16 @@
             const ctx = source.getContext('2d');
             ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
             ctx.clearRect(0, 0, w, h);
-            ctx.fillStyle = '#111318';
+            // 浅色背景（让特效更明显——和首页一致）
+            ctx.fillStyle = '#f5f3ff';
             ctx.fillRect(0, 0, w, h);
-            // 文字居中绘制（深色背景白色大字——特效明显）
-            ctx.fillStyle = '#fff';
+            ctx.fillStyle = '#1e293b';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.font = '800 ' + Math.round(Math.min(w * 0.07, 72)) + 'px -apple-system, sans-serif';
             ctx.fillText('MINDTRAINER', w / 2, h / 2 - 22);
             ctx.font = '500 ' + Math.round(Math.min(w * 0.024, 22)) + 'px -apple-system, sans-serif';
-            ctx.fillStyle = 'rgba(255,255,255,.8)';
+            ctx.fillStyle = 'rgba(30,41,59,.7)';
             ctx.fillText('选一个测试', w / 2, h / 2 + 30);
         }
 
@@ -233,9 +233,9 @@
                             const sc = document.getElementById('source-canvas');
                             const sctx = sc.getContext('2d');
                             sctx.setTransform(1, 0, 0, 1, 0, 0);
-                            sctx.fillStyle = '#111318';
+                            sctx.fillStyle = '#f5f3ff';
                             sctx.fillRect(0, 0, sc.width, sc.height);
-                            sctx.fillStyle = '#fff';
+                            sctx.fillStyle = '#1e293b';
                             sctx.textAlign = 'center';
                             sctx.textBaseline = 'middle';
                             sctx.font = '800 60px -apple-system, sans-serif';
