@@ -7,25 +7,37 @@
     <meta name="description" content="冥想训练：双脑同步声频（双耳节拍）、呼吸引导与曼陀罗动画，激活右脑，放松身心。">
     <link rel="icon" type="image/png" sizes="32x32" href="../assets/images/icons/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="../assets/images/icons/favicon-16x16.png">
-    <link rel="stylesheet" href="../assets/css/global.min.css?v=20260821">
-    <link rel="stylesheet" href="../assets/css/style.min.css?v=20260821">
-    <link rel="stylesheet" href="css/speed-read.css?v=20260821">
+    <link rel="stylesheet" href="../assets/css/global.min.css?v=20260845">
+    <link rel="stylesheet" href="../assets/css/style.min.css?v=20260845">
+    <link rel="stylesheet" href="css/speed-read.css?v=20260845">
     <style>
+        /* Liquid hero 液体背景（Canvas UI） */
+        .liq-hero-wrap { position: relative; overflow: hidden; }
+        #liq-source, #liq-output { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+        #liq-source { opacity: 0; }
+        #liq-output { z-index: 1; }
+        .liq-hero-content { position: relative; z-index: 2; }
         .wave-panel { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
         .wave-btn { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 10px 14px; border-radius: 10px; }
         .wave-btn small { font-size: 11px; color: #94a3b8; font-weight: 400; }
         .wave-btn.active { background: #0f172a; color: #fff; border-color: #0f172a; }
         .wave-btn.active small { color: #cbd5e1; }
     </style>
-    <script src="/assets/js/mt-nav.js?v=20260821" defer></script>
+    <script src="/assets/js/mt-nav.js?v=20260845" defer></script>
 </head>
 <body>
 <header id="mt-header"></header>
 
 <main>
     <section class="sr-hero" id="sr-hero">
-        <h1>冥想训练</h1>
-        <p>双脑同步声频（双耳节拍）· 呼吸引导 · 曼陀罗动画——放松身心，激活右脑。</p>
+        <div class="liq-hero-wrap">
+            <canvas id="liq-source" aria-hidden="true"></canvas>
+            <canvas id="liq-output" aria-hidden="true"></canvas>
+            <div class="liq-hero-content">
+                <h1>冥想训练</h1>
+                <p>双脑同步声频（双耳节拍）· 呼吸引导 · 曼陀罗动画——放松身心，激活右脑。</p>
+            </div>
+        </div>
     </section>
 
     <div class="sr-layout">
@@ -66,9 +78,56 @@
     </div>
 </footer>
 
-<script src="../assets/js/global.min.js?v=20260821" defer></script>
-<script src="js/sr-common.js?v=20260821" defer></script>
-<script src="js/sr-meditation.js?v=20260821" defer></script>
+<script src="../assets/js/global.min.js?v=20260845" defer></script>
+<script src="js/sr-common.js?v=20260845" defer></script>
+<script src="js/sr-meditation.js?v=20260845" defer></script>
+<script type="module">
+    // 冥想页 hero 液体流动背景（Canvas UI Liquid，无构建）
+    import { createLiquid } from '../assets/js/canvasui/liquid.js';
+    (function () {
+        const source = document.getElementById('liq-source');
+        const output = document.getElementById('liq-output');
+        const content = document.querySelector('.liq-hero-content');
+        if (!source || !output || !content) return;
+        const ctx = source.getContext('2d');
+        let inst = null;
+
+        function drawSource() {
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            const w = source.clientWidth, h = source.clientHeight;
+            if (!w || !h) return;
+            source.width = Math.round(w * dpr);
+            source.height = Math.round(h * dpr);
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            ctx.clearRect(0, 0, w, h);
+            ctx.fillStyle = '#0d0d12';
+            ctx.fillRect(0, 0, w, h);
+            const h1 = content.querySelector('h1');
+            const cs = h1 ? getComputedStyle(h1) : null;
+            ctx.fillStyle = '#fff';
+            ctx.font = (cs ? cs.fontWeight + ' ' : '700 ') + Math.round(Math.min(w * 0.06, 44)) + 'px -apple-system, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('冥想训练', w / 2, h / 2 - 16);
+            ctx.fillStyle = 'rgba(255,255,255,.72)';
+            ctx.font = '400 ' + Math.round(Math.min(w * 0.018, 15)) + 'px -apple-system, sans-serif';
+            ctx.fillText('双脑同步声频 · 呼吸引导 · 曼陀罗动画', w / 2, h / 2 + 24);
+        }
+
+        function init() {
+            drawSource();
+            inst = createLiquid(
+                { source, content, output },
+                { simResolution: 96, dyeResolution: 384, densityDissipation: 0.94, velocityDissipation: 1,
+                  pressure: 0.8, curl: 1.5, radius: 0.35, force: 1.0, intensity: 2.2,
+                  distortion: 0.4, blend: 4, rainbow: true }
+            );
+            window.__medLiq = inst;
+        }
+        init();
+        window.addEventListener('resize', () => { drawSource(); if (inst) { try { inst.resize(); } catch (e) {} } });
+    })();
+</script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const y = document.getElementById('currentYear');

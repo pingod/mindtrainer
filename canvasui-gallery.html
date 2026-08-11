@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas UI 组件库 — MindTrainer 演示</title>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "/vendor/canvasui-three/three.module.min.js",
+                "three/addons/": "/vendor/canvasui-three/"
+            }
+        }
+    </script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #0a0a0a; color: #e5e7eb; font-family: -apple-system, BlinkMacSystemFont, sans-serif; height: 100vh; overflow: hidden; }
+        .gallery { display: flex; height: 100vh; }
+        /* 左侧列表 */
+        .list { width: 240px; flex: none; background: #101014; border-right: 1px solid rgba(255,255,255,.08); overflow-y: auto; padding: 16px 10px; }
+        .list h2 { font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,.4); padding: 4px 10px 12px; }
+        .list button { display: flex; justify-content: space-between; align-items: center; width: 100%; text-align: left;
+                       background: none; border: none; color: rgba(255,255,255,.75); padding: 9px 12px; border-radius: 10px;
+                       cursor: pointer; font-size: 13.5px; transition: background .15s, color .15s; }
+        .list button:hover { background: rgba(255,255,255,.06); color: #fff; }
+        .list button.active { background: linear-gradient(135deg, rgba(109,40,217,.35), rgba(139,92,246,.2)); color: #fff; }
+        .list button small { font-size: 11px; color: rgba(255,255,255,.35); }
+        /* 右侧 demo */
+        .demo { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+        .demo-stage { position: relative; flex: 1; margin: 16px; border: 1px solid rgba(255,255,255,.09); border-radius: 16px; overflow: hidden; background: #000; }
+        #source-canvas { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; pointer-events: none; }
+        #content { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+                   font-size: clamp(30px, 6vw, 84px); font-weight: 800; letter-spacing: .05em; color: #fff; text-align: center; line-height: 1.15;
+                   pointer-events: none; }
+        #output-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+        .demo-info { padding: 12px 22px 16px; display: flex; align-items: baseline; gap: 12px; }
+        .demo-info h3 { font-size: 17px; font-weight: 700; color: #fff; }
+        .demo-info p { font-size: 12.5px; color: rgba(255,255,255,.45); }
+        .demo-info .err { color: #f87171; font-size: 12.5px; }
+        .gallery-badge { position: fixed; top: 14px; right: 18px; color: rgba(255,255,255,.35); font-size: 11px; letter-spacing: .14em; z-index: 9; }
+        .list::-webkit-scrollbar { width: 6px; }
+        .list::-webkit-scrollbar-thumb { background: rgba(255,255,255,.15); border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <div class="gallery-badge">CANVAS UI · 33 COMPONENTS</div>
+    <div class="gallery">
+        <aside class="list">
+            <h2>Canvas UI 组件</h2>
+            <div id="list"></div>
+        </aside>
+        <main class="demo">
+            <div class="demo-stage">
+                <canvas id="source-canvas"></canvas>
+                <div id="content">MINDTRAINER<br>选一个测试</div>
+                <canvas id="output-canvas"></canvas>
+            </div>
+            <div class="demo-info">
+                <h3 id="info-name"></h3>
+                <p id="info-desc"></p>
+                <span class="err" id="info-err"></span>
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        const COMPONENTS = [
+            ['particle-reveal', 'ParticleReveal', '粒子揭示：光标消散显现文字'],
+            ['liquid', 'Liquid', '液体流动：流体扭曲内容'],
+            ['asciiobject', 'AsciiObject', 'ASCII 物体：字符构成 3D 模型'],
+            ['asciify', 'Asciify', 'ASCII 滤镜：画面字符化'],
+            ['bend', 'Bend', '弯曲：内容扭曲弯折'],
+            ['blaze', 'Blaze', '火焰：燃烧效果'],
+            ['bubble', 'Bubble', '气泡：漂浮气泡'],
+            ['canvas', 'Canvas', '画布：基础画布'],
+            ['cloth', 'Cloth', '布料：织物飘动'],
+            ['clouds', 'Clouds', '云：流动云层'],
+            ['decryptreveal', 'DecryptReveal', '解密揭示：字符解密显现'],
+            ['displacement', 'Displacement', '置换：位移扭曲'],
+            ['ditheredobject', 'DitheredObject', '抖动点阵：像素化模型'],
+            ['droplets', 'Droplets', '水滴：雨水滴落'],
+            ['flamewrap', 'FlameWrap', '火焰包裹：火焰环绕'],
+            ['forcefield', 'ForceField', '力场：能量场波动'],
+            ['frost', 'Frost', '磨砂：霜冻玻璃'],
+            ['glass', 'Glass', '玻璃：毛玻璃折射'],
+            ['glassobject', 'GlassObject', '玻璃物体：玻璃质感模型'],
+            ['glitch', 'Glitch', '故障：信号失真'],
+            ['glyphrain', 'GlyphRain', '字符雨：数字雨下落'],
+            ['grid', 'Grid', '网格：动态网格场'],
+            ['hexfloat', 'HexFloat', '六边形漂浮：悬浮六边形'],
+            ['laser', 'Laser', '激光：激光光束'],
+            ['liquidobject', 'LiquidObject', '液体物体：流体包裹模型'],
+            ['magnify', 'Magnify', '放大镜：局部放大'],
+            ['particleobject', 'ParticleObject', '粒子物体：粒子构成模型'],
+            ['particlescroll', 'ParticleScroll', '滚动粒子：滚动粒子背景'],
+            ['peel', 'Peel', '剥离：页面剥离'],
+            ['retrodither', 'RetroDither', '复古抖动：像素噪点'],
+            ['ripple', 'Ripple', '波纹：涟漪扩散'],
+            ['shatter', 'Shatter', '破碎：碎块迸裂'],
+            ['vhs', 'VHS', '复古录像：VHS 特效'],
+        ];
+
+        const source = document.getElementById('source-canvas');
+        const output = document.getElementById('output-canvas');
+        const content = document.getElementById('content');
+        const infoName = document.getElementById('info-name');
+        const infoDesc = document.getElementById('info-desc');
+        const infoErr = document.getElementById('info-err');
+        let current = null;
+
+        function drawSource() {
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            const w = source.clientWidth, h = source.clientHeight;
+            if (!w || !h) return;
+            source.width = Math.round(w * dpr);
+            source.height = Math.round(h * dpr);
+            const ctx = source.getContext('2d');
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            ctx.clearRect(0, 0, w, h);
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, w, h);
+            ctx.fillStyle = '#fff';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.font = '800 ' + Math.round(Math.min(w * 0.09, 84)) + 'px -apple-system, sans-serif';
+            ctx.fillText('MINDTRAINER', w / 2, h / 2 - 30);
+            ctx.font = '500 ' + Math.round(Math.min(w * 0.028, 24)) + 'px -apple-system, sans-serif';
+            ctx.fillStyle = 'rgba(255,255,255,.85)';
+            ctx.fillText('选一个测试', w / 2, h / 2 + 34);
+        }
+
+        // Object 类组件（three 渲染 GLTF 模型）：elements 用 {canvas}，options 传 model
+        const OBJECT_COMPONENTS = new Set(['asciiobject', 'ditheredobject', 'glassobject', 'liquidobject', 'particleobject']);
+        const MODEL_URL = '/vendor/canvasui-three/models/box.glb';
+
+        async function loadComponent(name, createName) {
+            infoErr.textContent = '';
+            if (current && current.destroy) { try { current.destroy(); } catch (e) {} current = null; }
+            try {
+                const m = await import(`./assets/js/canvasui/${name}.js`);
+                const createFn = m[createName];
+                if (typeof createFn !== 'function') {
+                    const alt = Object.keys(m).find(k => k.startsWith('create') && typeof m[k] === 'function');
+                    if (!alt) throw new Error('无 create 函数');
+                    createFn = m[alt];
+                }
+                if (OBJECT_COMPONENTS.has(name)) {
+                    current = createFn({ canvas: output }, { model: MODEL_URL, autoRotate: true });
+                    infoErr.textContent = current ? '' : '（create 返回 null——需要特殊参数）';
+                } else {
+                    drawSource();
+                    current = createFn({ source, content, output }, { rainbow: true, radius: 0.4 });
+                    infoErr.textContent = current ? '' : '（create 返回 null——需要特殊参数）';
+                }
+            } catch (e) {
+                infoErr.textContent = '错误: ' + (e.message || e);
+            }
+        }
+
+        function buildList() {
+            const wrap = document.getElementById('list');
+            COMPONENTS.forEach(([file, name, desc], i) => {
+                const b = document.createElement('button');
+                b.innerHTML = `<span>${name}</span><small>${desc.split('：')[0]}</small>`;
+                b.onclick = async () => {
+                    document.querySelectorAll('.list button').forEach(x => x.classList.remove('active'));
+                    b.classList.add('active');
+                    infoName.textContent = name;
+                    infoDesc.textContent = desc;
+                    await loadComponent(file, `create${name}`);
+                };
+                wrap.appendChild(b);
+                if (i === 0) b.click();
+            });
+        }
+
+        window.addEventListener('resize', () => { drawSource(); if (current && current.resize) { try { current.resize(); } catch (e) {} } });
+        buildList();
+    </script>
+</body>
+</html>
