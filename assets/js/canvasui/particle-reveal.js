@@ -166,6 +166,7 @@ export function createParticleReveal(elements, options = {}) {
     stencil: false,
     antialias: false,
     premultipliedAlpha: false,
+    preserveDrawingBuffer: true,
   });
   if (!gl || gl.isContextLost()) return null;
 
@@ -289,7 +290,20 @@ export function createParticleReveal(elements, options = {}) {
   syncCanvasSize();
 
   function uploadContent() {
-    if (!htmlInCanvas || !contentDirty) return;
+    // 手动绘制模式（drawElementImage 不可用）：每次渲染上传 source canvas 内容
+    if (!htmlInCanvas) {
+      gl.bindTexture(gl.TEXTURE_2D, contentTexture);
+      gl.texImage2D(
+        gl.TEXTURE_2D,
+        0,
+        gl.RGBA,
+        gl.RGBA,
+        gl.UNSIGNED_BYTE,
+        source,
+      );
+      return;
+    }
+    if (!contentDirty) return;
     contentDirty = false;
     gl.bindTexture(gl.TEXTURE_2D, contentTexture);
     gl.texImage2D(
@@ -331,7 +345,7 @@ export function createParticleReveal(elements, options = {}) {
     gl.uniform3f(uniforms.uBg, bg[0], bg[1], bg[2]);
     gl.uniform1f(uniforms.uTime, time);
     gl.uniform1f(uniforms.uMaxX, contentMaxX);
-    gl.uniform1f(uniforms.uCrisp, reducedMotion || !htmlInCanvas ? 1 : 0);
+    gl.uniform1f(uniforms.uCrisp, reducedMotion ? 1 : 0);
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     gl.viewport(0, 0, output.width, output.height);
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
