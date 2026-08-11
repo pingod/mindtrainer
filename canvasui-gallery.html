@@ -65,7 +65,7 @@
         </main>
     </div>
 
-    <script src="assets/js/feedback-marker.js?v=20260848" defer></script>
+    <script src="assets/js/feedback-marker.js?v=20260849" defer></script>
     <script type="module">
         const COMPONENTS = [
             ['particle-reveal', 'ParticleReveal', '粒子揭示：光标消散显现文字'],
@@ -106,6 +106,7 @@
         const source = document.getElementById('source-canvas');
         const output = document.getElementById('output-canvas');
         const content = document.getElementById('content');
+        const stage = document.querySelector('.demo-stage');
         const infoName = document.getElementById('info-name');
         const infoDesc = document.getElementById('info-desc');
         const infoErr = document.getElementById('info-err');
@@ -113,24 +114,44 @@
 
         function drawSource() {
             const dpr = Math.min(window.devicePixelRatio || 1, 2);
-            const w = source.clientWidth, h = source.clientHeight;
+            const w = stage.clientWidth, h = stage.clientHeight;
             if (!w || !h) return;
             source.width = Math.round(w * dpr);
             source.height = Math.round(h * dpr);
             const ctx = source.getContext('2d');
             ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
             ctx.clearRect(0, 0, w, h);
-            ctx.fillStyle = '#000';
+            ctx.fillStyle = '#111318';
             ctx.fillRect(0, 0, w, h);
-            // 文字偏上绘制（1/3 处）——用于检测方向（正常=上密下疏，倒置=下密上疏）
+            // 文字居中绘制（深色背景白色大字——特效明显）
             ctx.fillStyle = '#fff';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.font = '800 ' + Math.round(Math.min(w * 0.09, 84)) + 'px -apple-system, sans-serif';
-            ctx.fillText('MINDTRAINER', w / 2, h * 0.35);
-            ctx.font = '500 ' + Math.round(Math.min(w * 0.028, 24)) + 'px -apple-system, sans-serif';
-            ctx.fillStyle = 'rgba(255,255,255,.85)';
-            ctx.fillText('选一个测试', w / 2, h * 0.35 + 40);
+            ctx.font = '800 ' + Math.round(Math.min(w * 0.07, 72)) + 'px -apple-system, sans-serif';
+            ctx.fillText('MINDTRAINER', w / 2, h / 2 - 22);
+            ctx.font = '500 ' + Math.round(Math.min(w * 0.024, 22)) + 'px -apple-system, sans-serif';
+            ctx.fillStyle = 'rgba(255,255,255,.8)';
+            ctx.fillText('选一个测试', w / 2, h / 2 + 30);
+        }
+
+        // 自动交互序列（pointermove → click → 移动——覆盖所有交互型组件）
+        function autoInteract(inst, el) {
+            if (!inst || !el) return;
+            const rect = () => el.getBoundingClientRect();
+            const fire = (type, x, y) => {
+                try {
+                    el.dispatchEvent(new PointerEvent(type, { clientX: x, clientY: y, bubbles: true, cancelable: true }));
+                } catch (e) {}
+            };
+            const cx = () => rect().left + rect().width / 2;
+            const cy = () => rect().top + rect().height / 2;
+            setTimeout(() => fire('pointermove', cx(), cy()), 300);
+            setTimeout(() => {
+                try {
+                    el.dispatchEvent(new MouseEvent('click', { clientX: cx(), clientY: cy(), bubbles: true, cancelable: true }));
+                } catch (e) {}
+            }, 650);
+            setTimeout(() => fire('pointermove', cx() + Math.min(120, rect().width * 0.2), cy() - Math.min(60, rect().height * 0.15)), 1100);
         }
 
         // Object 类组件（three 渲染 GLTF 模型）：elements 用 {canvas}，options 传 model
@@ -153,22 +174,11 @@
                     infoErr.textContent = current ? '' : '（create 返回 null——需要特殊参数）';
                 } else {
                     drawSource();
-                    current = createFn({ source, content, output }, { rainbow: true, radius: 0.4 });
+                    current = createFn({ source, content: stage, output }, { rainbow: true, radius: 0.4 });
                     infoErr.textContent = current ? '' : '（create 返回 null——需要特殊参数）';
                 }
-                // 自动触发一次交互（pointermove 到中心——交互型组件初始即有反应）
-                if (current && output) {
-                    setTimeout(() => {
-                        try {
-                            const rect = output.getBoundingClientRect();
-                            output.dispatchEvent(new PointerEvent('pointermove', {
-                                clientX: rect.left + rect.width / 2,
-                                clientY: rect.top + rect.height / 2,
-                                bubbles: true
-                            }));
-                        } catch (e) {}
-                    }, 300);
-                }
+                // 自动交互序列（pointermove → click → 移动）
+                autoInteract(current, output);
                 infoDesc.textContent = (infoDesc.dataset.base || '') + ' · 移动鼠标 / 点击交互';
             } catch (e) {
                 infoErr.textContent = '错误: ' + (e.message || e);
@@ -219,30 +229,56 @@
                         const err = document.getElementById('info-err').textContent;
                         let res = 'EMPTY'; let top = 0, bot = 0, total = 0;
                         if (o && o.width && !err) {
-                            const c = o.getContext('webgl2');
-                            if (c && c.drawingBufferWidth > 0) {
-                                const bw = c.drawingBufferWidth, bh = c.drawingBufferHeight;
-                                const buf = new Uint8Array(bw * bh * 4);
-                                c.readPixels(0, 0, bw, bh, c.RGBA, c.UNSIGNED_BYTE, buf);
-                                for (let yy = 0; yy < bh; yy++) {
-                                    for (let xx = 0; xx < bw; xx++) {
-                                        const idx = (yy * bw + xx) * 4;
-                                        const lum = buf[idx] * 0.3 + buf[idx + 1] * 0.6 + buf[idx + 2] * 0.1;
-                                        if (lum > 15) { total++; if (yy / bh < 0.4) top++; if (yy / bh > 0.6) bot++; }
+                            // 偏上检测：重画 source（文字偏上）→ 触发重渲染 → 读像素分布
+                            const sc = document.getElementById('source-canvas');
+                            const sctx = sc.getContext('2d');
+                            sctx.setTransform(1, 0, 0, 1, 0, 0);
+                            sctx.fillStyle = '#111318';
+                            sctx.fillRect(0, 0, sc.width, sc.height);
+                            sctx.fillStyle = '#fff';
+                            sctx.textAlign = 'center';
+                            sctx.textBaseline = 'middle';
+                            sctx.font = '800 60px -apple-system, sans-serif';
+                            sctx.fillText('MINDTRAINER', sc.width / 2, sc.height * 0.3);
+                            o.dispatchEvent(new PointerEvent('pointermove', {
+                                clientX: o.getBoundingClientRect().left + o.getBoundingClientRect().width / 2,
+                                clientY: o.getBoundingClientRect().top + o.getBoundingClientRect().height / 2,
+                                bubbles: true
+                            }));
+                            // 等渲染完成 → destroy 停止渲染 → 读最后帧（避免持续渲染组件阻塞 readPixels）
+                            setTimeout(() => {
+                                try {
+                                    if (current && current.destroy) { try { current.destroy(); } catch (e) {} current = null; }
+                                } catch (e) {}
+                                const c = o.getContext('webgl2');
+                                if (c && c.drawingBufferWidth > 0) {
+                                    const bw = c.drawingBufferWidth, bh = c.drawingBufferHeight;
+                                    const buf = new Uint8Array(bw * bh * 4);
+                                    c.readPixels(0, 0, bw, bh, c.RGBA, c.UNSIGNED_BYTE, buf);
+                                    for (let yy = 0; yy < bh; yy++) {
+                                        for (let xx = 0; xx < bw; xx++) {
+                                            const idx = (yy * bw + xx) * 4;
+                                            const lum = buf[idx] * 0.3 + buf[idx + 1] * 0.6 + buf[idx + 2] * 0.1;
+                                            if (lum > 15) { total++; if (yy / bh < 0.35) top++; if (yy / bh > 0.65) bot++; }
+                                        }
                                     }
+                                    if (total < 50) res = 'EMPTY';
+                                    else if (top > bot * 1.5) res = 'UP(正常)';
+                                    else if (bot > top * 1.5) res = 'DOWN(倒置!)';
+                                    else res = 'CENTER';
                                 }
-                                if (total < 50) res = 'EMPTY';
-                                else if (top > bot * 1.5) res = 'UP(正常)';
-                                else if (bot > top * 1.5) res = 'DOWN(倒置!)';
-                                else res = 'CENTER';
-                            }
+                                lines.push(name.padEnd(20) + ' ' + res.padEnd(12) + ' px=' + total + (err ? ' err=' + err.slice(0, 30) : ''));
+                                i++; next();
+                            }, 600);
+                        } else {
+                            lines.push(name.padEnd(20) + ' EMPTY/SKIP px=0' + (err ? ' err=' + err.slice(0, 30) : ''));
+                            i++; next();
                         }
-                        lines.push(name.padEnd(20) + ' ' + res.padEnd(12) + ' px=' + total + (err ? ' err=' + err.slice(0, 30) : ''));
                     } catch (e) {
                         lines.push(name.padEnd(20) + ' EXC:' + e.message.slice(0, 40));
+                        i++; next();
                     }
-                    i++; next();
-                }, 900);
+                }, 1100);
             }
             next();
         };

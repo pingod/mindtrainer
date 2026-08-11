@@ -312,6 +312,43 @@
       d.appendChild(t1);
       d.appendChild(t2);
       d.appendChild(t3);
+      // 编辑按钮：点击后改为 textarea 编辑问题
+      const editRow = document.createElement('div');
+      editRow.style.cssText = 'display:flex;gap:6px;margin-top:8px;';
+      const editBtn = document.createElement('button');
+      editBtn.textContent = '✏ 编辑';
+      editBtn.style.cssText = 'background:#f1f5f9;color:#475569;';
+      const ta = document.createElement('textarea');
+      ta.style.cssText = 'display:none;width:100%;box-sizing:border-box;min-height:60px;border:1px solid rgba(99,102,241,.3);border-radius:8px;padding:8px;font-size:12.5px;font-family:inherit;';
+      ta.value = it.question;
+      const saveBtn = document.createElement('button');
+      saveBtn.textContent = '保存';
+      saveBtn.style.cssText = 'display:none;background:linear-gradient(135deg,#6d28d9,#8b5cf6);color:#fff;';
+      editBtn.onclick = () => {
+        ta.style.display = 'block';
+        saveBtn.style.display = 'inline-block';
+        editBtn.style.display = 'none';
+        ta.focus();
+      };
+      saveBtn.onclick = () => {
+        const q = ta.value.trim();
+        if (!q) { toast('问题不能为空'); return; }
+        const all = load();
+        if (all[i]) {
+          all[i].question = q;
+          all[i].edited = true;
+          save(all);
+          t3.textContent = q;
+        }
+        ta.style.display = 'none';
+        saveBtn.style.display = 'none';
+        editBtn.style.display = 'inline-block';
+        toast('✅ 已更新');
+      };
+      editRow.appendChild(editBtn);
+      editRow.appendChild(ta);
+      editRow.appendChild(saveBtn);
+      d.appendChild(editRow);
       list.appendChild(d);
     });
     const close = document.createElement('button');

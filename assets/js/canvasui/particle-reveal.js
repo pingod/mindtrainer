@@ -293,7 +293,8 @@ export function createParticleReveal(elements, options = {}) {
     // 手动绘制模式（drawElementImage 不可用）：每次渲染上传 source canvas 内容
     if (!htmlInCanvas) {
       gl.bindTexture(gl.TEXTURE_2D, contentTexture);
-      gl.texImage2D(
+      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+    gl.texImage2D(
         gl.TEXTURE_2D,
         0,
         gl.RGBA,

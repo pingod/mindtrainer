@@ -533,7 +533,13 @@ function createGlassObject(elements, options = {}) {
   }
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(config.fov, 1, 0.1, 200);
+  scene.add(new THREE.AmbientLight(0xffffff, 1.4));
+  const dirLight = new THREE.DirectionalLight(0xffffff, 1.6);
+  dirLight.position.set(2, 3, 4);
+  scene.add(dirLight);
+  const dirLight2 = new THREE.DirectionalLight(0xffffff, 0.5);
+  dirLight2.position.set(-3, 1, -2);
+  scene.add(dirLight2);  const camera = new THREE.PerspectiveCamera(config.fov, 1, 0.1, 200);
   camera.position.copy(CAMERA_DIR).multiplyScalar(config.cameraDistance);
   const floatGroup = new THREE.Group();
   floatGroup.position.y = MODEL_LIFT;

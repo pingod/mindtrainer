@@ -229,7 +229,16 @@ function createPeel(elements, options = {}) {
   let hasTexture = false;
   if (under && htmlInCanvas) under.style.visibility = "hidden";
   capture = () => {
-    if (!htmlInCanvas) return;
+    if (!htmlInCanvas) {
+      try {
+        gl.bindTexture(gl.TEXTURE_2D, contentTexture);
+        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, source);
+        wake();
+      } catch {
+      }
+      return;
+    }
     try {
       sourceCtx.reset();
       sourceCtx.drawElementImage(content, 0, 0);
@@ -410,6 +419,7 @@ function createPeel(elements, options = {}) {
   }
   function start() {
     if (destroyed || running || !visible) return;
+    capture();
     running = true;
     lastTime = performance.now();
     raf = requestAnimationFrame(frame);
@@ -457,7 +467,6 @@ function createPeel(elements, options = {}) {
     return x;
   }
   function onPointerMove(event) {
-    if (!htmlInCanvas) return;
     const rect = output.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;

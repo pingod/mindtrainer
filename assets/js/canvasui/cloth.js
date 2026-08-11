@@ -279,7 +279,16 @@ function createCloth(elements, options = {}) {
   );
   let contentMaxX = 1;
   capture = () => {
-    if (!htmlInCanvas) return;
+    if (!htmlInCanvas) {
+      try {
+        gl.bindTexture(gl.TEXTURE_2D, contentTexture);
+        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, source);
+        wake();
+      } catch {
+      }
+      return;
+    }
     try {
       sourceCtx.reset();
       sourceCtx.drawElementImage(content, 0, 0);
@@ -634,8 +643,8 @@ function createCloth(elements, options = {}) {
     raf = requestAnimationFrame(frame);
   }
   function start() {
-    if (!htmlInCanvas) return;
     if (destroyed || running || !visible) return;
+    capture();
     running = true;
     lastTime = performance.now();
     raf = requestAnimationFrame(frame);
@@ -677,7 +686,6 @@ function createCloth(elements, options = {}) {
   intersection.observe(output);
   const listenTarget = wrapper;
   function onPointerMove(event) {
-    if (!htmlInCanvas) return;
     const rect = wrapper.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
