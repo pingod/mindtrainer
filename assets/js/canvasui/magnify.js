@@ -331,7 +331,6 @@ function createMagnify(elements, options = {}) {
   function uploadContent() {
     if (!htmlInCanvas) {
       gl.bindTexture(gl.TEXTURE_2D, contentTexture);
-      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, source);
       return;
     }
