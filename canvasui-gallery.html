@@ -111,6 +111,7 @@
         const infoDesc = document.getElementById('info-desc');
         const infoErr = document.getElementById('info-err');
         let current = null;
+        let aiTimers = [];  // autoInteract timeout IDs
 
         function drawSource() {
             const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -145,13 +146,13 @@
             };
             const cx = () => rect().left + rect().width / 2;
             const cy = () => rect().top + rect().height / 2;
-            setTimeout(() => fire('pointermove', cx(), cy()), 300);
-            setTimeout(() => {
+            aiTimers.push(setTimeout(() => fire('pointermove', cx(), cy()), 300));
+            aiTimers.push(setTimeout(() => {
                 try {
                     el.dispatchEvent(new MouseEvent('click', { clientX: cx(), clientY: cy(), bubbles: true, cancelable: true }));
                 } catch (e) {}
-            }, 650);
-            setTimeout(() => fire('pointermove', cx() + Math.min(120, rect().width * 0.2), cy() - Math.min(60, rect().height * 0.15)), 1100);
+            }, 650));
+            aiTimers.push(setTimeout(() => fire('pointermove', cx() + Math.min(120, rect().width * 0.2), cy() - Math.min(60, rect().height * 0.15)), 1100));
         }
 
         // Object 类组件（three 渲染 GLTF 模型）：elements 用 {canvas}，options 传 model
@@ -160,6 +161,9 @@
 
         async function loadComponent(name, createName) {
             infoErr.textContent = '';
+            // 清理前一个组件 + 待执行交互定时器
+            aiTimers.forEach(t => clearTimeout(t));
+            aiTimers = [];
             if (current && current.destroy) { try { current.destroy(); } catch (e) {} current = null; }
             try {
                 const m = await import(`./assets/js/canvasui/${name}.js`);
