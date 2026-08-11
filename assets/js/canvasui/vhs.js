@@ -188,7 +188,8 @@ function createVHS(elements, options = {}) {
     depth: false,
     stencil: false,
     antialias: false,
-    premultipliedAlpha: false
+    premultipliedAlpha: false,
+    preserveDrawingBuffer: true
   });
   if (!gl || gl.isContextLost()) return null;
   const sourceCtx = source.getContext("2d");

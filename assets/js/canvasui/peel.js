@@ -131,7 +131,8 @@ function createPeel(elements, options = {}) {
     depth: true,
     stencil: false,
     antialias: true,
-    premultipliedAlpha: true
+    premultipliedAlpha: true,
+    preserveDrawingBuffer: true
   });
   if (!gl || gl.isContextLost()) return null;
   const sourceCtx = source.getContext("2d");

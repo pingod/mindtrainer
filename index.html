@@ -32,20 +32,37 @@
     <meta name="twitter:description" content="6 项认知基准测试：反应时间、瞄准、序列记忆、数字记忆、多物体追踪、斯特鲁普；另有速读、闪视、照相记忆、冥想等训练。">
     <meta name="twitter:image" content="https://picktests.com/assets/images/og/og-image.png">
 
-    <link rel="stylesheet" href="assets/css/global.min.css?v=20260845">
-    <link rel="stylesheet" href="assets/css/style.min.css?v=20260845">
+    <link rel="stylesheet" href="assets/css/global.min.css?v=20260846">
+    <link rel="stylesheet" href="assets/css/style.min.css?v=20260846">
 
     <style>
         /* ParticleReveal 标题粒子效果（Canvas UI） */
-        .pr-title-wrap { position: relative; display: inline-block; }
-        #pr-source, #pr-output { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
-        #pr-source { opacity: 0; }
-        #pr-output { z-index: 2; }
-        .pr-title-wrap h1 { position: relative; z-index: 1; margin: 0; }
+        .pr-title-wrap, .fx-title-wrap { position: relative; display: inline-block; }
+        #pr-source, #pr-output, #dr-source, #dr-output, #gl-source, #gl-output { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+        #pr-source, #dr-source, #gl-source { opacity: 0; }
+        #pr-output, #dr-output, #gl-output { z-index: 2; }
+        .pr-title-wrap h1, .fx-title-wrap h2 { position: relative; z-index: 1; margin: 0; }
+        /* 特效画廊入口（页面底部） */
+        .gallery-entry { max-width: 1200px; margin: 0 auto 32px; }
+        .gallery-entry-card {
+            display: flex; align-items: center; justify-content: space-between; gap: 24px;
+            padding: 34px 40px; border-radius: 24px; text-decoration: none;
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4c1d95 100%);
+            box-shadow: 0 24px 60px -28px rgba(76,29,149,.6);
+            transition: transform .2s ease, box-shadow .2s ease;
+        }
+        .gallery-entry-card:hover { transform: translateY(-3px); box-shadow: 0 32px 70px -30px rgba(76,29,149,.75); }
+        .gallery-entry-copy h3 { color: #fff; font-size: 26px; font-weight: 800; margin-bottom: 8px; letter-spacing: .02em; }
+        .gallery-entry-copy p { color: rgba(255,255,255,.72); font-size: 14px; line-height: 1.7; margin: 0; }
+        .gallery-entry-btn {
+            flex: none; display: inline-flex; align-items: center; gap: 8px;
+            background: #fff; color: #4c1d95; font-weight: 700; font-size: 15px;
+            padding: 13px 26px; border-radius: 999px; white-space: nowrap;
+        }
         /* 飞克视读：与「Mind基准测试」同款独立框 */
         .speed-reading-section { flex: 0 0 1200px; max-width: 1200px; box-sizing: border-box; padding-top: 56px; padding-bottom: 56px; margin-bottom: 0; }
     </style>
-    <script src="/assets/js/mt-nav.js?v=20260845" defer></script>
+    <script src="/assets/js/mt-nav.js?v=20260846" defer></script>
 </head>
 <body>
 <header id="mt-header"></header>
@@ -68,7 +85,11 @@
 
     <section id="tests" class="main-tests">
         <div class="test-directory-heading">
-            <h2>Mind基准测试</h2>
+            <div class="fx-title-wrap">
+                <canvas id="dr-source" aria-hidden="true"></canvas>
+                <canvas id="dr-output" aria-hidden="true"></canvas>
+                <h2>Mind基准测试</h2>
+            </div>
             <p>每项测试只关注一种能力，完成后留下清楚的结果。</p>
         </div>
 
@@ -114,7 +135,11 @@
 
 <section class="main-tests speed-reading-section" aria-label="速读训练中心">
         <div class="test-directory-heading">
-            <h2>⚡ 速读训练中心 · 飞克视读 Web 重写版</h2>
+            <div class="fx-title-wrap">
+                <canvas id="gl-source" aria-hidden="true"></canvas>
+                <canvas id="gl-output" aria-hidden="true"></canvas>
+                <h2>⚡ 速读训练中心 · 飞克视读 Web 重写版</h2>
+            </div>
             <p>基础训练 26 项 · 闪视 · 速读 · 照相记忆 · 冥想 · 训练计划</p>
         </div>
         <div class="test-directory-grid">
@@ -259,20 +284,28 @@
     </div>
 </footer>
 
-<script src="assets/js/global.min.js?v=20260845" defer></script>
+<section class="gallery-entry">
+    <a class="gallery-entry-card" href="/canvasui-gallery.html">
+        <div class="gallery-entry-copy">
+            <h3>✨ 特效画廊</h3>
+            <p>33 个 WebGL 视觉组件 · 粒子 / 液体 / 玻璃 / 火焰 / 故障……全部可交互演示</p>
+        </div>
+        <span class="gallery-entry-btn">进入画廊 →</span>
+    </a>
+</section>
+
+<script src="assets/js/global.min.js?v=20260846" defer></script>
 
 <script type="module">
-    // 首页标题粒子揭示（Canvas UI ParticleReveal，无构建）
+    // 首页标题特效（Canvas UI，无构建）
     import { createParticleReveal } from './assets/js/canvasui/particle-reveal.js';
-    (function () {
-        const source = document.getElementById('pr-source');
-        const output = document.getElementById('pr-output');
-        const content = document.querySelector('.pr-title-wrap h1');
-        if (!source || !output || !content) return;
-        const ctx = source.getContext('2d');
-        let inst = null;
+    import { createDecryptReveal } from './assets/js/canvasui/decryptreveal.js';
+    import { createGlitch } from './assets/js/canvasui/glitch.js';
 
-        function drawSource() {
+    // 通用：把元素文字画到 source canvas
+    function setupSource(source, content, opts) {
+        const ctx = source.getContext('2d');
+        return function draw() {
             const dpr = Math.min(window.devicePixelRatio || 1, 2);
             const w = source.clientWidth, h = source.clientHeight;
             if (!w || !h) return;
@@ -280,19 +313,28 @@
             source.height = Math.round(h * dpr);
             ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
             ctx.clearRect(0, 0, w, h);
-            ctx.fillStyle = '#f7f6ff';
+            ctx.fillStyle = opts.bg || '#ffffff';
             ctx.fillRect(0, 0, w, h);
-            const cs = getComputedStyle(content);
-            ctx.fillStyle = cs.color || '#0f172a';
-            ctx.font = cs.fontWeight + ' ' + cs.fontSize + ' ' + (cs.fontFamily || 'sans-serif');
+            const el = content instanceof Element ? content : content[0];
+            const cs = el ? getComputedStyle(el) : null;
+            ctx.fillStyle = opts.color || (cs ? cs.color : '#0f172a');
+            ctx.font = (cs ? (cs.fontWeight + ' ' + cs.fontSize) : '700 40px sans-serif') + ' ' + (cs ? cs.fontFamily : 'sans-serif');
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.fillText(content.textContent.trim(), w / 2, h / 2);
-        }
+            ctx.fillText((el ? el.textContent : '标题').trim(), w / 2, h / 2);
+        };
+    }
 
+    // 1. hero 标题：ParticleReveal 粒子揭示
+    (function () {
+        const source = document.getElementById('pr-source');
+        const output = document.getElementById('pr-output');
+        const content = document.querySelector('.pr-title-wrap h1');
+        if (!source || !output || !content) return;
+        const draw = setupSource(source, content, { bg: '#f7f6ff' });
         function init() {
-            drawSource();
-            inst = createParticleReveal(
+            draw();
+            const inst = createParticleReveal(
                 { source, content, output },
                 { radius: 320, size: 1.2, scatter: 24, drift: 1, aberration: 30, bend: 40,
                   fade: 0.8, threshold: 0.15, background: '#f7f6ff', smoothing: 0.3 }
@@ -305,13 +347,60 @@
                     clientY: rect.top + rect.height / 2,
                     bubbles: true
                 }));
-            } else {
-                window.__prInst = null;
-                window.__prInitErr = 'createParticleReveal 返回 null';
             }
         }
         init();
-        window.addEventListener('resize', () => { drawSource(); if (inst) { try { inst.resize(); } catch (e) {} } });
+        window.addEventListener('resize', () => { draw(); if (window.__prInst) { try { window.__prInst.resize(); } catch (e) {} } });
+    })();
+
+    // 2. Mind 标题：DecryptReveal 解密显现
+    (function () {
+        const source = document.getElementById('dr-source');
+        const output = document.getElementById('dr-output');
+        const content = document.querySelector('.fx-title-wrap h2');
+        if (!source || !output || !content) return;
+        const draw = setupSource(source, content, { bg: '#ffffff', color: '#1e293b' });
+        let inst = null;
+        function init() {
+            draw();
+            inst = createDecryptReveal(
+                { source, content, output },
+                { radius: 300, cell: 12, colored: 0.6, color: '#6d28d9', brightness: 1.1,
+                  scramble: 0.12, scrambleSpeed: 5, legibility: 1 }
+            );
+            window.__drInst = inst;
+            // 初始解密动画
+            if (inst) {
+                const rect = output.getBoundingClientRect();
+                output.dispatchEvent(new PointerEvent('pointermove', {
+                    clientX: rect.left + rect.width / 2,
+                    clientY: rect.top + rect.height / 2,
+                    bubbles: true
+                }));
+            }
+        }
+        init();
+        window.addEventListener('resize', () => { draw(); if (window.__drInst) { try { window.__drInst.resize(); } catch (e) {} } });
+    })();
+
+    // 3. 飞克标题：Glitch 故障
+    (function () {
+        const source = document.getElementById('gl-source');
+        const output = document.getElementById('gl-output');
+        const content = document.querySelector('.speed-reading-section .fx-title-wrap h2');
+        if (!source || !output || !content) return;
+        const draw = setupSource(source, content, { bg: '#ffffff', color: '#1e293b' });
+        let inst = null;
+        function init() {
+            draw();
+            inst = createGlitch(
+                { source, content, output },
+                { intensity: 1, interval: 3, duration: 0.4, slices: 24, shift: 30, rgbShift: 4, blocks: 0.5, noise: 0.3 }
+            );
+            window.__glInst = inst;
+        }
+        init();
+        window.addEventListener('resize', () => { draw(); if (window.__glInst) { try { window.__glInst.resize(); } catch (e) {} } });
     })();
 </script>
 

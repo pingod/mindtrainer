@@ -325,7 +325,8 @@ function createShatter(elements, options = {}) {
     depth: false,
     stencil: false,
     antialias: true,
-    premultipliedAlpha: false
+    premultipliedAlpha: false,
+    preserveDrawingBuffer: true
   });
   if (!gl || gl.isContextLost()) return null;
   const sourceCtx = source.getContext("2d");

@@ -221,7 +221,8 @@ function createLaser(elements, options = {}) {
     depth: false,
     stencil: false,
     antialias: false,
-    premultipliedAlpha: true
+    premultipliedAlpha: true,
+    preserveDrawingBuffer: true
   });
   if (!gl || gl.isContextLost()) return null;
   const sourceCtx = source.getContext("2d");

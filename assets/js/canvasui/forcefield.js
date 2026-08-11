@@ -461,7 +461,8 @@ function createForceField(elements, options = {}) {
     depth: false,
     stencil: false,
     antialias: false,
-    premultipliedAlpha: true
+    premultipliedAlpha: true,
+    preserveDrawingBuffer: true
   });
   if (!gl || gl.isContextLost()) return null;
   const hdr = Boolean(
