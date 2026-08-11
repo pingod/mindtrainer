@@ -32,15 +32,16 @@
     <meta name="twitter:description" content="6 项认知基准测试：反应时间、瞄准、序列记忆、数字记忆、多物体追踪、斯特鲁普；另有速读、闪视、照相记忆、冥想等训练。">
     <meta name="twitter:image" content="https://picktests.com/assets/images/og/og-image.png">
 
-    <link rel="stylesheet" href="assets/css/global.min.css?v=20260846">
-    <link rel="stylesheet" href="assets/css/style.min.css?v=20260846">
+    <link rel="stylesheet" href="assets/css/global.min.css?v=20260848">
+    <link rel="stylesheet" href="assets/css/style.min.css?v=20260848">
 
     <style>
         /* ParticleReveal 标题粒子效果（Canvas UI） */
         .pr-title-wrap, .fx-title-wrap { position: relative; display: inline-block; }
-        #pr-source, #pr-output, #dr-source, #dr-output, #gl-source, #gl-output { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
-        #pr-source, #dr-source, #gl-source { opacity: 0; }
-        #pr-output, #dr-output, #gl-output { z-index: 2; }
+        #pr-source, #pr-output, #dr-source, #dr-output, #gl-source, #gl-output,
+        #rp-source, #rp-output, #ft-source, #ft-output { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+        #pr-source, #dr-source, #gl-source, #rp-source, #ft-source { opacity: 0; }
+        #pr-output, #dr-output, #gl-output, #rp-output, #ft-output { z-index: 2; }
         .pr-title-wrap h1, .fx-title-wrap h2 { position: relative; z-index: 1; margin: 0; }
         /* 特效画廊入口（页面底部） */
         .gallery-entry { max-width: 1200px; margin: 0 auto 32px; }
@@ -62,7 +63,7 @@
         /* 飞克视读：与「Mind基准测试」同款独立框 */
         .speed-reading-section { flex: 0 0 1200px; max-width: 1200px; box-sizing: border-box; padding-top: 56px; padding-bottom: 56px; margin-bottom: 0; }
     </style>
-    <script src="/assets/js/mt-nav.js?v=20260846" defer></script>
+    <script src="/assets/js/mt-nav.js?v=20260848" defer></script>
 </head>
 <body>
 <header id="mt-header"></header>
@@ -184,7 +185,11 @@
 
     <section id="features" class="features">
         <div class="common-container">
-            <h2>测试简单，结果清楚</h2>
+            <div class="fx-title-wrap">
+                <canvas id="rp-source" aria-hidden="true"></canvas>
+                <canvas id="rp-output" aria-hidden="true"></canvas>
+                <h2>测试简单，结果清楚</h2>
+            </div>
             <p class="features-subtitle">
                 选一个测试，看看结果，想再试时随时回来。
             </p>
@@ -231,7 +236,11 @@
 
     <section id="faq" class="faq">
         <div class="common-container">
-            <h2>常见问题</h2>
+            <div class="fx-title-wrap">
+                <canvas id="ft-source" aria-hidden="true"></canvas>
+                <canvas id="ft-output" aria-hidden="true"></canvas>
+                <h2>常见问题</h2>
+            </div>
 
             <div class="faq-grid">
                 <div class="faq-item">
@@ -294,7 +303,7 @@
     </a>
 </section>
 
-<script src="assets/js/global.min.js?v=20260846" defer></script>
+<script src="assets/js/global.min.js?v=20260848" defer></script>
 <script src="assets/js/feedback-marker.js?v=20260847" defer></script>
 
 <script type="module">
@@ -302,6 +311,8 @@
     import { createParticleReveal } from './assets/js/canvasui/particle-reveal.js';
     import { createDecryptReveal } from './assets/js/canvasui/decryptreveal.js';
     import { createGlitch } from './assets/js/canvasui/glitch.js';
+    import { createRipple } from './assets/js/canvasui/ripple.js';
+    import { createFrost } from './assets/js/canvasui/frost.js';
 
     // 通用：把元素文字画到 source canvas
     function setupSource(source, content, opts) {
@@ -402,6 +413,59 @@
         }
         init();
         window.addEventListener('resize', () => { draw(); if (window.__glInst) { try { window.__glInst.resize(); } catch (e) {} } });
+    })();
+
+    // 4. features 标题：Ripple 点击波纹
+    (function () {
+        const source = document.getElementById('rp-source');
+        const output = document.getElementById('rp-output');
+        const content = document.querySelector('#features .fx-title-wrap h2');
+        if (!source || !output || !content) return;
+        const draw = setupSource(source, content, { bg: '#ffffff', color: '#1e293b' });
+        let inst = null;
+        function init() {
+            draw();
+            inst = createRipple(
+                { source, content, output },
+                { amplitude: 0.6, speed: 0.7, wavelength: 90, rings: 3, decay: 1.2, refraction: 120, dispersion: 0.6, shine: 0.6, trigger: 'click' }
+            );
+            window.__rpInst = inst;
+            // 初始波纹（自动点击一次产生涟漪）
+            if (inst) {
+                setTimeout(() => {
+                    try {
+                        const rect = output.getBoundingClientRect();
+                        output.dispatchEvent(new MouseEvent('click', {
+                            clientX: rect.left + rect.width / 2,
+                            clientY: rect.top + rect.height / 2,
+                            bubbles: true
+                        }));
+                    } catch (e) {}
+                }, 400);
+            }
+        }
+        init();
+        window.addEventListener('resize', () => { draw(); if (window.__rpInst) { try { window.__rpInst.resize(); } catch (e) {} } });
+    })();
+
+    // 5. faq 标题：Frost 磨砂
+    (function () {
+        const source = document.getElementById('ft-source');
+        const output = document.getElementById('ft-output');
+        const content = document.querySelector('#faq .fx-title-wrap h2');
+        if (!source || !output || !content) return;
+        const draw = setupSource(source, content, { bg: '#ffffff', color: '#1e293b' });
+        let inst = null;
+        function init() {
+            draw();
+            inst = createFrost(
+                { source, content, output },
+                { frost: 0.06, strength: 0.8, contrast: 3, highlight: 0.3, highlightStrength: 0.8, haze: 0.5, brightness: 0.9, saturation: 1.2 }
+            );
+            window.__ftInst = inst;
+        }
+        init();
+        window.addEventListener('resize', () => { draw(); if (window.__ftInst) { try { window.__ftInst.resize(); } catch (e) {} } });
     })();
 </script>
 
