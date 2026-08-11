@@ -32,21 +32,11 @@
     <meta name="twitter:description" content="6 项认知基准测试：反应时间、瞄准、序列记忆、数字记忆、多物体追踪、斯特鲁普；另有速读、闪视、照相记忆、冥想等训练。">
     <meta name="twitter:image" content="https://picktests.com/assets/images/og/og-image.png">
 
-    <link rel="stylesheet" href="assets/css/global.min.css?v=20260850">
-    <link rel="stylesheet" href="assets/css/style.min.css?v=20260850">
+    <link rel="stylesheet" href="assets/css/global.min.css?v=20260851">
+    <link rel="stylesheet" href="assets/css/style.min.css?v=20260851">
 
     <style>
-        /* ParticleReveal 标题粒子效果（Canvas UI） */
-        .pr-title-wrap, .fx-title-wrap { position: relative; display: inline-block; }
-        #pr-source, #pr-output, #dr-source, #dr-output, #gl-source, #gl-output,
-        #rp-source, #rp-output, #ft-source, #ft-output { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
-        #pr-source, #dr-source, #gl-source, #rp-source, #ft-source { opacity: 0; }
-        #pr-output, #dr-output, #gl-output, #rp-output, #ft-output { z-index: 2; }
-        .pr-title-wrap h1, .fx-title-wrap h2 { position: relative; z-index: 1; margin: 0; }
-        /* features/faq 标题特效 wrap 居中（父容器 text-align 居中） */
-        #features .common-container, #faq .common-container { text-align: center; }
-        #features .features-grid, #faq .faq-grid { text-align: left; }
-        /* 导航 Frost 特效 */
+        /* 导航 GlyphRain 特效 */
         #mt-header { position: relative; overflow: hidden; }
         #nav-source, #nav-output { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
         #nav-source { opacity: 0; }
@@ -71,7 +61,7 @@
         /* 飞克视读：与「Mind基准测试」同款独立框 */
         .speed-reading-section { flex: 0 0 1200px; max-width: 1200px; box-sizing: border-box; padding-top: 56px; padding-bottom: 56px; margin-bottom: 0; }
     </style>
-    <script src="/assets/js/mt-nav.js?v=20260850" defer></script>
+    <script src="/assets/js/mt-nav.js?v=20260851" defer></script>
 </head>
 <body>
 <header id="mt-header"></header>
@@ -80,11 +70,7 @@
     <section class="hero">
         <div class="common-container">
             <div class="hero-content">
-                <div class="pr-title-wrap">
-                    <canvas id="pr-source" aria-hidden="true"></canvas>
-                    <canvas id="pr-output" aria-hidden="true"></canvas>
-                    <h1><span class="hero-title-text">选一个测试</span></h1>
-                </div>
+                <h1><span class="hero-title-text">选一个测试</span></h1>
                 <p class="hero-subtitle">反应、瞄准、记忆、追踪、斯特鲁普——6 项 Mind 基准测试；另有速读、闪视、照相记忆与冥想训练，<a href="#tests">看看你的水平</a>。</p>
             </div>
         </div>
@@ -94,11 +80,7 @@
 
     <section id="tests" class="main-tests">
         <div class="test-directory-heading">
-            <div class="fx-title-wrap">
-                <canvas id="dr-source" aria-hidden="true"></canvas>
-                <canvas id="dr-output" aria-hidden="true"></canvas>
-                <h2>Mind基准测试</h2>
-            </div>
+            <h2>Mind基准测试</h2>
             <p>每项测试只关注一种能力，完成后留下清楚的结果。</p>
         </div>
 
@@ -144,11 +126,7 @@
 
 <section class="main-tests speed-reading-section" aria-label="速读训练中心">
         <div class="test-directory-heading">
-            <div class="fx-title-wrap">
-                <canvas id="gl-source" aria-hidden="true"></canvas>
-                <canvas id="gl-output" aria-hidden="true"></canvas>
-                <h2>⚡ 速读训练中心 · 飞克视读 Web 重写版</h2>
-            </div>
+            <h2>⚡ 速读训练中心 · 飞克视读 Web 重写版</h2>
             <p>基础训练 26 项 · 闪视 · 速读 · 照相记忆 · 冥想 · 训练计划</p>
         </div>
         <div class="test-directory-grid">
@@ -193,11 +171,7 @@
 
     <section id="features" class="features">
         <div class="common-container">
-            <div class="fx-title-wrap">
-                <canvas id="rp-source" aria-hidden="true"></canvas>
-                <canvas id="rp-output" aria-hidden="true"></canvas>
-                <h2>测试简单，结果清楚</h2>
-            </div>
+            <h2>测试简单，结果清楚</h2>
             <p class="features-subtitle">
                 选一个测试，看看结果，想再试时随时回来。
             </p>
@@ -244,11 +218,7 @@
 
     <section id="faq" class="faq">
         <div class="common-container">
-            <div class="fx-title-wrap">
-                <canvas id="ft-source" aria-hidden="true"></canvas>
-                <canvas id="ft-output" aria-hidden="true"></canvas>
-                <h2>常见问题</h2>
-            </div>
+            <h2>常见问题</h2>
 
             <div class="faq-grid">
                 <div class="faq-item">
@@ -311,192 +281,12 @@
     </a>
 </section>
 
-<script src="assets/js/global.min.js?v=20260850" defer></script>
+<script src="assets/js/global.min.js?v=20260851" defer></script>
 <script src="assets/js/feedback-marker.js?v=20260849" defer></script>
 
 <script type="module">
-    // 首页标题特效（Canvas UI，无构建）
-    import { createParticleReveal } from './assets/js/canvasui/particle-reveal.js';
-    import { createForceField } from './assets/js/canvasui/forcefield.js';
-    import { createDecryptReveal } from './assets/js/canvasui/decryptreveal.js';
-    import { createRipple } from './assets/js/canvasui/ripple.js';
-    import { createBubble } from './assets/js/canvasui/bubble.js';
-    import { createGrid } from './assets/js/canvasui/grid.js';
-
-    // 通用：把元素文字画到 source canvas
-    function setupSource(source, content, opts) {
-        const ctx = source.getContext('2d');
-        return function draw() {
-            const dpr = Math.min(window.devicePixelRatio || 1, 2);
-            const w = source.clientWidth, h = source.clientHeight;
-            if (!w || !h) return;
-            source.width = Math.round(w * dpr);
-            source.height = Math.round(h * dpr);
-            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-            ctx.clearRect(0, 0, w, h);
-            ctx.fillStyle = opts.bg || '#ffffff';
-            ctx.fillRect(0, 0, w, h);
-            const el = content instanceof Element ? content : content[0];
-            const cs = el ? getComputedStyle(el) : null;
-            ctx.fillStyle = opts.color || (cs ? cs.color : '#0f172a');
-            ctx.font = (cs ? (cs.fontWeight + ' ' + cs.fontSize) : '700 40px sans-serif') + ' ' + (cs ? cs.fontFamily : 'sans-serif');
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText((el ? el.textContent : '标题').trim(), w / 2, h / 2);
-        };
-    }
-
-    // 1. hero 标题：ParticleReveal 粒子揭示
-    (function () {
-        const source = document.getElementById('pr-source');
-        const output = document.getElementById('pr-output');
-        const content = document.querySelector('.pr-title-wrap h1');
-        if (!source || !output || !content) return;
-        const draw = setupSource(source, content, { bg: '#f7f6ff' });
-        function init() {
-            draw();
-            const inst = createParticleReveal(
-                { source, content, output },
-                { radius: 320, size: 1.2, scatter: 24, drift: 1, aberration: 30, bend: 40,
-                  fade: 0.8, threshold: 0.15, background: '#f7f6ff', smoothing: 0.3 }
-            );
-            if (inst) {
-                window.__prInst = inst;
-                const rect = output.getBoundingClientRect();
-                output.dispatchEvent(new PointerEvent('pointermove', {
-                    clientX: rect.left + rect.width / 2,
-                    clientY: rect.top + rect.height / 2,
-                    bubbles: true
-                }));
-            }
-        }
-        init();
-        window.addEventListener('resize', () => { draw(); if (window.__prInst) { try { window.__prInst.resize(); } catch (e) {} } });
-    })();
-
-    // 2. Mind 标题：ForceField 力场
-    (function () {
-        const source = document.getElementById('dr-source');
-        const output = document.getElementById('dr-output');
-        const content = document.querySelector('#tests .fx-title-wrap h2');
-        if (!source || !output || !content) return;
-        const draw = setupSource(source, content, { bg: '#ffffff', color: '#1e293b' });
-        let inst = null;
-        function init() {
-            draw();
-            inst = createForceField(
-                { source, content, output },
-                { shape: 'hexagon', color: [0.42, 0.28, 0.95], edgeColor: [0.6, 0.45, 1], opacity: 0.85,
-                  cellScale: 16, lineWidth: 0.03, gridOpacity: 0.12, gridReveal: 'click', gridRevealRadius: 250 }
-            );
-            window.__drInst = inst;
-            // 初始触发一次力场（点击揭示）
-            if (inst) {
-                setTimeout(() => {
-                    try {
-                        const rect = output.getBoundingClientRect();
-                        output.dispatchEvent(new MouseEvent('click', {
-                            clientX: rect.left + rect.width / 2,
-                            clientY: rect.top + rect.height / 2,
-                            bubbles: true
-                        }));
-                    } catch (e) {}
-                }, 400);
-            }
-        }
-        init();
-        window.addEventListener('resize', () => { draw(); if (window.__drInst) { try { window.__drInst.resize(); } catch (e) {} } });
-    })();
-
-    // 3. 飞克标题：DecryptReveal 解密显现（文字完整可见）
-    (function () {
-        const source = document.getElementById('gl-source');
-        const output = document.getElementById('gl-output');
-        const content = document.querySelector('.speed-reading-section .fx-title-wrap h2');
-        if (!source || !output || !content) return;
-        const draw = setupSource(source, content, { bg: '#ffffff', color: '#1e293b' });
-        let inst = null;
-        function init() {
-            draw();
-            inst = createDecryptReveal(
-                { source, content, output },
-                { radius: 320, cell: 10, colored: 0.6, color: '#6d28d9', brightness: 1.1,
-                  scramble: 0.1, scrambleSpeed: 5, legibility: 1.2 }
-            );
-            window.__glInst = inst;
-            // 初始解密（进入页面即显示完整文字）
-            if (inst) {
-                setTimeout(() => {
-                    try {
-                        const rect = output.getBoundingClientRect();
-                        output.dispatchEvent(new PointerEvent('pointermove', {
-                            clientX: rect.left + rect.width / 2,
-                            clientY: rect.top + rect.height / 2,
-                            bubbles: true
-                        }));
-                    } catch (e) {}
-                }, 400);
-            }
-        }
-        init();
-        window.addEventListener('resize', () => { draw(); if (window.__glInst) { try { window.__glInst.resize(); } catch (e) {} } });
-    })();
-
-    // 4. features 标题：Ripple 点击波纹
-    (function () {
-        const source = document.getElementById('rp-source');
-        const output = document.getElementById('rp-output');
-        const content = document.querySelector('#features .fx-title-wrap h2');
-        if (!source || !output || !content) return;
-        const draw = setupSource(source, content, { bg: '#ffffff', color: '#1e293b' });
-        let inst = null;
-        function init() {
-            draw();
-            inst = createRipple(
-                { source, content, output },
-                { amplitude: 0.6, speed: 0.7, wavelength: 90, rings: 3, decay: 1.2, refraction: 120, dispersion: 0.6, shine: 0.6, trigger: 'click' }
-            );
-            window.__rpInst = inst;
-            // 初始波纹（自动点击一次产生涟漪）
-            if (inst) {
-                setTimeout(() => {
-                    try {
-                        const rect = output.getBoundingClientRect();
-                        output.dispatchEvent(new MouseEvent('click', {
-                            clientX: rect.left + rect.width / 2,
-                            clientY: rect.top + rect.height / 2,
-                            bubbles: true
-                        }));
-                    } catch (e) {}
-                }, 400);
-            }
-        }
-        init();
-        window.addEventListener('resize', () => { draw(); if (window.__rpInst) { try { window.__rpInst.resize(); } catch (e) {} } });
-    })();
-
-    // 5. faq 标题：Bubble 气泡
-    (function () {
-        const source = document.getElementById('ft-source');
-        const output = document.getElementById('ft-output');
-        const content = document.querySelector('#faq .fx-title-wrap h2');
-        if (!source || !output || !content) return;
-        const draw = setupSource(source, content, { bg: '#ffffff', color: '#1e293b' });
-        let inst = null;
-        function init() {
-            draw();
-            inst = createBubble(
-                { source, content, output },
-                { size: 26, trail: 20, follow: 0.5, blend: 14, speed: 2, refraction: 80, dispersion: 1,
-                  frost: 0.1, shine: 0.3, rim: 0.5, iridescence: 1, intensity: 0.9 }
-            );
-            window.__ftInst = inst;
-        }
-        init();
-        window.addEventListener('resize', () => { draw(); if (window.__ftInst) { try { window.__ftInst.resize(); } catch (e) {} } });
-    })();
-
-    // 6. 导航 Grid 网格特效（背景装饰，不干扰菜单点击）
+    // 导航 GlyphRain 字符雨特效（背景装饰，不干扰菜单点击）
+    import { createGlyphRain } from './assets/js/canvasui/glyphrain.js';
     (function () {
         const header = document.getElementById('mt-header');
         if (!header) return;
@@ -529,11 +319,10 @@
         }
         draw();
         try {
-            const inst = createGrid(
+            const inst = createGlyphRain(
                 { source, content: source, output },
-                { tileSize: 110, amplitude: 2.2, waveSpeed: 0.45, frequency: 14, waveWidth: 0.05,
-                  fadeTime: 0.2, maxLift: 0.8, jitter: 0, liftHeight: 50, perspective: 1200, tilt: 1,
-                  shading: 0.05, tint: [0.42, 0.28, 0.95], tintStrength: 0.08, idleRipple: 0.4 }
+                { cell: 16, color: [0.3, 0.45, 1], headColor: [0.2, 0.4, 1], speed: 0.3,
+                  density: 0.12, trail: 0.5, glow: 1.5, layers: 2, dim: 0.4, light: 2.5, lightRadius: 240 }
             );
             window.__navInst = inst;
         } catch (e) {
