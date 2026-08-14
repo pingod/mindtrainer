@@ -5,11 +5,11 @@
  * ============================================================ */
 
 /* ---------- 字体 ---------- */
-@font-face { font-family: 'Outfit'; src: url('fonts/outfit-400.woff2') format('woff2'); font-weight: 400; font-display: swap; }
-@font-face { font-family: 'Outfit'; src: url('fonts/outfit-500.woff2') format('woff2'); font-weight: 500; font-display: swap; }
-@font-face { font-family: 'Outfit'; src: url('fonts/outfit-600.woff2') format('woff2'); font-weight: 600; font-display: swap; }
-@font-face { font-family: 'Outfit'; src: url('fonts/outfit-700.woff2') format('woff2'); font-weight: 700; font-display: swap; }
-@font-face { font-family: 'Outfit'; src: url('fonts/outfit-800.woff2') format('woff2'); font-weight: 800; font-display: swap; }
+@font-face { font-family: 'Outfit'; src: url('../fonts/outfit-400.woff2') format('woff2'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Outfit'; src: url('../fonts/outfit-500.woff2') format('woff2'); font-weight: 500; font-display: swap; }
+@font-face { font-family: 'Outfit'; src: url('../fonts/outfit-600.woff2') format('woff2'); font-weight: 600; font-display: swap; }
+@font-face { font-family: 'Outfit'; src: url('../fonts/outfit-700.woff2') format('woff2'); font-weight: 700; font-display: swap; }
+@font-face { font-family: 'Outfit'; src: url('../fonts/outfit-800.woff2') format('woff2'); font-weight: 800; font-display: swap; }
 
 /* ---------- 基底 ---------- */
 :root {
