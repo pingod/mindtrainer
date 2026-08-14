@@ -32,10 +32,71 @@
     <meta name="twitter:description" content="6 项认知基准测试：反应时间、瞄准、序列记忆、数字记忆、多物体追踪、斯特鲁普；另有速读、闪视、照相记忆、冥想等训练。">
     <meta name="twitter:image" content="https://picktests.com/assets/images/og/og-image.png">
 
-    <link rel="stylesheet" href="assets/css/global.min.css?v=20260852">
-    <link rel="stylesheet" href="assets/css/style.min.css?v=20260852">
+    <link rel="stylesheet" href="assets/css/global.min.css?v=20260853">
+    <link rel="stylesheet" href="assets/css/style.min.css?v=20260853">
 
     <style>
+        /* ===== taste-skill 第一批：品牌色统一 + 排版 + 去 slop ===== */
+        /* Outfit 字体（标题拉丁/数字；中文回退系统字体） */
+        @font-face { font-family: 'Outfit'; src: url('assets/fonts/outfit-400.woff2') format('woff2'); font-weight: 400; font-display: swap; }
+        @font-face { font-family: 'Outfit'; src: url('assets/fonts/outfit-500.woff2') format('woff2'); font-weight: 500; font-display: swap; }
+        @font-face { font-family: 'Outfit'; src: url('assets/fonts/outfit-600.woff2') format('woff2'); font-weight: 600; font-display: swap; }
+        @font-face { font-family: 'Outfit'; src: url('assets/fonts/outfit-700.woff2') format('woff2'); font-weight: 700; font-display: swap; }
+        @font-face { font-family: 'Outfit'; src: url('assets/fonts/outfit-800.woff2') format('woff2'); font-weight: 800; font-display: swap; }
+
+        /* 标题字体栈：Outfit + 中文回退 */
+        .hero-content h1, .test-directory-heading h2, .feature-card h3, .faq-item h3,
+        .test-entry-copy strong, .gallery-entry-copy h3 {
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+        }
+
+        /* hero 标题：去彩虹渐变 → 品牌深紫渐变（克制，单一 accent） */
+        .hero-title-text {
+            background: linear-gradient(120deg, #4c1d95 0%, #6d28d9 45%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+            animation: none !important;
+        }
+
+        /* faq 文字：去绿橙变色 → 品牌中性色 */
+        .faq-item h3, .faq-item p {
+            background: none !important;
+            -webkit-text-fill-color: currentColor !important;
+            color: var(--faq-text-color, #1e293b);
+        }
+        .faq-item h3 { --faq-text-color: #1e293b; color: #1e293b; }
+        .faq-item p  { --faq-text-color: #64748b; color: #64748b; }
+
+        /* feature 卡片 hover 光斑：橙绿 → 品牌紫 */
+        .feature-card::before {
+            background: radial-gradient(220px circle at var(--spotlight-x,-999px) var(--spotlight-y,-999px),
+                rgb(139 92 246 / 82%) 0, rgb(109 40 217 / 56%) 28%, rgb(124 58 237 / 34%) 48%, transparent 72%) !important;
+        }
+        .feature-card {
+            transition: transform .25s ease, box-shadow .25s ease;
+        }
+        .feature-card:hover { transform: translateY(-4px); box-shadow: 0 20px 44px -20px rgba(109,40,217,.35); }
+
+        /* hero 测试链接 hover：绿 → 紫 */
+        .hero-test-links-track a:hover { color: #6d28d9 !important; }
+        .hero-test-links-track a:focus-visible { outline-color: #7c3aed !important; }
+
+        /* 章节间距节奏（skill: 章节像独立篇章） */
+        .main-tests { padding-top: 72px; padding-bottom: 72px; }
+        .speed-reading-section { padding-top: 72px; padding-bottom: 72px; }
+        .features { padding-top: 72px; padding-bottom: 72px; }
+        .faq { padding-top: 72px; padding-bottom: 72px; }
+
+        /* hero 入场动效（有动机：层级揭示） */
+        @keyframes hero-fade-up { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+        .hero-content h1 { animation: hero-fade-up .55s ease-out both; }
+        .hero-subtitle { animation: hero-fade-up .55s ease-out .12s both; }
+        @media (prefers-reduced-motion: reduce) {
+            .hero-content h1, .hero-subtitle { animation: none; }
+        }
+
         /* 特效画廊入口（页面底部） */
         .gallery-entry { max-width: 1200px; margin: 0 auto 32px; }
         .gallery-entry-card {
@@ -56,7 +117,7 @@
         /* 飞克视读：与「Mind基准测试」同款独立框 */
         .speed-reading-section { flex: 0 0 1200px; max-width: 1200px; box-sizing: border-box; padding-top: 56px; padding-bottom: 56px; margin-bottom: 0; }
     </style>
-    <script src="/assets/js/mt-nav.js?v=20260852" defer></script>
+    <script src="/assets/js/mt-nav.js?v=20260853" defer></script>
 </head>
 <body>
 <header id="mt-header"></header>
@@ -66,7 +127,7 @@
         <div class="common-container">
             <div class="hero-content">
                 <h1><span class="hero-title-text">选一个测试</span></h1>
-                <p class="hero-subtitle">反应、瞄准、记忆、追踪、斯特鲁普——6 项 Mind 基准测试；另有速读、闪视、照相记忆与冥想训练，<a href="#tests">看看你的水平</a>。</p>
+                <p class="hero-subtitle">反应、瞄准、记忆、追踪、斯特鲁普：6 项 Mind 基准测试；另有速读、闪视、照相记忆与冥想训练，<a href="#tests">看看你的水平</a>。</p>
             </div>
         </div>
     </section>
@@ -276,7 +337,7 @@
     </a>
 </section>
 
-<script src="assets/js/global.min.js?v=20260852" defer></script>
+<script src="assets/js/global.min.js?v=20260853" defer></script>
 <script src="assets/js/feedback-marker.js?v=20260849" defer></script>
 
 </body>
