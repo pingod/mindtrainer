@@ -32,8 +32,8 @@
     <meta name="twitter:description" content="6 项认知基准测试：反应时间、瞄准、序列记忆、数字记忆、多物体追踪、斯特鲁普；另有速读、闪视、照相记忆、冥想等训练。">
     <meta name="twitter:image" content="https://picktests.com/assets/images/og/og-image.png">
 
-    <link rel="stylesheet" href="assets/css/global.min.css?v=20260853">
-    <link rel="stylesheet" href="assets/css/style.min.css?v=20260853">
+    <link rel="stylesheet" href="assets/css/global.min.css?v=20260854">
+    <link rel="stylesheet" href="assets/css/style.min.css?v=20260854">
 
     <style>
         /* ===== taste-skill 第一批：品牌色统一 + 排版 + 去 slop ===== */
@@ -97,6 +97,59 @@
             .hero-content h1, .hero-subtitle { animation: none; }
         }
 
+        /* ===== taste-skill 第二批：卡片物理 + emoji 容器化 + 色彩一致锁 + scroll-reveal ===== */
+        /* test-entry 卡片 hover 物理（从 notebook 底浮起） */
+        .test-entry-card {
+            border-radius: 20px;
+            transition: transform .22s ease, box-shadow .22s ease, background .22s ease;
+        }
+        .test-entry-card:hover {
+            transform: translateY(-3px);
+            background: #fff;
+            box-shadow: 0 18px 40px -22px rgba(109,40,217,.4);
+        }
+        .test-entry-card:focus-visible { outline-color: #7c3aed !important; }
+
+        /* feature emoji 图标容器化（浅紫玻璃圆角方块，24px 圆角统一） */
+        .feature-icon {
+            font-size: 32px;
+            width: 72px; height: 72px;
+            margin: 0 auto 20px;
+            display: grid; place-items: center;
+            border-radius: 24px;
+            background: linear-gradient(135deg, #f3efff, #e9e2ff);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.8), 0 10px 22px -14px rgba(109,40,217,.45);
+        }
+        /* feature 卡片顶部品牌紫 accent 线（与 test-entry 目录区分） */
+        .feature-card::after {
+            content: ""; position: absolute; top: 0; left: 28px; right: 28px; height: 3px;
+            border-radius: 0 0 4px 4px;
+            background: linear-gradient(90deg, #6d28d9, #8b5cf6);
+            opacity: .55;
+        }
+        /* faq 卡片 hover 浅紫背景 */
+        .faq-item { transition: background .2s ease, transform .2s ease; border-radius: 20px; }
+        .faq-item:hover { background: #f8f6ff; }
+
+        /* 色彩一致锁：残留绿色/暖色 accent → 品牌紫 */
+        .header-center-box:focus-visible { outline-color: rgb(124 58 237 / 34%) !important; }
+        .hero-test-links-track .hero-test-link--reaction { --hero-test-link-wash: #f3efff !important; }
+        .hero-test-links-track .hero-test-link--aim { --hero-test-link-wash: #eef1ff !important; }
+        .hero-test-links-track .hero-test-link--stroop { --hero-test-link-wash: #f3efff !important; }
+        .hero-test-links-track .hero-test-link--sequence { --hero-test-link-wash: #eef0ff !important; }
+        .hero-test-links-track .hero-test-link--number { --hero-test-link-wash: #f3efff !important; }
+        .hero-test-links-track .hero-test-link--tracking { --hero-test-link-wash: #eef1ff !important; }
+
+        /* scroll-reveal（JS 添加 .revealed；reduced-motion 关闭） */
+        .test-entry-card, .feature-card, .faq-item {
+            opacity: 0; transform: translateY(16px);
+            transition: opacity .5s ease, transform .5s ease;
+        }
+        .revealed { opacity: 1; transform: none; }
+        @media (prefers-reduced-motion: reduce) {
+            .test-entry-card, .feature-card, .faq-item { opacity: 1; transform: none; transition: none; }
+        }
+
         /* 特效画廊入口（页面底部） */
         .gallery-entry { max-width: 1200px; margin: 0 auto 32px; }
         .gallery-entry-card {
@@ -117,7 +170,7 @@
         /* 飞克视读：与「Mind基准测试」同款独立框 */
         .speed-reading-section { flex: 0 0 1200px; max-width: 1200px; box-sizing: border-box; padding-top: 56px; padding-bottom: 56px; margin-bottom: 0; }
     </style>
-    <script src="/assets/js/mt-nav.js?v=20260853" defer></script>
+    <script src="/assets/js/mt-nav.js?v=20260854" defer></script>
 </head>
 <body>
 <header id="mt-header"></header>
@@ -337,8 +390,27 @@
     </a>
 </section>
 
-<script src="assets/js/global.min.js?v=20260853" defer></script>
+<script src="assets/js/global.min.js?v=20260854" defer></script>
 <script src="assets/js/feedback-marker.js?v=20260849" defer></script>
+<script>
+    // scroll-reveal：卡片进入视口时显示（reduced-motion 关闭）
+    (function () {
+        var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        var els = document.querySelectorAll('.test-entry-card, .feature-card, .faq-item');
+        if (!els.length) return;
+        if (reduce || !('IntersectionObserver' in window)) {
+            // 无 IO / reduced-motion：直接全部显示
+            els.forEach(function (el) { el.classList.add('revealed'); });
+            return;
+        }
+        var io = new IntersectionObserver(function (entries) {
+            entries.forEach(function (e) {
+                if (e.isIntersecting) { e.target.classList.add('revealed'); io.unobserve(e.target); }
+            });
+        }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+        els.forEach(function (el) { io.observe(el); });
+    })();
+</script>
 
 </body>
 </html>
