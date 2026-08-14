@@ -357,16 +357,14 @@ footer a:hover { color: var(--accent); }
 .hero-ctas { animation: fade-up .55s ease-out .18s both; }
 .hero-stats { animation: fade-up .6s ease-out .24s both; }
 
+/* scroll-reveal：默认可见（不再初始隐藏，避免"元素消失"错乱）；JS 仅做 reveal 过渡 */
 [data-reveal] {
-  opacity: 0; transform: translateY(20px);
   transition: opacity .5s ease, transform .5s ease;
 }
-[data-reveal].revealed { opacity: 1; transform: none; }
-
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .hero-eyebrow, .hero h1, .hero-sub, .hero-ctas, .hero-stats { animation: none; }
-  [data-reveal] { opacity: 1; transform: none; transition: none; }
+  [data-reveal] { transition: none; }
 }
 
 /* ---------- 响应式 ---------- */
