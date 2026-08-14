@@ -1,5 +1,5 @@
 /* ============================================================
- * MindTrainer 页面反馈标记工具（无构建）
+ * Unitale 页面反馈标记工具（无构建）
  * 用法：点击右下角「✎ 反馈」→「标记问题」→ 点击页面任意元素
  *       → 输入问题描述 → 提交（localStorage 保存）
  *       → 「查看反馈」复制/导出 JSON 给 AI 定位修改
@@ -12,17 +12,18 @@
   const KEY = 'mt_feedback_v1';
   const CSS = /* css */ `
     #mt-fb-fab {
-      position: fixed; right: 22px; bottom: 22px; z-index: 99990;
-      display: flex; align-items: center; gap: 8px;
-      background: linear-gradient(135deg, #6d28d9, #8b5cf6);
-      color: #fff; font-size: 14px; font-weight: 700;
-      padding: 12px 20px; border-radius: 999px; border: none; cursor: pointer;
-      box-shadow: 0 12px 32px -10px rgba(109, 40, 217, .6);
-      transition: transform .15s ease, box-shadow .15s ease;
+      position: fixed; left: 16px; bottom: 16px; z-index: 99990;
+      width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(15,23,42,.75);
+      color: #fff; font-size: 17px;
+      border-radius: 50%; border: none; cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,.25);
+      transition: transform .15s ease;
     }
-    #mt-fb-fab:hover { transform: translateY(-2px); box-shadow: 0 16px 40px -12px rgba(109, 40, 217, .7); }
+    #mt-fb-fab:hover { transform: translateY(-2px); }
     #mt-fb-menu {
-      position: fixed; right: 22px; bottom: 78px; z-index: 99991;
+      position: fixed; left: 16px; bottom: 56px; z-index: 99991;
       background: rgba(255,255,255,.96); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
       border: 1px solid rgba(99,102,241,.2); border-radius: 16px;
       box-shadow: 0 20px 48px -16px rgba(79,70,229,.35);
@@ -63,7 +64,7 @@
     #mt-fb-panel .fb-ok { background: linear-gradient(135deg, #6d28d9, #8b5cf6); color: #fff; }
     #mt-fb-panel .fb-cancel { background: #f1f5f9; color: #475569; }
     #mt-fb-list {
-      position: fixed; right: 22px; bottom: 78px; z-index: 99994; width: 380px; max-height: 60vh;
+      position: fixed; left: 16px; bottom: 56px; z-index: 99994; width: 380px; max-height: 60vh;
       background: rgba(255,255,255,.98); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
       border: 1px solid rgba(99,102,241,.25); border-radius: 18px;
       box-shadow: 0 28px 64px -20px rgba(79,70,229,.5);
@@ -76,6 +77,9 @@
     #mt-fb-list button { border: none; border-radius: 8px; padding: 6px 12px; font-size: 12px; cursor: pointer; font-weight: 600; }
     .mt-fb-marker { outline: 2px dashed #ef4444 !important; outline-offset: 2px; cursor: crosshair !important; }
     .mt-fb-marker-locked { outline: 3px solid #ef4444 !important; outline-offset: 2px; }
+    .mt-fb-marked { outline: 3px solid #ef4444 !important; outline-offset: 2px; }
+    .mt-fb-flash { animation: mt-fb-flash-anim 0.6s ease 4 !important; }
+    @keyframes mt-fb-flash-anim { 0%,100% { outline: 3px solid #6d28d9; outline-offset: 2px; } 50% { outline: 3px solid transparent; outline-offset: 2px; } }
   `;
 
   // ---------- 工具 ----------
@@ -143,13 +147,13 @@
   // ---------- UI 元素 ----------
   const fab = document.createElement('button');
   fab.id = 'mt-fb-fab';
-  fab.textContent = '✎ 反馈';
+  fab.textContent = '✎';
   fab.title = '页面反馈标记（点击位置 → 记录问题 → 导出给 AI）';
   const menu = document.createElement('div');
   menu.id = 'mt-fb-menu';
   const hint = document.createElement('div');
   hint.id = 'mt-fb-hint';
-  hint.textContent = '点击页面任意位置标记问题（Esc 退出）';
+  hint.textContent = '连续点击标记多个问题（已标记的显示红框，Esc 退出）';
   const panel = document.createElement('div');
   panel.id = 'mt-fb-panel';
   const list = document.createElement('div');
@@ -164,6 +168,7 @@
   let mode = false;
   let hoverEl = null;
   let lockedEl = null;
+  const markedEls = []; // 已标记元素（保持红色框，导出/清空时移除）
 
   function setMode(on) {
     mode = on;
@@ -196,6 +201,7 @@
           setTimeout(() => { if (b && b.dataset.arm) { b.dataset.arm = ''; b.textContent = '🗑 清空全部'; } }, 3000);
         } else {
           save([]);
+          clearMarked();
           closeAll();
           toast('已清空全部反馈');
         }
@@ -213,6 +219,11 @@
     panel.style.display = 'none';
     list.style.display = 'none';
     setMode(false);
+  }
+  // 清除所有已标记元素的红色框（导出/清空后）
+  function clearMarked() {
+    markedEls.forEach(el => { if (el && el.classList) el.classList.remove('mt-fb-marked'); });
+    markedEls.length = 0;
   }
 
   // ---------- 反馈面板 ----------
@@ -252,11 +263,23 @@
         url: location.pathname,
         selector: cssPath(el),
         summary: elSummary(el),
+        text: (el.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 80),
+        x: Math.round(rect.left), y: Math.round(rect.top),
+        w: Math.round(rect.width), h: Math.round(rect.height),
         question: q
       });
       save(list2);
-      closeAll();
-      toast('✅ 已记录（' + list2.length + ' 条）——菜单「查看反馈」可导出');
+      // 已标记元素保持红色框
+      el.classList.remove('mt-fb-marker-locked');
+      el.classList.add('mt-fb-marked');
+      markedEls.push(el);
+      // 连续标记：关闭输入框，保持标记模式继续点下一个
+      panel.style.display = 'none';
+      lockedEl = null;
+      mode = true;
+      hint.style.display = 'block';
+      document.body.style.cursor = 'crosshair';
+      toast('✅ 已标记（' + list2.length + '）——继续点下一个，Esc 退出');
     };
     const cancel = document.createElement('button');
     cancel.className = 'fb-cancel';
@@ -281,9 +304,10 @@
     copyAll.textContent = '复制全部';
     copyAll.style.cssText = 'background:linear-gradient(135deg,#6d28d9,#8b5cf6);color:#fff;';
     copyAll.onclick = () => {
-      const txt = items.map((it, i) => `【${i + 1}】${it.time}  ${it.url}\n选择器: ${it.selector}\n问题: ${it.question}`).join('\n\n');
+      const txt = items.map((it, i) => `【${i + 1}】${it.time}  ${it.url}\n内容: ${it.text || it.summary || ''}\n位置: (${it.x},${it.y})  尺寸: ${it.w}×${it.h}\n选择器: ${it.selector}\n问题: ${it.question}`).join('\n\n');
       navigator.clipboard.writeText(txt).then(() => {
         save([]);
+        clearMarked();
         closeAll();
         toast('✅ 已复制 ' + items.length + ' 条反馈并清空');
       }, () => toast('复制失败——请手动选择'));
@@ -318,6 +342,19 @@
       const editBtn = document.createElement('button');
       editBtn.textContent = '✏ 编辑';
       editBtn.style.cssText = 'background:#f1f5f9;color:#475569;';
+      // 定位按钮：滚动到对应元素并闪烁高亮
+      const locateBtn = document.createElement('button');
+      locateBtn.textContent = '📍 定位';
+      locateBtn.style.cssText = 'background:#ede9fe;color:#6d28d9;';
+      locateBtn.onclick = () => {
+        const el = document.querySelector(it.selector);
+        if (!el) { toast('元素未找到（页面可能已变化）'); return; }
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.classList.remove('mt-fb-flash');
+        void el.offsetWidth; // 强制 reflow 重启动画
+        el.classList.add('mt-fb-flash');
+        setTimeout(() => el.classList.remove('mt-fb-flash'), 2600);
+      };
       const ta = document.createElement('textarea');
       ta.style.cssText = 'display:none;width:100%;box-sizing:border-box;min-height:60px;border:1px solid rgba(99,102,241,.3);border-radius:8px;padding:8px;font-size:12.5px;font-family:inherit;';
       ta.value = it.question;
@@ -346,6 +383,7 @@
         toast('✅ 已更新');
       };
       editRow.appendChild(editBtn);
+      editRow.appendChild(locateBtn);
       editRow.appendChild(ta);
       editRow.appendChild(saveBtn);
       d.appendChild(editRow);
