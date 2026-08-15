@@ -3,139 +3,456 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Canvas UI 组件库 — MindTrainer 演示</title>
+    <title>特效画廊 — MindTrainer</title>
+    <meta name="description" content="33 个 WebGL 视觉组件画廊，全部可交互演示。">
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/images/icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/images/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/images/icons/favicon-16x16.png">
+    <link rel="stylesheet" href="assets/css/redesign.css?v=20260864">
+
     <script type="importmap">
-        {
-            "imports": {
-                "three": "/vendor/canvasui-three/three.module.min.js",
-                "three/addons/": "/vendor/canvasui-three/"
-            }
+    {
+        "imports": {
+            "three": "/vendor/canvasui-three/three.module.min.js",
+            "three/addons/": "/vendor/canvasui-three/"
         }
+    }
     </script>
+
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: #0a0a0a; color: #e5e7eb; font-family: -apple-system, BlinkMacSystemFont, sans-serif; height: 100vh; overflow: hidden; }
-        .gallery { display: flex; height: 100vh; }
-        /* 左侧列表 */
-        .list { width: 240px; flex: none; background: #101014; border-right: 1px solid rgba(255,255,255,.08); overflow-y: auto; padding: 16px 10px; }
-        .list h2 { font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,.4); padding: 4px 10px 12px; }
-        .list button { display: flex; justify-content: space-between; align-items: center; width: 100%; text-align: left;
-                       background: none; border: none; color: rgba(255,255,255,.75); padding: 9px 12px; border-radius: 10px;
-                       cursor: pointer; font-size: 13.5px; transition: background .15s, color .15s; }
-        .list button:hover { background: rgba(255,255,255,.06); color: #fff; }
-        .list button.active { background: linear-gradient(135deg, rgba(109,40,217,.35), rgba(139,92,246,.2)); color: #fff; }
-        .list button small { font-size: 11px; color: rgba(255,255,255,.35); }
-        /* 右侧 demo */
-        .demo { flex: 1; display: flex; flex-direction: column; min-width: 0; }
-        .demo-stage { position: relative; flex: 1; margin: 16px; border: 1px solid rgba(99,102,241,.12); border-radius: 16px; overflow: hidden; background: #f5f3ff; }
-        #source-canvas { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; pointer-events: none; }
-        #content { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-                   font-size: clamp(30px, 6vw, 84px); font-weight: 800; letter-spacing: .05em; color: #fff; text-align: center; line-height: 1.15;
-                   pointer-events: none; }
-        #output-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
-        .demo-info { padding: 12px 22px 16px; display: flex; align-items: baseline; gap: 12px; }
-        .demo-info h3 { font-size: 17px; font-weight: 700; color: #fff; }
-        .demo-info p { font-size: 12.5px; color: rgba(255,255,255,.45); }
-        .demo-info .err { color: #f87171; font-size: 12.5px; }
-        .gallery-badge { position: fixed; top: 14px; right: 18px; color: rgba(255,255,255,.35); font-size: 11px; letter-spacing: .14em; z-index: 9; }
-        .list::-webkit-scrollbar { width: 6px; }
-        .list::-webkit-scrollbar-thumb { background: rgba(255,255,255,.15); border-radius: 3px; }
+        /* ===== Page-specific full-screen gallery ===== */
+        *, *::before, *::after { box-sizing: border-box; }
+        html, body { height: 100%; margin: 0; overflow: hidden; }
+        body {
+            background: var(--dark-bg);
+            color: var(--dark-ink);
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ===== Mesh gradient background ===== */
+        .gallery-bg {
+            position: fixed; inset: 0; z-index: 0; pointer-events: none;
+            background:
+                radial-gradient(900px 600px at 15% 15%, rgba(59,130,246,.12), transparent 55%),
+                radial-gradient(700px 500px at 90% 85%, rgba(139,92,246,.08), transparent 55%);
+        }
+        .gallery-bg::after {
+            content: ""; position: absolute; inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+            background-size: 48px 48px;
+            -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, #000 20%, transparent 85%);
+            mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, #000 20%, transparent 85%);
+        }
+
+        /* ===== Top bar ===== */
+        .gallery-topbar {
+            position: relative; z-index: 10;
+            display: flex; align-items: center; gap: 16px;
+            padding: 0 24px; height: 56px;
+            background: rgba(15,20,36,.7);
+            -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,.07);
+        }
+        .gallery-back {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 14px; font-weight: 600; color: var(--dark-ink-2);
+            text-decoration: none; transition: color .2s ease;
+        }
+        .gallery-back:hover { color: #fff; }
+        .gallery-back svg { width: 16px; height: 16px; }
+        .gallery-title {
+            font-size: 16px; font-weight: 800; letter-spacing: -.02em; color: #fff;
+        }
+        .gallery-count {
+            margin-left: auto;
+            font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+            color: var(--dark-ink-3);
+            background: rgba(255,255,255,.05);
+            padding: 5px 12px; border-radius: var(--r-pill);
+            border: 1px solid rgba(255,255,255,.08);
+        }
+        .gallery-random {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 13px; font-weight: 600; cursor: pointer;
+            background: rgba(255,255,255,.06);
+            border: 1px solid rgba(255,255,255,.12);
+            color: var(--dark-ink);
+            padding: 6px 14px; border-radius: var(--r-pill);
+            transition: background .2s ease, border-color .2s ease;
+        }
+        .gallery-random:hover { background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.2); }
+        .gallery-random svg { width: 14px; height: 14px; }
+
+        /* ===== Layout ===== */
+        .gallery-body {
+            position: relative; z-index: 1;
+            display: flex;
+            height: calc(100vh - 56px);
+            height: calc(100dvh - 56px);
+        }
+
+        /* ===== Sidebar ===== */
+        .gallery-sidebar {
+            width: 260px; flex: none;
+            background: rgba(15,20,36,.5);
+            -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
+            border-right: 1px solid rgba(255,255,255,.07);
+            display: flex; flex-direction: column;
+            overflow: hidden;
+        }
+        .sidebar-search {
+            padding: 14px 14px 10px;
+            position: relative;
+        }
+        .sidebar-search input {
+            width: 100%; box-sizing: border-box;
+            background: rgba(255,255,255,.05);
+            border: 1px solid rgba(255,255,255,.1);
+            border-radius: var(--r-sm);
+            color: var(--dark-ink);
+            font: inherit; font-size: 13px;
+            padding: 9px 12px 9px 34px;
+            outline: none;
+            transition: border-color .2s ease, background .2s ease;
+        }
+        .sidebar-search input::placeholder { color: var(--dark-ink-3); }
+        .sidebar-search input:focus {
+            border-color: rgba(59,130,246,.4);
+            background: rgba(255,255,255,.07);
+        }
+        .sidebar-search svg {
+            position: absolute; left: 26px; top: 50%; transform: translateY(-50%);
+            width: 15px; height: 15px; color: var(--dark-ink-3);
+            pointer-events: none;
+        }
+        .sidebar-nav {
+            flex: 1; overflow-y: auto;
+            padding: 4px 10px 16px;
+        }
+        .sidebar-nav::-webkit-scrollbar { width: 5px; }
+        .sidebar-nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,.12); border-radius: 3px; }
+        .sidebar-cat {
+            font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+            color: var(--dark-ink-3);
+            padding: 16px 10px 6px;
+            position: sticky; top: 0;
+            background: rgba(15,20,36,.8);
+            -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+            z-index: 1;
+        }
+        .comp-btn {
+            display: flex; align-items: center; justify-content: space-between; gap: 8px;
+            width: 100%; text-align: left;
+            background: none; border: none;
+            color: rgba(255,255,255,.6);
+            padding: 8px 12px; border-radius: var(--r-sm);
+            cursor: pointer; font: inherit; font-size: 13px;
+            transition: background .15s ease, color .15s ease;
+        }
+        .comp-btn:hover { background: rgba(255,255,255,.05); color: #fff; }
+        .comp-btn.active {
+            background: linear-gradient(135deg, rgba(59,130,246,.2), rgba(139,92,246,.12));
+            color: #fff;
+            border: 1px solid rgba(59,130,246,.2);
+            padding: 7px 11px;
+        }
+        .comp-btn small {
+            font-size: 10.5px; color: rgba(255,255,255,.3);
+            flex-shrink: 0;
+        }
+        .comp-btn.active small { color: rgba(255,255,255,.45); }
+
+        /* ===== Demo stage ===== */
+        .gallery-stage {
+            flex: 1; display: flex; flex-direction: column;
+            min-width: 0; padding: 16px;
+        }
+        .stage-canvas-wrap {
+            position: relative; flex: 1;
+            border-radius: var(--r-card);
+            overflow: hidden;
+            background: #0a0e1a;
+            border: 1px solid rgba(255,255,255,.08);
+            box-shadow: 0 30px 80px -30px rgba(0,0,0,.5);
+        }
+        #source-canvas {
+            position: absolute; inset: 0; width: 100%; height: 100%;
+            opacity: 0; pointer-events: none;
+        }
+        #content {
+            position: absolute; inset: 0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: clamp(28px, 5.5vw, 72px);
+            font-weight: 800; letter-spacing: .04em;
+            color: #fff; text-align: center; line-height: 1.15;
+            pointer-events: none;
+        }
+        #output-canvas {
+            position: absolute; inset: 0; width: 100%; height: 100%;
+        }
+
+        /* Stage overlay badges */
+        .stage-hint {
+            position: absolute; top: 14px; left: 14px;
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 11px; font-weight: 600; letter-spacing: .06em;
+            color: rgba(255,255,255,.4);
+            background: rgba(0,0,0,.3);
+            -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+            padding: 5px 12px; border-radius: var(--r-pill);
+            border: 1px solid rgba(255,255,255,.06);
+            z-index: 5; pointer-events: none;
+            opacity: 0; transition: opacity .3s ease;
+        }
+        .stage-hint.show { opacity: 1; }
+
+        /* Info bar */
+        .stage-info {
+            display: flex; align-items: center; gap: 14px;
+            padding: 14px 4px 0;
+        }
+        .info-left { display: flex; align-items: baseline; gap: 12px; flex: 1; min-width: 0; }
+        .info-left h3 {
+            font-size: 16px; font-weight: 700; color: #fff;
+            margin: 0; white-space: nowrap;
+        }
+        .info-left p {
+            font-size: 13px; color: var(--dark-ink-2);
+            margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+        .info-err { color: #f87171; font-size: 12.5px; flex-shrink: 0; }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 768px) {
+            .gallery-sidebar { width: 200px; }
+            .gallery-stage { padding: 10px; }
+            .gallery-topbar { padding: 0 14px; }
+            .gallery-count { display: none; }
+        }
+        @media (max-width: 580px) {
+            .gallery-body { flex-direction: column; }
+            .gallery-sidebar {
+                width: 100%; height: 180px;
+                border-right: none;
+                border-bottom: 1px solid rgba(255,255,255,.07);
+            }
+            .sidebar-nav { display: flex; gap: 6px; padding: 10px; overflow-x: auto; overflow-y: hidden; }
+            .sidebar-cat { display: none; }
+            .comp-btn { width: auto; flex-shrink: 0; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * { transition-duration: .01ms !important; }
+        }
     </style>
 </head>
 <body>
-    <div class="gallery-badge">CANVAS UI · 33 COMPONENTS</div>
-    <div class="gallery">
-        <aside class="list">
-            <h2>Canvas UI 组件</h2>
-            <div id="list"></div>
+    <div class="gallery-bg"></div>
+
+    <header class="gallery-topbar">
+        <a class="gallery-back" href="/">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            返回首页
+        </a>
+        <span class="gallery-title">特效画廊</span>
+        <button class="gallery-random" id="randomBtn" title="随机组件">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>
+            随机
+        </button>
+        <span class="gallery-count">33 组件</span>
+    </header>
+
+    <div class="gallery-body">
+        <aside class="gallery-sidebar">
+            <div class="sidebar-search">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                <input type="text" id="gallerySearch" placeholder="搜索组件…" autocomplete="off">
+            </div>
+            <nav class="sidebar-nav" id="galleryList"></nav>
         </aside>
-        <main class="demo">
-            <div class="demo-stage">
+
+        <main class="gallery-stage">
+            <div class="stage-canvas-wrap" id="stage">
+                <span class="stage-hint" id="stageHint">移动鼠标 / 点击交互</span>
                 <canvas id="source-canvas"></canvas>
                 <div id="content">MINDTRAINER<br>选一个测试</div>
                 <canvas id="output-canvas"></canvas>
             </div>
-            <div class="demo-info">
-                <h3 id="info-name"></h3>
-                <p id="info-desc"></p>
-                <span class="err" id="info-err"></span>
-                <button id="diag-btn" style="margin-left:auto;padding:6px 14px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:none;color:#e5e7eb;font-size:12px;cursor:pointer;">诊断全部</button>
+            <div class="stage-info">
+                <div class="info-left">
+                    <h3 id="info-name"></h3>
+                    <p id="info-desc"></p>
+                    <span class="info-err" id="info-err"></span>
+                </div>
             </div>
-            <pre id="diag-out" style="display:none;position:fixed;right:16px;bottom:16px;max-width:420px;max-height:300px;overflow:auto;background:#000c;color:#7df;font-size:11px;padding:10px;border-radius:10px;z-index:99;white-space:pre-wrap;"></pre>
         </main>
     </div>
 
-    <script src="assets/js/feedback-marker.js?v=20260849" defer></script>
     <script type="module">
+        /* ============================================================
+         * CanvasUI Gallery — Bug-fixed + taste-skill redesigned
+         * Bugs fixed:
+         *   1. Model path: box.glb → Box.glb (case-sensitive)
+         *   2. Per-component options (no generic radius:0.4 breaking particle-reveal)
+         *   3. Pass #content div as content element (not stage, fixes retrodither)
+         *   4. Fresh output canvas per component (prevents WebGL state leakage)
+         *   5. Proper source canvas drawing for dark theme
+         * ============================================================ */
+
         const COMPONENTS = [
-            ['particle-reveal', 'ParticleReveal', '粒子揭示：光标消散显现文字'],
-            ['liquid', 'Liquid', '液体流动：流体扭曲内容'],
-            ['asciiobject', 'AsciiObject', 'ASCII 物体：字符构成 3D 模型'],
-            ['asciify', 'Asciify', 'ASCII 滤镜：画面字符化'],
-            ['bend', 'Bend', '弯曲：内容扭曲弯折'],
-            ['blaze', 'Blaze', '火焰：燃烧效果'],
-            ['bubble', 'Bubble', '气泡：漂浮气泡'],
-            ['canvas', 'Canvas', '画布：基础画布'],
-            ['cloth', 'Cloth', '布料：织物飘动'],
-            ['clouds', 'Clouds', '云：流动云层'],
-            ['decryptreveal', 'DecryptReveal', '解密揭示：字符解密显现'],
-            ['displacement', 'Displacement', '置换：位移扭曲'],
-            ['ditheredobject', 'DitheredObject', '抖动点阵：像素化模型'],
-            ['droplets', 'Droplets', '水滴：雨水滴落'],
-            ['flamewrap', 'FlameWrap', '火焰包裹：火焰环绕'],
-            ['forcefield', 'ForceField', '力场：能量场波动'],
-            ['frost', 'Frost', '磨砂：霜冻玻璃'],
-            ['glass', 'Glass', '玻璃：毛玻璃折射'],
-            ['glassobject', 'GlassObject', '玻璃物体：玻璃质感模型'],
-            ['glitch', 'Glitch', '故障：信号失真'],
-            ['glyphrain', 'GlyphRain', '字符雨：数字雨下落'],
-            ['grid', 'Grid', '网格：动态网格场'],
-            ['hexfloat', 'HexFloat', '六边形漂浮：悬浮六边形'],
-            ['laser', 'Laser', '激光：激光光束'],
-            ['liquidobject', 'LiquidObject', '液体物体：流体包裹模型'],
-            ['magnify', 'Magnify', '放大镜：局部放大'],
-            ['particleobject', 'ParticleObject', '粒子物体：粒子构成模型'],
-            ['particlescroll', 'ParticleScroll', '滚动粒子：滚动粒子背景'],
-            ['peel', 'Peel', '剥离：页面剥离'],
-            ['retrodither', 'RetroDither', '复古抖动：像素噪点'],
-            ['ripple', 'Ripple', '波纹：涟漪扩散'],
-            ['shatter', 'Shatter', '破碎：碎块迸裂'],
-            ['vhs', 'VHS', '复古录像：VHS 特效'],
+            // [file, createFnName, displayName, description, category]
+            ['particle-reveal',    'ParticleReveal',  'ParticleReveal',  '粒子揭示：光标消散显现文字',     'reveal'],
+            ['decryptreveal',      'DecryptReveal',   'DecryptReveal',   '解密揭示：字符解密显现',         'reveal'],
+            ['shatter',            'Shatter',         'Shatter',         '破碎：碎块迸裂',                'reveal'],
+            ['peel',               'Peel',            'Peel',            '剥离：页面剥离',                'reveal'],
+
+            ['liquid',             'Liquid',          'Liquid',          '液体流动：流体扭曲内容',         'distort'],
+            ['bend',               'Bend',            'Bend',            '弯曲：内容扭曲弯折',             'distort'],
+            ['displacement',       'Displacement',    'Displacement',    '置换：位移扭曲',                'distort'],
+            ['ripple',             'Ripple',          'Ripple',          '波纹：涟漪扩散',                'distort'],
+            ['magnify',            'Magnify',         'Magnify',         '放大镜：局部放大',              'distort'],
+            ['glitch',             'Glitch',          'Glitch',          '故障：信号失真',                'distort'],
+            ['vhs',                'VHS',             'VHS',             '复古录像：VHS 特效',            'distort'],
+            ['retrodither',        'RetroDither',     'RetroDither',     '复古抖动：像素噪点',             'distort'],
+            ['frost',              'Frost',           'Frost',           '磨砂：霜冻玻璃',                'distort'],
+
+            ['blaze',              'Blaze',           'Blaze',           '火焰：燃烧效果',                'atmosphere'],
+            ['flamewrap',          'FlameWrap',       'FlameWrap',       '火焰包裹：火焰环绕',             'atmosphere'],
+            ['clouds',             'Clouds',          'Clouds',          '云：流动云层',                  'atmosphere'],
+            ['droplets',           'Droplets',        'Droplets',        '水滴：雨水滴落',                'atmosphere'],
+            ['forcefield',         'ForceField',      'ForceField',      '力场：能量场波动',              'atmosphere'],
+            ['bubble',             'Bubble',          'Bubble',          '气泡：漂浮气泡',                'atmosphere'],
+            ['cloth',              'Cloth',           'Cloth',           '布料：织物飘动',                'atmosphere'],
+
+            ['grid',               'Grid',            'Grid',            '网格：动态网格场',              'grid'],
+            ['hexfloat',           'HexFloat',        'HexFloat',        '六边形漂浮：悬浮六边形',          'grid'],
+            ['glyphrain',          'GlyphRain',       'GlyphRain',       '字符雨：数字雨下落',             'grid'],
+            ['particlescroll',     'ParticleScroll',  'ParticleScroll',  '滚动粒子：滚动粒子背景',          'grid'],
+
+            ['asciiobject',        'AsciiObject',     'AsciiObject',     'ASCII 物体：字符构成 3D 模型',   'object3d'],
+            ['ditheredobject',     'DitheredObject',  'DitheredObject',  '抖动点阵：像素化模型',           'object3d'],
+            ['glassobject',        'GlassObject',     'GlassObject',     '玻璃物体：玻璃质感模型',          'object3d'],
+            ['liquidobject',       'LiquidObject',    'LiquidObject',    '液体物体：流体包裹模型',          'object3d'],
+            ['particleobject',     'ParticleObject',  'ParticleObject',  '粒子物体：粒子构成模型',          'object3d'],
+
+            ['glass',              'Glass',           'Glass',           '玻璃：毛玻璃折射',              'material'],
+            ['laser',              'Laser',           'Laser',           '激光：激光光束',                'material'],
+            ['canvas',             'Canvas',          'Canvas',          '画布：基础画布',                'material'],
+            ['asciify',            'Asciify',         'Asciify',         'ASCII 滤镜：画面字符化',         'material'],
         ];
 
-        const source = document.getElementById('source-canvas');
-        const output = document.getElementById('output-canvas');
+        const CATEGORY_LABELS = {
+            reveal:      '揭示 / 破碎',
+            distort:     '扭曲 / 变形',
+            atmosphere:  '氛围 / 天气',
+            grid:        '网格 / 粒子',
+            object3d:    '3D 物体',
+            material:    '材质 / 光效',
+        };
+
+        // Object-type components (Three.js + GLTF)
+        const OBJECT_COMPONENTS = new Set(['asciiobject', 'ditheredobject', 'glassobject', 'liquidobject', 'particleobject']);
+        // FIX: correct case — file is Box.glb not box.glb
+        const MODEL_URL = '/vendor/canvasui-three/models/Box.glb';
+
+        // FIX: per-component options instead of generic { rainbow: true, radius: 0.4 }
+        // particle-reveal default radius is 500 (px) — passing 0.4 made it invisible
+        const COMPONENT_OPTIONS = {
+            'particle-reveal':  { background: '#0a0e1a' },
+            'decryptreveal':    { background: '#0a0e1a' },
+            'shatter':          {},
+            'peel':             {},
+            'liquid':           { rainbow: true, radius: 0.3 },
+            'bend':             {},
+            'displacement':     {},
+            'ripple':           {},
+            'magnify':          {},
+            'glitch':           {},
+            'vhs':              {},
+            'retrodither':      { background: '#0a0e1a' },
+            'frost':            {},
+            'blaze':            {},
+            'flamewrap':        {},
+            'clouds':           {},
+            'droplets':         {},
+            'forcefield':       {},
+            'bubble':           {},
+            'cloth':            {},
+            'grid':             {},
+            'hexfloat':         {},
+            'glyphrain':        {},
+            'particlescroll':   {},
+            'glass':            {},
+            'laser':            {},
+            'canvas':           {},
+            'asciify':          { background: [0.04, 0.05, 0.1], backgroundOpacity: 1 },
+        };
+
+        // State
+        let source = document.getElementById('source-canvas');
+        let output = document.getElementById('output-canvas');
         const content = document.getElementById('content');
-        const stage = document.querySelector('.demo-stage');
+        const stage = document.getElementById('stage');
         const infoName = document.getElementById('info-name');
         const infoDesc = document.getElementById('info-desc');
         const infoErr = document.getElementById('info-err');
+        const stageHint = document.getElementById('stageHint');
         let current = null;
-        let aiTimers = [];  // autoInteract timeout IDs
+        let aiTimers = [];
+        let currentIndex = -1;
 
+        /* ----- Source canvas drawing (dark theme) ----- */
         function drawSource() {
             const dpr = Math.min(window.devicePixelRatio || 1, 2);
-            const w = stage.clientWidth, h = stage.clientHeight;
+            // BUG FIX: use source.clientWidth (the canvas's own layout size), not stage.clientWidth
+            const w = source.clientWidth || stage.clientWidth, h = source.clientHeight || stage.clientHeight;
             if (!w || !h) return;
             source.width = Math.round(w * dpr);
             source.height = Math.round(h * dpr);
             const ctx = source.getContext('2d');
             ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
             ctx.clearRect(0, 0, w, h);
-            // 浅色背景（让特效更明显——和首页一致）
-            ctx.fillStyle = '#f5f3ff';
+            // Dark background matching stage
+            ctx.fillStyle = '#0a0e1a';
             ctx.fillRect(0, 0, w, h);
-            ctx.fillStyle = '#1e293b';
+            // Light text
+            ctx.fillStyle = '#f1f5f9';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
             ctx.font = '800 ' + Math.round(Math.min(w * 0.07, 72)) + 'px -apple-system, sans-serif';
             ctx.fillText('MINDTRAINER', w / 2, h / 2 - 22);
             ctx.font = '500 ' + Math.round(Math.min(w * 0.024, 22)) + 'px -apple-system, sans-serif';
-            ctx.fillStyle = 'rgba(30,41,59,.7)';
+            ctx.fillStyle = 'rgba(241,245,249,.5)';
             ctx.fillText('选一个测试', w / 2, h / 2 + 30);
         }
 
-        // 自动交互序列（pointermove → click → 移动——覆盖所有交互型组件）
+        /* ----- FIX: fresh output canvas per component + force WebGL context loss ----- */
+        function refreshOutputCanvas() {
+            if (current && current.destroy) {
+                try { current.destroy(); } catch (e) {}
+                current = null;
+            }
+            // BUG FIX: Force WebGL context loss on old canvas to prevent context exhaustion
+            // After switching through ~16 components, browsers refuse new WebGL contexts → black screen
+            try {
+                const oldGl = output.getContext('webgl2');
+                if (oldGl) {
+                    const ext = oldGl.getExtension('WEBGL_lose_context');
+                    if (ext) ext.loseContext();
+                }
+            } catch (e) {}
+            // Replace canvas element entirely — guarantees a clean WebGL context
+            const fresh = document.createElement('canvas');
+            fresh.id = 'output-canvas';
+            fresh.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;';
+            output.replaceWith(fresh);
+            output = fresh;
+        }
+
+        /* ----- Auto interaction (pointermove → click → move) ----- */
         function autoInteract(inst, el) {
             if (!inst || !el) return;
             const rect = () => el.getBoundingClientRect();
@@ -155,137 +472,159 @@
             aiTimers.push(setTimeout(() => fire('pointermove', cx() + Math.min(120, rect().width * 0.2), cy() - Math.min(60, rect().height * 0.15)), 1100));
         }
 
-        // Object 类组件（three 渲染 GLTF 模型）：elements 用 {canvas}，options 传 model
-        const OBJECT_COMPONENTS = new Set(['asciiobject', 'ditheredobject', 'glassobject', 'liquidobject', 'particleobject']);
-        const MODEL_URL = '/vendor/canvasui-three/models/box.glb';
-
-        async function loadComponent(name, createName) {
+        /* ----- Load a component ----- */
+        async function loadComponent(name, createName, displayName, desc) {
             infoErr.textContent = '';
-            // 清理前一个组件 + 待执行交互定时器
+            // Clear pending interaction timers
             aiTimers.forEach(t => clearTimeout(t));
             aiTimers = [];
-            if (current && current.destroy) { try { current.destroy(); } catch (e) {} current = null; }
+
+            // Show hint
+            stageHint.classList.add('show');
+            setTimeout(() => stageHint.classList.remove('show'), 3000);
+
+            // FIX: fresh canvas per component (with WebGL context loss)
+            refreshOutputCanvas();
+
+            // BUG FIX: wait one frame so the new canvas has proper layout dimensions
+            // Without this, output.clientWidth may be 0 → component gets bad dimensions → black screen
+            await new Promise(r => requestAnimationFrame(() => r()));
+
             try {
                 const m = await import(`./assets/js/canvasui/${name}.js`);
-                const createFn = m[createName];
+                let createFn = m[createName];
                 if (typeof createFn !== 'function') {
                     const alt = Object.keys(m).find(k => k.startsWith('create') && typeof m[k] === 'function');
                     if (!alt) throw new Error('无 create 函数');
                     createFn = m[alt];
                 }
+
                 if (OBJECT_COMPONENTS.has(name)) {
-                    current = createFn({ canvas: output }, { model: MODEL_URL, autoRotate: true });
-                    infoErr.textContent = current ? '' : '（create 返回 null——需要特殊参数）';
+                    // BUG FIX: components expect config.src (not config.model) for model URL
+                    current = createFn({ canvas: output }, { src: MODEL_URL, autoRotate: true, autoRotateSpeed: 1.5 });
+                    infoErr.textContent = current ? '' : '（create 返回 null）';
                 } else {
+                    // BUG FIX: redraw source AFTER canvas replacement to ensure correct dimensions
                     drawSource();
-                    current = createFn({ source, content: stage, output }, { rainbow: true, radius: 0.4 });
-                    infoErr.textContent = current ? '' : '（create 返回 null——需要特殊参数）';
+                    // Pass content div (not stage), and per-component options
+                    const opts = COMPONENT_OPTIONS[name] || {};
+                    current = createFn({ source, content, output }, opts);
+                    infoErr.textContent = current ? '' : '（create 返回 null — WebGL 可能不可用）';
                 }
-                // 自动交互序列（pointermove → click → 移动）
-                autoInteract(current, output);
-                infoDesc.textContent = (infoDesc.dataset.base || '') + ' · 移动鼠标 / 点击交互';
+
+                if (current) {
+                    autoInteract(current, output);
+                }
             } catch (e) {
                 infoErr.textContent = '错误: ' + (e.message || e);
+                console.error('[Gallery] Component load error:', name, e);
             }
         }
 
+        /* ----- Build sidebar ----- */
         function buildList() {
-            const wrap = document.getElementById('list');
-            COMPONENTS.forEach(([file, name, desc], i) => {
-                const b = document.createElement('button');
-                b.innerHTML = `<span>${name}</span><small>${desc.split('：')[0]}</small>`;
-                b.onclick = async () => {
-                    document.querySelectorAll('.list button').forEach(x => x.classList.remove('active'));
-                    b.classList.add('active');
-                    infoName.textContent = name;
-                    infoDesc.dataset.base = desc;
-                    infoDesc.textContent = desc;
-                    await loadComponent(file, `create${name}`);
-                };
-                wrap.appendChild(b);
-                if (i === 0) b.click();
+            const wrap = document.getElementById('galleryList');
+            const grouped = {};
+            COMPONENTS.forEach((c, i) => {
+                const cat = c[4];
+                if (!grouped[cat]) grouped[cat] = [];
+                grouped[cat].push({ comp: c, index: i });
+            });
+
+            const catOrder = ['reveal', 'distort', 'atmosphere', 'grid', 'object3d', 'material'];
+            let html = '';
+            for (const cat of catOrder) {
+                if (!grouped[cat]) continue;
+                html += `<div class="sidebar-cat">${CATEGORY_LABELS[cat]}</div>`;
+                for (const { comp, index } of grouped[cat]) {
+                    const [file, fnName, dispName, desc] = comp;
+                    html += `<button class="comp-btn" data-index="${index}" data-name="${dispName.toLowerCase()}">
+                        <span>${dispName}</span>
+                        <small>${desc.split('：')[0]}</small>
+                    </button>`;
+                }
+            }
+            wrap.innerHTML = html;
+
+            // Click handlers
+            wrap.querySelectorAll('.comp-btn').forEach(btn => {
+                btn.addEventListener('click', () => selectComponent(parseInt(btn.dataset.index)));
             });
         }
 
-        window.addEventListener('resize', () => { drawSource(); if (current && current.resize) { try { current.resize(); } catch (e) {} } });
-        buildList();
+        /* ----- Select a component by index ----- */
+        function selectComponent(index) {
+            if (index < 0 || index >= COMPONENTS.length) return;
+            currentIndex = index;
+            const [file, fnName, dispName, desc] = COMPONENTS[index];
 
-        // 诊断全部：逐个组件读 output 像素分布（空/倒置/正常）
-        document.getElementById('diag-btn').onclick = () => {
-            const out = document.getElementById('diag-out');
-            out.style.display = 'block';
-            out.textContent = '诊断中…\n';
-            const btns = [...document.querySelectorAll('.list button')];
-            let i = 0;
-            const lines = [];
-            function next() {
-                if (i >= btns.length) {
-                    out.textContent = lines.join('\n');
-                    window.__diagFinal = lines.join('\n');
-                    return;
-                }
-                const b = btns[i];
-                const name = b.textContent.trim().slice(0, 20);
-                b.click();
-                setTimeout(() => {
-                    try {
-                        const o = document.getElementById('output-canvas');
-                        const err = document.getElementById('info-err').textContent;
-                        let res = 'EMPTY'; let top = 0, bot = 0, total = 0;
-                        if (o && o.width && !err) {
-                            // 偏上检测：重画 source（文字偏上）→ 触发重渲染 → 读像素分布
-                            const sc = document.getElementById('source-canvas');
-                            const sctx = sc.getContext('2d');
-                            sctx.setTransform(1, 0, 0, 1, 0, 0);
-                            sctx.fillStyle = '#f5f3ff';
-                            sctx.fillRect(0, 0, sc.width, sc.height);
-                            sctx.fillStyle = '#1e293b';
-                            sctx.textAlign = 'center';
-                            sctx.textBaseline = 'middle';
-                            sctx.font = '800 60px -apple-system, sans-serif';
-                            sctx.fillText('MINDTRAINER', sc.width / 2, sc.height * 0.3);
-                            o.dispatchEvent(new PointerEvent('pointermove', {
-                                clientX: o.getBoundingClientRect().left + o.getBoundingClientRect().width / 2,
-                                clientY: o.getBoundingClientRect().top + o.getBoundingClientRect().height / 2,
-                                bubbles: true
-                            }));
-                            // 等渲染完成 → destroy 停止渲染 → 读最后帧（避免持续渲染组件阻塞 readPixels）
-                            setTimeout(() => {
-                                try {
-                                    if (current && current.destroy) { try { current.destroy(); } catch (e) {} current = null; }
-                                } catch (e) {}
-                                const c = o.getContext('webgl2');
-                                if (c && c.drawingBufferWidth > 0) {
-                                    const bw = c.drawingBufferWidth, bh = c.drawingBufferHeight;
-                                    const buf = new Uint8Array(bw * bh * 4);
-                                    c.readPixels(0, 0, bw, bh, c.RGBA, c.UNSIGNED_BYTE, buf);
-                                    for (let yy = 0; yy < bh; yy++) {
-                                        for (let xx = 0; xx < bw; xx++) {
-                                            const idx = (yy * bw + xx) * 4;
-                                            const lum = buf[idx] * 0.3 + buf[idx + 1] * 0.6 + buf[idx + 2] * 0.1;
-                                            if (lum > 15) { total++; if (yy / bh < 0.35) top++; if (yy / bh > 0.65) bot++; }
-                                        }
-                                    }
-                                    if (total < 50) res = 'EMPTY';
-                                    else if (top > bot * 1.5) res = 'UP(正常)';
-                                    else if (bot > top * 1.5) res = 'DOWN(倒置!)';
-                                    else res = 'CENTER';
-                                }
-                                lines.push(name.padEnd(20) + ' ' + res.padEnd(12) + ' px=' + total + (err ? ' err=' + err.slice(0, 30) : ''));
-                                i++; next();
-                            }, 600);
-                        } else {
-                            lines.push(name.padEnd(20) + ' EMPTY/SKIP px=0' + (err ? ' err=' + err.slice(0, 30) : ''));
-                            i++; next();
-                        }
-                    } catch (e) {
-                        lines.push(name.padEnd(20) + ' EXC:' + e.message.slice(0, 40));
-                        i++; next();
-                    }
-                }, 1100);
+            // Update active state
+            document.querySelectorAll('.comp-btn').forEach(b => b.classList.remove('active'));
+            const btn = document.querySelector(`.comp-btn[data-index="${index}"]`);
+            if (btn) {
+                btn.classList.add('active');
+                btn.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
             }
-            next();
-        };
+
+            infoName.textContent = dispName;
+            infoDesc.textContent = desc;
+            loadComponent(file, `create${fnName}`, dispName, desc);
+        }
+
+        /* ----- Search ----- */
+        document.getElementById('gallerySearch').addEventListener('input', (e) => {
+            const q = e.target.value.toLowerCase().trim();
+            document.querySelectorAll('.comp-btn').forEach(btn => {
+                const match = !q || btn.dataset.name.includes(q);
+                btn.style.display = match ? '' : 'none';
+            });
+            // Hide empty category headers
+            document.querySelectorAll('.sidebar-cat').forEach(cat => {
+                let next = cat.nextElementSibling;
+                let hasVisible = false;
+                while (next && !next.classList.contains('sidebar-cat')) {
+                    if (next.style.display !== 'none') { hasVisible = true; break; }
+                    next = next.nextElementSibling;
+                }
+                cat.style.display = hasVisible ? '' : 'none';
+            });
+        });
+
+        /* ----- Random button ----- */
+        document.getElementById('randomBtn').addEventListener('click', () => {
+            let idx;
+            do { idx = Math.floor(Math.random() * COMPONENTS.length); }
+            while (idx === currentIndex && COMPONENTS.length > 1);
+            selectComponent(idx);
+        });
+
+        /* ----- Keyboard navigation ----- */
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT') return;
+            if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+                e.preventDefault();
+                selectComponent(Math.min(currentIndex + 1, COMPONENTS.length - 1));
+            } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+                e.preventDefault();
+                selectComponent(Math.max(currentIndex - 1, 0));
+            } else if (e.key === 'r' || e.key === 'R') {
+                document.getElementById('randomBtn').click();
+            }
+        });
+
+        /* ----- Resize ----- */
+        window.addEventListener('resize', () => {
+            if (!OBJECT_COMPONENTS.has(COMPONENTS[currentIndex]?.[0])) {
+                drawSource();
+            }
+            if (current && current.resize) {
+                try { current.resize(); } catch (e) {}
+            }
+        });
+
+        /* ----- Init ----- */
+        buildList();
+        selectComponent(0);
     </script>
 </body>
 </html>

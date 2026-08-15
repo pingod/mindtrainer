@@ -66,7 +66,7 @@
     '  -webkit-backdrop-filter:blur(22px) saturate(1.5);backdrop-filter:blur(22px) saturate(1.5);',
     '  border-bottom:1px solid rgba(226,232,240,.7);',
     '  box-shadow:0 1px 2px rgba(15,23,42,.03),0 12px 32px -16px rgba(15,23,42,.12);}',
-    /* main 让位同步（原站 128px → 72px） */
+    /* main 让位同步（原站 128px → 72px）；首页 hero 自带 padding-top，通过 body>main 覆盖 */
     'main{margin-top:72px !important;}',
     /* 品牌 */
     '.mt-brand{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0}',
@@ -117,7 +117,7 @@
   /* ---- 组装 header ---- */
   current.innerHTML =
     '<a class="mt-brand" href="/">' +
-    '<span class="mt-brand-icon">⚡</span>' +
+    '<span class="mt-brand-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l14 9-6 1 3 8-14-9 6-1-3-8z"/></svg></span>' +
     '<span class="mt-brand-text">MindTrainer</span>' +
     '</a>' +
     '<nav class="mt-menu" aria-label="主导航">' + itemsHtml + '</nav>';
