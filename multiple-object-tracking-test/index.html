@@ -32,65 +32,23 @@
     <meta name="twitter:description" content="免费在线测试视觉注意力。记住被高亮的目标，在它们与其他物体一起移动时持续追踪，停止后将原来的目标选出。">
     <meta name="twitter:image" content="https://picktests.com/assets/images/og/og-image.png">
 
-    <link rel="stylesheet" href="../assets/css/global.min.css?v=20260830">
-    <link rel="stylesheet" href="../assets/css/style.min.css?v=20260830">
+<!-- theme bootstrap: applied before first paint so there is no flash -->
+    <script>try{var t=localStorage.getItem('mt-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
 
-    <link rel="stylesheet" href="../assets/css/multiple-object-tracking-test.min.css?v=20260830">
-    <script src="/assets/js/mt-nav.js?v=20260864" defer></script>
-    <style>
-        /* 模式选择器可点击反馈：未选中项 hover 明显可点（避免灰色误认为禁用） */
-        [class*="mode-picker"] span { transition: color 180ms ease-out, background 180ms ease-out, box-shadow 180ms ease-out; }
-        [class*="mode-picker"]:not(:disabled) label:hover span {
-            background: rgba(35, 122, 94, .09);
-            box-shadow: inset 0 0 0 1.5px rgba(35, 122, 94, .35);
-        }
-        [class*="mode-picker"] input:checked+span { font-weight: 750; }
-    </style>
-<style>
-  /* 测试区域加宽：充分利用宽屏版面 */
-  .common-container { max-width: min(100%, 1650px); }
-  .number-page, .aim-page, .sequence-page, .tracking-page, .stroop-page, .reaction-page { width: min(1650px, 100%); max-width: min(1650px, 100%); }
-</style>
-    <link rel="stylesheet" href="../assets/css/theme.css?v=20260860">
+    <link rel="stylesheet" href="/assets/css/mt.css?v=20270101">
+    <link rel="stylesheet" href="/assets/css/multiple-object-tracking-test.min.css?v=20260830">
+    <link rel="stylesheet" href="/assets/css/mt-stage.css?v=20270101">
+    <script src="/assets/js/mt-nav.js?v=20270101" defer></script>
+    <script src="/assets/js/mt-app.js?v=20270101" defer></script>
 </head>
 <body class="test-page">
 <header id="mt-header"></header>
 
 <main>
-    <section class="hero">
-        <div class="common-container">
-            <div class="hero-content">
-                <h1><span class="hero-title-text">多目标追踪</span></h1>
-                <p class="hero-subtitle">所有物体开始移动后，<span class="hero-underline">仍然盯住最初的目标</span>。</p>
-
-                <nav class="hero-test-links" aria-label="更多测试">
-                    <div class="hero-test-links-viewport">
-                        <div class="hero-test-links-marquee">
-                            <div class="hero-test-links-track">
-                                <a class="hero-test-link--reaction" href="/reaction-time-test/" target="_blank" rel="noopener">反应时间</a>
-                                <a class="hero-test-link--aim" href="/aim-trainer/" target="_blank" rel="noopener">瞄准训练</a>
-                                <a class="hero-test-link--stroop" href="/stroop-test/" target="_blank" rel="noopener">斯特鲁普</a>
-                                <a class="hero-test-link--sequence" href="/sequence-memory-test/" target="_blank" rel="noopener">序列记忆</a>
-                                <a class="hero-test-link--number" href="/number-memory-test/" target="_blank" rel="noopener">数字记忆</a>
-                            </div>
-                            <div class="hero-test-links-track" aria-hidden="true">
-                                <a class="hero-test-link--reaction" href="/reaction-time-test/" target="_blank" rel="noopener" tabindex="-1">反应时间</a>
-                                <a class="hero-test-link--aim" href="/aim-trainer/" target="_blank" rel="noopener" tabindex="-1">瞄准训练</a>
-                                <a class="hero-test-link--stroop" href="/stroop-test/" target="_blank" rel="noopener" tabindex="-1">斯特鲁普</a>
-                                <a class="hero-test-link--sequence" href="/sequence-memory-test/" target="_blank" rel="noopener" tabindex="-1">序列记忆</a>
-                                <a class="hero-test-link--number" href="/number-memory-test/" target="_blank" rel="noopener" tabindex="-1">数字记忆</a>
-                            </div>
-                            <div class="hero-test-links-track" aria-hidden="true">
-                                <a class="hero-test-link--reaction" href="/reaction-time-test/" target="_blank" rel="noopener" tabindex="-1">反应时间</a>
-                                <a class="hero-test-link--aim" href="/aim-trainer/" target="_blank" rel="noopener" tabindex="-1">瞄准训练</a>
-                                <a class="hero-test-link--stroop" href="/stroop-test/" target="_blank" rel="noopener" tabindex="-1">斯特鲁普</a>
-                                <a class="hero-test-link--sequence" href="/sequence-memory-test/" target="_blank" rel="noopener" tabindex="-1">序列记忆</a>
-                                <a class="hero-test-link--number" href="/number-memory-test/" target="_blank" rel="noopener" tabindex="-1">数字记忆</a>
-                            </div>
-                        </div>
-                    </div>
-                </nav>
-            </div>
+    <section class="mt-test-head">
+        <div class="mt-wrap-wide">
+            <h1>多目标追踪测试</h1>
+            <p>先记住被标记的球，等所有球混在一起停下来，再把它们挑出来。</p>
         </div>
     </section>
 
@@ -219,101 +177,105 @@
         </div>
     </section>
 
-    <section id="features" class="features tracking-features">
-        <div class="common-container">
-            <h2>运动中的注意力</h2>
-            <p class="features-subtitle">自然的移动、克制的难度变化，以及一份清楚的个人记录。</p>
-
-            <div class="features-grid">
-                <div class="feature-card">
-                    <span class="feature-kicker">回合</span>
-                    <h3>难度稳步提高</h3>
-                    <p>十六轮每次只提高一到两项要求，让每一步更难，但不会突然失控。</p>
+    <section class="mt-section">
+        <div class="mt-wrap-wide">
+            <div class="mt-section-head">
+                <h2>关于这个测试</h2>
+            </div>
+            <div class="mt-notes">
+                <div class="mt-note">
+                    <h3>十六轮，一轮比一轮难</h3>
+                    <p>每轮只加一到两项要求，从 8 个球里追 2 个，一路到 20 个球里追 7 个。</p>
                 </div>
-                <div class="feature-card">
-                    <span class="feature-kicker">目标</span>
-                    <h3>八到二十个物体</h3>
-                    <p>从八个物体中追踪两个目标，逐步增加到二十个物体中的七个目标。</p>
+                <div class="mt-note">
+                    <h3>移动是自然的</h3>
+                    <p>球走的是缓和曲线，会互相擦过和交叉，但不会突然瞬移。难度来自遮挡和交叉，不是来自抽搐。</p>
                 </div>
-                <div class="feature-card">
-                    <span class="feature-kicker">运动</span>
-                    <h3>自然交叉与接近</h3>
-                    <p>缓和曲线、近距离擦过和方向变化带来压力，却不会突然跳动。</p>
+                <div class="mt-note">
+                    <h3>干扰模式</h3>
+                    <p>移动过程中会有一组球短暂变成目标色，数量和真目标一样，而且真目标也可能混在里面。</p>
                 </div>
-                <div class="feature-card">
-                    <span class="feature-kicker">模式</span>
-                    <h3>两种追踪方式</h3>
-                    <p>经典模式保持所有物体一致；干扰模式会让一组随机物体短暂变成目标颜色。</p>
+                <div class="mt-note">
+                    <h3>选满即判定</h3>
+                    <p>选够要求的数量就自动判定。在选最后一个之前，再点一次已选的球可以取消。</p>
                 </div>
-                <div class="feature-card">
-                    <span class="feature-kicker">进度</span>
-                    <h3>只比较重要的</h3>
-                    <p>查看通过轮数、个人最佳，以及这次和上一次之间的差距。</p>
+                <div class="mt-note">
+                    <h3>错一轮就结束</h3>
+                    <p>成绩是你连续通过的轮数。任意一轮选错，本次测试结束。</p>
                 </div>
-                <div class="feature-card">
-                    <span class="feature-kicker">隐私</span>
-                    <h3>只保存在当前浏览器</h3>
-                    <p>每种模式最近 20 次完整测试只保存在当前浏览器，不会上传。</p>
+                <div class="mt-note">
+                    <h3>数据不出这台设备</h3>
+                    <p>每种模式各保留最近 20 次完整测试，只写进当前浏览器，不会上传。</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <section id="faq" class="faq">
-        <div class="common-container">
-            <h2>常见问题</h2>
-
-            <div class="faq-grid">
-                <div class="faq-item">
-                    <h3>测试如何进行？</h3>
-                    <p>选择经典或干扰模式，记住高亮物体，在移动中持续追踪，停止后再把它们选出来。</p>
+    <section id="faq" class="mt-section">
+        <div class="mt-wrap-wide">
+            <div class="mt-section-head">
+                <h2>常见问题</h2>
+            </div>
+            <div class="mt-faq">
+                <div class="mt-faq-item">
+                    <button class="mt-faq-q" type="button">怎么测？
+                        <span class="mt-chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+                    </button>
+                    <div class="mt-faq-a"><div class="mt-faq-a-inner">选经典或干扰模式，记住一开始高亮的那几个球，在它们移动时一直盯着，停下来后把它们点出来。</div></div>
                 </div>
-                <div class="faq-item">
-                    <h3>成绩如何计算？</h3>
-                    <p>成绩是连续通过的轮数。当你选满要求数量但结果错误时，本次测试结束。</p>
+                <div class="mt-faq-item">
+                    <button class="mt-faq-q" type="button">成绩怎么算？
+                        <span class="mt-chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+                    </button>
+                    <div class="mt-faq-a"><div class="mt-faq-a-inner">成绩是连续通过的轮数。选满要求数量但里面有错的，本次测试就结束。</div></div>
                 </div>
-                <div class="faq-item">
-                    <h3>干扰模式有什么不同？</h3>
-                    <p>移动过程中，一组随机物体会短暂变成目标颜色。数量与真正目标相同，真实目标也可能包含在其中。</p>
+                <div class="mt-faq-item">
+                    <button class="mt-faq-q" type="button">干扰模式难在哪？
+                        <span class="mt-chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+                    </button>
+                    <div class="mt-faq-a"><div class="mt-faq-a-inner">移动中会有一组球短暂变成目标颜色，数量和真目标一样，真目标也可能包含在里面。所以不能靠颜色，只能靠一直盯着。</div></div>
                 </div>
-                <div class="faq-item">
-                    <h3>这项测试测量什么？</h3>
-                    <p>它测试你能否在多个移动物体之间持续分配视觉注意力，并不是医疗或诊断工具。</p>
+                <div class="mt-faq-item">
+                    <button class="mt-faq-q" type="button">选错了能反悔吗？
+                        <span class="mt-chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+                    </button>
+                    <div class="mt-faq-a"><div class="mt-faq-a-inner">可以，在点最后一个之前，再点一次已选中的球就能取消。选满数量后立即判定，就不能改了。</div></div>
                 </div>
-                <div class="faq-item">
-                    <h3>什么时候判断选择结果？</h3>
-                    <p>选满要求数量后会自动判断。在最后一次选择前，再点一次已选物体即可取消。</p>
+                <div class="mt-faq-item">
+                    <button class="mt-faq-q" type="button">这测的是什么？
+                        <span class="mt-chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+                    </button>
+                    <div class="mt-faq-a"><div class="mt-faq-a-inner">在多个移动物体之间分配并保持视觉注意力的能力。它是一个小测试，不是医疗或诊断工具。</div></div>
                 </div>
-                <div class="faq-item">
-                    <h3>成绩保存在哪里？</h3>
-                    <p>每种模式最多保存 20 次完整测试，并且只保存在当前浏览器；中断的回合不会保存。</p>
+                <div class="mt-faq-item">
+                    <button class="mt-faq-q" type="button">成绩存在哪？
+                        <span class="mt-chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+                    </button>
+                    <div class="mt-faq-a"><div class="mt-faq-a-inner">只在当前浏览器的本地存储里，每种模式各留最近 20 次。中断的回合不保存。</div></div>
                 </div>
             </div>
+        </div>
+    </section>
+
+    <section class="mt-section">
+        <div class="mt-wrap-wide">
+            <div class="mt-section-head">
+                <h2>换一个测试</h2>
+            </div>
+            <nav class="mt-more" aria-label="其他测试">
+                <a href="/reaction-time-test/">反应时间<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left:auto"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                <a href="/aim-trainer/">瞄准训练<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left:auto"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                <a href="/sequence-memory-test/">序列记忆<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left:auto"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                <a href="/number-memory-test/">数字记忆<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left:auto"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                <a href="/stroop-test/">斯特鲁普<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left:auto"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+            </nav>
         </div>
     </section>
 </main>
 
-<footer>
-    <div class="footer-center-box">
-        <div class="footer-center-content-box">
-            <p>
-                <span class="footer-brand-line">&copy;&nbsp;<span id="currentYear"></span>&nbsp;PickTests</span>
-                <span class="footer-link-line">
-                    <a href="/privacy-policy/">隐私</a>
-                    <a href="/terms-of-use/">条款</a>
-                    <a href="/about/">关于</a>
-                    <a href="mailto:hello@picktests.com">联系</a>
-                </span>
-            </p>
-        </div>
-    </div>
-</footer>
+<footer></footer>
 
-<script src="../assets/js/global.min.js?v=20260830" defer></script>
-
-<script src="../assets/js/multiple-object-tracking-test.min.js?v=20260830" defer></script>
-
-
-    <script src="../assets/js/feedback-marker.js?v=20260849" defer></script>
+<script src="/assets/js/multiple-object-tracking-test.min.js?v=20260830" defer></script>
+<script src="/assets/js/feedback-marker.js?v=20270101" defer></script>
 </body>
 </html>

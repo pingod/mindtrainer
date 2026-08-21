@@ -1,413 +1,460 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Mind 认知基准测试与速读训练</title>
+<title>MindTrainer 认知测试与速读训练</title>
+<meta name="description" content="6 项认知基准测试：反应时间、瞄准、序列记忆、数字记忆、多目标追踪、斯特鲁普。另有速读、闪视、照相记忆与冥想训练。打开即用，无需注册。">
 
-    <meta name="description" content="6 项认知基准测试：反应时间、瞄准、序列记忆、数字记忆、多物体追踪、斯特鲁普；另有速读、闪视、照相记忆、冥想等训练。选一个即可开始。">
+<link rel="canonical" href="https://picktests.com/">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/images/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/images/icons/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/images/icons/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
 
-    <link rel="canonical" href="https://picktests.com/">
+<meta property="og:title" content="MindTrainer 认知测试与速读训练">
+<meta property="og:description" content="6 项认知基准测试，另有速读、闪视、照相记忆与冥想训练。打开即用，无需注册。">
+<meta property="og:url" content="https://picktests.com/">
+<meta property="og:type" content="website">
 
-    <link rel="alternate" hreflang="en" href="https://picktests.com/">
-    <link rel="alternate" hreflang="zh" href="https://picktests.com/">
-    <link rel="alternate" hreflang="x-default" href="https://picktests.com/">
+<!-- theme bootstrap: applied before first paint so there is no flash -->
+<script>try{var t=localStorage.getItem('mt-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
 
-    <link rel="apple-touch-icon" sizes="180x180" href="assets/images/icons/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="assets/images/icons/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="assets/images/icons/favicon-16x16.png">
-
-    <link rel="manifest" href="site.webmanifest">
-
-    <meta property="og:title" content="Mind 认知基准测试与速读训练">
-    <meta property="og:description" content="6 项认知基准测试：反应时间、瞄准、序列记忆、数字记忆、多物体追踪、斯特鲁普；另有速读、闪视、照相记忆、冥想等训练。">
-    <meta property="og:image" content="https://picktests.com/assets/images/og/og-image.png">
-    <meta property="og:url" content="https://picktests.com/">
-    <meta property="og:type" content="website">
-
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Mind 认知基准测试与速读训练">
-    <meta name="twitter:description" content="6 项认知基准测试：反应时间、瞄准、序列记忆、数字记忆、多物体追踪、斯特鲁普；另有速读、闪视、照相记忆、冥想等训练。">
-    <meta name="twitter:image" content="https://picktests.com/assets/images/og/og-image.png">
-
-    <link rel="stylesheet" href="assets/css/redesign.css?v=20260864">
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js" defer></script>
-    <script src="/assets/js/mt-nav.js?v=20260864" defer></script>
+<link rel="stylesheet" href="/assets/css/mt.css?v=20270101">
+<script src="/assets/js/mt-nav.js?v=20270101" defer></script>
+<script src="/assets/js/mt-app.js?v=20270101" defer></script>
 </head>
 <body>
 <header id="mt-header"></header>
 
 <main>
-    <!-- ================= HERO — Dark cinematic, centered ================= -->
-    <section class="hero">
-        <div class="hero-mesh"></div>
-        <div class="hero-grid-lines"></div>
-        <div class="hero-noise"></div>
-        <div class="hero-inner">
-            <p class="hero-eyebrow">6 项基准测试 · 7 类训练</p>
-            <h1>测一测你的<span class="hero-pill"></span><span class="hero-accent">大脑</span><br>看看你的水平</h1>
-            <p class="hero-sub">反应、瞄准、记忆、追踪、斯特鲁普，每项测试只关注一种能力。另有速读、闪视、照相记忆与冥想训练，随时回来，看看自己有没有进步。</p>
-            <div class="hero-ctas">
-                <a class="btn btn-primary" href="#tests">开始测试</a>
-                <a class="btn btn-ghost-light" href="/canvasui-gallery.html">进入特效画廊</a>
-            </div>
-        </div>
-        <div class="hero-scroll">
-            <span>Scroll</span>
-            <div class="hero-scroll-line"></div>
-        </div>
-        <div class="hero-fade"></div>
-    </section>
 
-    <!-- ================= MARQUEE — Infinite scroll bridge ================= -->
-    <div class="marquee" aria-hidden="true">
-        <div class="marquee-track" id="marqueeTrack"></div>
+  <!-- ================================================================ hero -->
+  <section class="mt-hero">
+    <div class="mt-wrap mt-hero-grid">
+      <div>
+        <h1>测一测你的大脑<br>到底有多快</h1>
+        <p class="mt-lead mt-hero-sub">六项测试，每项只测一种能力。做完立刻出分，随时回来和自己比。</p>
+        <div class="mt-hero-ctas">
+          <a class="mt-btn mt-btn-primary mt-btn-lg" href="#tests">开始测试</a>
+          <a class="mt-btn mt-btn-ghost mt-btn-lg" href="/speed-read/basic.html">速读训练</a>
+        </div>
+      </div>
+
+      <!-- A real round of the reaction test, not a picture of one. -->
+      <button class="mt-try" id="mtTry" type="button" data-state="idle" aria-live="polite">
+        <span class="mt-try-label" id="mtTryLabel">先试一轮</span>
+        <span class="mt-try-big" id="mtTryBig">反应时间</span>
+        <span class="mt-try-hint" id="mtTryHint">点击开始，等方块变绿再点一次。</span>
+      </button>
     </div>
+  </section>
 
-    <!-- ================= BENTO GRID — Mind 基准测试 ================= -->
-    <section id="tests" class="section">
-        <div class="wrap">
-            <div class="section-head">
-                <h2>Mind 基准测试</h2>
-                <p>每项测试只关注一种能力，完成后留下清楚的结果。</p>
-            </div>
-            <div class="bento-grid">
-                <!-- Card 1: Large 2x2 with image -->
-                <a class="bento-card bento-lg" href="/reaction-time-test/" data-anim>
-                    <div class="bento-bg" style="background-image: url('https://picsum.photos/seed/reaction-speed-lightning/800/800')"></div>
-                    <div class="bento-overlay"></div>
-                    <div class="bento-content">
-                        <span class="bento-ico">
-                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l14 9-6 1 3 8-14-9 6-1-3-8z"/></svg>
-                        </span>
-                        <h3>反应时间</h3>
-                        <p>测试你作出反应需要多少时间。屏幕变色的一瞬间，立刻点击。</p>
-                        <span class="bento-arrow">开始测试 &rarr;</span>
-                    </div>
-                </a>
-                <!-- Card 2: Medium 2x1 -->
-                <a class="bento-card bento-md" href="/aim-trainer/" data-anim>
-                    <div class="bento-content">
-                        <span class="bento-ico">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
-                        </span>
-                        <h3>瞄准训练</h3>
-                        <p>快速、准确地击中不断出现的目标。</p>
-                        <span class="bento-arrow">开始测试 &rarr;</span>
-                    </div>
-                </a>
-                <!-- Card 3: Small 1x1 -->
-                <a class="bento-card bento-sm accent-violet" href="/sequence-memory-test/" data-anim>
-                    <div class="bento-content">
-                        <span class="bento-ico">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-                        </span>
-                        <h3>序列记忆</h3>
-                        <span class="bento-arrow">&rarr;</span>
-                    </div>
-                </a>
-                <!-- Card 4: Small 1x1 -->
-                <a class="bento-card bento-sm accent-cyan" href="/number-memory-test/" data-anim>
-                    <div class="bento-content">
-                        <span class="bento-ico">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg>
-                        </span>
-                        <h3>数字记忆</h3>
-                        <span class="bento-arrow">&rarr;</span>
-                    </div>
-                </a>
-                <!-- Card 5: Medium 2x1 -->
-                <a class="bento-card bento-md" href="/multiple-object-tracking-test/" data-anim>
-                    <div class="bento-content">
-                        <span class="bento-ico">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="18" r="3"/><path d="M9 6h6M9 18h6M6 9v6M18 9v6"/></svg>
-                        </span>
-                        <h3>多目标追踪</h3>
-                        <p>记住被标记的物体，在它们移动后找出来。</p>
-                        <span class="bento-arrow">开始测试 &rarr;</span>
-                    </div>
-                </a>
-                <!-- Card 6: Medium 2x1 -->
-                <a class="bento-card bento-md" href="/stroop-test/" data-anim>
-                    <div class="bento-content">
-                        <span class="bento-ico">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4a2 2 0 0 0-2-2H6.5A2.5 2.5 0 0 0 4 4.5v15Z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg>
-                        </span>
-                        <h3>斯特鲁普</h3>
-                        <p>根据提示选择颜色，别让文字本身干扰你。</p>
-                        <span class="bento-arrow">开始测试 &rarr;</span>
-                    </div>
-                </a>
-            </div>
-        </div>
-    </section>
+  <!-- =============================================================== tests -->
+  <section class="mt-section" id="tests">
+    <div class="mt-wrap">
+      <div class="mt-section-head">
+        <h2>认知基准测试</h2>
+        <p>每项测试只关注一种能力，成绩保存在你自己的浏览器里。</p>
+      </div>
 
-    <!-- ================= SPEED READING ================= -->
-    <section class="section" style="padding-top:0">
-        <div class="wrap">
-            <div class="section-head">
-                <h2>飞克视读 · 速读训练中心</h2>
-                <p>基础训练 26 项 · 闪视 · 速读 · 照相记忆 · 冥想 · 训练计划</p>
-            </div>
-            <div class="sr-grid">
-                <a class="sr-card" href="speed-read/basic.html" data-anim>
-                    <span class="sr-icon">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-                    </span>
-                    <strong>基础训练</strong>
-                    <span class="sr-desc">视野扩展与眼球运动训练：发散箭头、扩大方框、左右拓宽、定点凝视等。</span>
-                    <span class="sr-meta">26 项训练 &rarr;</span>
-                </a>
-                <a class="sr-card" href="speed-read/flash.html" data-anim>
-                    <span class="sr-icon">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4.5 13.5H11L9.5 22 19 10.5h-6.5L13 2Z"/></svg>
-                    </span>
-                    <strong>闪视训练</strong>
-                    <span class="sr-desc">数字、字母、汉字、文章快速闪现，训练短时记忆，附测试题与回放。</span>
-                    <span class="sr-meta">7 项训练 &rarr;</span>
-                </a>
-                <a class="sr-card" href="speed-read/speed.html" data-anim>
-                    <span class="sr-icon">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4a2 2 0 0 0-2-2H6.5A2.5 2.5 0 0 0 4 4.5v15Z"/><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"/></svg>
-                    </span>
-                    <strong>速读训练</strong>
-                    <span class="sr-desc">字块移动、视野扩展、阅读与实战训练，眼停眼跳节奏控制。</span>
-                    <span class="sr-meta">4 大模块 &rarr;</span>
-                </a>
-                <a class="sr-card" href="speed-read/photo.html" data-anim>
-                    <span class="sr-icon">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a4 4 0 0 1 4 4c0 1.9-1.3 3.4-3 3.9V14a1 1 0 0 1-2 0V9.9c-1.7-.5-3-2-3-3.9a4 4 0 0 1 4-4Z"/><path d="M9 22h6"/><path d="M10 18h4"/></svg>
-                    </span>
-                    <strong>照相记忆</strong>
-                    <span class="sr-desc">黄卡残像、曼陀罗卡、3D 卡、找同训练、位置记忆、瞬间计算。</span>
-                    <span class="sr-meta">8 项训练 &rarr;</span>
-                </a>
-                <a class="sr-card" href="speed-read/meditation.html" data-anim>
-                    <span class="sr-icon">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
-                    </span>
-                    <strong>冥想训练</strong>
-                    <span class="sr-desc">双脑同步声频（双耳节拍）、呼吸引导与曼陀罗动画，激活右脑。</span>
-                    <span class="sr-meta">3.0 新增 &rarr;</span>
-                </a>
-                <a class="sr-card" href="speed-read/plan.html" data-anim>
-                    <span class="sr-icon">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-                    </span>
-                    <strong>训练计划</strong>
-                    <span class="sr-desc">自定义训练步骤与时长，一键按序执行整套训练教程。</span>
-                    <span class="sr-meta">自定义 &rarr;</span>
-                </a>
-            </div>
-        </div>
-    </section>
+      <div class="mt-tests">
+        <a class="mt-tile mt-tile-tall mt-tile-img" href="/reaction-time-test/" data-reveal="0"
+           style="--img:url('/assets/images/other/hero-test-reaction.svg')">
+          <span class="mt-tile-ico">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l14 9-6 1 3 8-14-9 6-1-3-8z"/></svg>
+          </span>
+          <h3>反应时间</h3>
+          <p>屏幕变绿的一瞬间点下去。单轮快速测，五轮看平均。</p>
+          <span class="mt-tile-go">开始测试 &rarr;</span>
+        </a>
 
-    <!-- ================= FEATURES BAND — Dark, GSAP scrub ================= -->
-    <section class="section section-features">
-        <div class="wrap">
-            <h2 class="scrub-headline" id="scrubHeadline">测试简单，结果清楚。选一个测试，看看结果，想再试时随时回来。每项测试都能反复进行，方便比较成绩，看看自己有没有进步。</h2>
-            <div class="features-grid">
-                <div class="feature-tile" data-anim>
-                    <span class="f-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span>
-                    <strong>立即开始</strong>
-                    <p>无需注册或设置，选择一个测试就能开始。</p>
-                </div>
-                <div class="feature-tile" data-anim>
-                    <span class="f-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 15 4-6 4 3 5-8"/></svg></span>
-                    <strong>结果清楚</strong>
-                    <p>完成后立即看到成绩，一眼就能看懂。</p>
-                </div>
-                <div class="feature-tile" data-anim>
-                    <span class="f-ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M5 8l7-5 7 5M5 16l7 5 7-5"/></svg></span>
-                    <strong>和自己比较</strong>
-                    <p>重复测试、比较成绩，看看自己有没有进步。</p>
-                </div>
-            </div>
-        </div>
-    </section>
+        <a class="mt-tile mt-tile-tall" href="/aim-trainer/" data-reveal="60">
+          <span class="mt-tile-ico">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg>
+          </span>
+          <h3>瞄准训练</h3>
+          <p>30 个目标、30 秒、移动目标三种模式，速度和准确率一起算。</p>
+          <span class="mt-tile-go">开始测试 &rarr;</span>
+        </a>
 
-    <!-- ================= FAQ ================= -->
-    <section id="faq" class="section section-faq">
-        <div class="wrap">
-            <div class="section-head section-head-center">
-                <h2>常见问题</h2>
-                <p>测试、成绩与设备相关的疑问。</p>
-            </div>
-            <div class="faq-list">
-                <div class="faq-item" data-anim>
-                    <button class="faq-q" type="button">可以测试哪些能力？<span class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></button>
-                    <div class="faq-a"><div class="faq-a-inner">这里包含反应速度、瞄准、专注力、记忆力和视觉追踪等测试。</div></div>
-                </div>
-                <div class="faq-item" data-anim>
-                    <button class="faq-q" type="button">测试免费吗？<span class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></button>
-                    <div class="faq-a"><div class="faq-a-inner">是的。所有测试都可以免费使用，不用账号，也不需要下载。</div></div>
-                </div>
-                <div class="faq-item" data-anim>
-                    <button class="faq-q" type="button">成绩代表什么？<span class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></button>
-                    <div class="faq-a"><div class="faq-a-inner">成绩告诉你这次做得怎么样，也方便和自己在相近条件下的其他结果比较。</div></div>
-                </div>
-                <div class="faq-item" data-anim>
-                    <button class="faq-q" type="button">可以反复测试吗？<span class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></button>
-                    <div class="faq-a"><div class="faq-a-inner">可以。每项测试都能重复进行，方便比较成绩，看看自己有没有进步。</div></div>
-                </div>
-                <div class="faq-item" data-anim>
-                    <button class="faq-q" type="button">手机和平板可以使用吗？<span class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></button>
-                    <div class="faq-a"><div class="faq-a-inner">可以。常见的手机、平板、笔记本电脑和台式电脑都能使用。</div></div>
-                </div>
-                <div class="faq-item" data-anim>
-                    <button class="faq-q" type="button">为什么不同设备上的成绩会有差异？<span class="chev"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span></button>
-                    <div class="faq-a"><div class="faq-a-inner">屏幕刷新率、输入延迟、浏览器性能，以及触屏或鼠标输入，都可能影响测试结果。</div></div>
-                </div>
-            </div>
-        </div>
-    </section>
+        <a class="mt-tile" href="/sequence-memory-test/" data-reveal="0">
+          <span class="mt-tile-ico">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+          </span>
+          <h3>序列记忆</h3>
+          <p>记住方块亮起的顺序，正着或倒着重复。</p>
+          <span class="mt-tile-go">开始测试 &rarr;</span>
+        </a>
 
-    <!-- ================= GALLERY CTA ================= -->
-    <section class="section-gallery">
-        <div class="wrap">
-            <a class="gallery-card" href="/canvasui-gallery.html" data-anim>
-                <div>
-                    <h3>特效画廊</h3>
-                    <p>33 个 WebGL 视觉组件，全部可交互演示。</p>
-                </div>
-                <span class="gallery-btn">进入画廊 &rarr;</span>
-            </a>
+        <a class="mt-tile" href="/number-memory-test/" data-reveal="60">
+          <span class="mt-tile-ico">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg>
+          </span>
+          <h3>数字记忆</h3>
+          <p>数字一位位变长，看你能记到第几位。</p>
+          <span class="mt-tile-go">开始测试 &rarr;</span>
+        </a>
+
+        <a class="mt-tile" href="/multiple-object-tracking-test/" data-reveal="120">
+          <span class="mt-tile-ico">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.5 6h7M8.5 18h7M6 8.5v7M18 8.5v7"/></svg>
+          </span>
+          <h3>多目标追踪</h3>
+          <p>盯住被标记的球，等它们停下来再找出来。</p>
+          <span class="mt-tile-go">开始测试 &rarr;</span>
+        </a>
+
+        <a class="mt-tile mt-tile-wide mt-tile-img" href="/stroop-test/" data-reveal="0"
+           style="--img:url('/assets/images/other/hero-test-stroop.svg')">
+          <span class="mt-tile-ico">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18 3 3 0 0 0 0-6 3 3 0 0 1 0-6 3 3 0 0 0 0-6Z"/><circle cx="9" cy="9" r="1"/><circle cx="15" cy="9" r="1"/></svg>
+          </span>
+          <h3>斯特鲁普</h3>
+          <p>选颜色，别被字义带偏。测的是注意力和抗干扰。</p>
+          <span class="mt-tile-go">开始测试 &rarr;</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================== speed read -->
+  <section class="mt-section mt-section-sunk">
+    <div class="mt-wrap">
+      <div class="mt-section-head">
+        <h2>飞克视读训练</h2>
+        <p>把老版飞克视读的训练体系搬到浏览器里，六个模块都能直接开练。</p>
+      </div>
+
+      <div class="mt-sr-split">
+        <a class="mt-sr-anchor" href="/speed-read/basic.html" data-reveal="0"
+           style="--img:url('/assets/images/other/test-directory-notebook.webp')">
+          <h3>基础训练</h3>
+          <p>视野扩展、眼动、凝视、舒尔特表，26 项从头练起。</p>
+        </a>
+
+        <div class="mt-sr-list">
+          <a class="mt-sr-row" href="/speed-read/flash.html">
+            <span class="mt-sr-row-ico"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4.5 13.5H11L9.5 22 19 10.5h-6.5L13 2Z"/></svg></span>
+            <span><strong>闪视训练</strong><span>数字、汉字、文章瞬间闪现，练短时记忆</span></span>
+            <span class="mt-sr-row-count">7 项</span>
+          </a>
+          <a class="mt-sr-row" href="/speed-read/speed.html">
+            <span class="mt-sr-row-ico"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4a2 2 0 0 0-2-2H6.5A2.5 2.5 0 0 0 4 4.5v15Z"/></svg></span>
+            <span><strong>速读训练</strong><span>字块移动、视野扩展、眼停眼跳节奏</span></span>
+            <span class="mt-sr-row-count">4 模块</span>
+          </a>
+          <a class="mt-sr-row" href="/speed-read/photo.html">
+            <span class="mt-sr-row-ico"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="14" rx="2"/><circle cx="12" cy="13" r="3.5"/><path d="M8 6l1.5-2h5L16 6"/></svg></span>
+            <span><strong>照相记忆</strong><span>黄卡残像、曼陀罗、3D 卡、瞬间计算</span></span>
+            <span class="mt-sr-row-count">8 项</span>
+          </a>
+          <a class="mt-sr-row" href="/speed-read/meditation.html">
+            <span class="mt-sr-row-ico"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></span>
+            <span><strong>冥想训练</strong><span>双耳节拍、呼吸引导与曼陀罗动画</span></span>
+            <span class="mt-sr-row-count">5 档</span>
+          </a>
+          <a class="mt-sr-row" href="/speed-read/plan.html">
+            <span class="mt-sr-row-ico"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span>
+            <span><strong>训练计划</strong><span>把多个训练排成序列，倒计时自动切换</span></span>
+            <span class="mt-sr-row-count">自定义</span>
+          </a>
         </div>
-    </section>
+      </div>
+    </div>
+  </section>
+
+  <!-- =============================================================== facts -->
+  <section class="mt-section">
+    <div class="mt-wrap">
+      <dl class="mt-facts">
+        <div class="mt-fact"><dd>6</dd><dt>项认知测试，各测一种能力</dt></div>
+        <div class="mt-fact"><dd>26</dd><dt>项基础速读训练</dt></div>
+        <div class="mt-fact"><dd>0</dd><dt>注册、下载、上传</dt></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- ================================================================= faq -->
+  <section class="mt-section" id="faq">
+    <div class="mt-wrap">
+      <div class="mt-section-head">
+        <h2>常见问题</h2>
+      </div>
+
+      <div class="mt-faq">
+        <div class="mt-faq-item">
+          <button class="mt-faq-q" type="button">这些测试能测出什么？
+            <span class="mt-chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+          </button>
+          <div class="mt-faq-a"><div class="mt-faq-a-inner">反应速度、瞄准控制、短时记忆、视觉追踪和抗干扰能力。每项测试只针对其中一种，所以结果好读，也好对比。</div></div>
+        </div>
+        <div class="mt-faq-item">
+          <button class="mt-faq-q" type="button">要钱吗？要注册吗？
+            <span class="mt-chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+          </button>
+          <div class="mt-faq-a"><div class="mt-faq-a-inner">都不用。打开网页就能测，不需要账号，也不需要下载任何东西。</div></div>
+        </div>
+        <div class="mt-faq-item">
+          <button class="mt-faq-q" type="button">成绩存在哪里？
+            <span class="mt-chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+          </button>
+          <div class="mt-faq-a"><div class="mt-faq-a-inner">只存在你这台设备的浏览器本地存储里，不会上传。换浏览器或清掉浏览数据，记录就没了。</div></div>
+        </div>
+        <div class="mt-faq-item">
+          <button class="mt-faq-q" type="button">多少分算好？
+            <span class="mt-chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+          </button>
+          <div class="mt-faq-a"><div class="mt-faq-a-inner">没有统一标准。这类测试最有意义的用法，是在同一台设备上和自己以前的成绩比，而不是和别人比。</div></div>
+        </div>
+        <div class="mt-faq-item">
+          <button class="mt-faq-q" type="button">为什么换台设备成绩就不一样？
+            <span class="mt-chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+          </button>
+          <div class="mt-faq-a"><div class="mt-faq-a-inner">屏幕刷新率、输入延迟、浏览器性能都会影响记录到的时间，触屏和鼠标的手感也不同。所以跨设备比意义不大。</div></div>
+        </div>
+        <div class="mt-faq-item">
+          <button class="mt-faq-q" type="button">手机上能用吗？
+            <span class="mt-chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+          </button>
+          <div class="mt-faq-a"><div class="mt-faq-a-inner">可以。手机、平板、笔记本和台式机都支持。速读训练里的部分模块在大屏上体验更好。</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================================================================= cta -->
+  <section class="mt-section">
+    <div class="mt-wrap">
+      <a class="mt-gallery" href="/canvasui-gallery.html">
+        <span class="mt-gallery-visual" aria-hidden="true">
+          <span></span><span></span><span></span><span></span>
+        </span>
+        <span class="mt-gallery-copy">
+          <strong>特效画廊</strong>
+          <span>33 个 WebGL 视觉组件，全部可交互演示。</span>
+        </span>
+        <span class="mt-gallery-go">进入画廊 &rarr;</span>
+      </a>
+    </div>
+  </section>
+
+  <section class="mt-section" style="padding-top:0">
+    <div class="mt-wrap">
+      <div class="mt-cta">
+        <div>
+          <h2>挑一个，现在就测</h2>
+          <p>大部分测试一分钟内就能做完。测完再看看自己下次能不能更快。</p>
+        </div>
+        <a class="mt-btn mt-btn-primary mt-btn-lg" href="#tests">开始测试</a>
+      </div>
+    </div>
+  </section>
+
 </main>
 
-<footer>
-    <div class="footer-content">
-        <p>
-            <span class="footer-brand">&copy;&nbsp;<span id="currentYear"></span>&nbsp;PickTests</span>
-            <span class="footer-links">
-                <a href="/privacy-policy/">隐私</a>
-                <a href="/terms-of-use/">条款</a>
-                <a href="/about/">关于</a>
-                <a href="mailto:hello@picktests.com">联系</a>
-            </span>
-        </p>
-    </div>
-</footer>
+<footer></footer>
 
-<script src="assets/js/global.min.js?v=20260852" defer></script>
-<script src="assets/js/feedback-marker.js?v=20260850" defer></script>
 <script>
+/* ---------------------------------------------------------------------------
+   Hero try-it tile: one real round of the reaction test.
+   Same rules as the full test, so the number it shows is honest.
+   --------------------------------------------------------------------------- */
 (function () {
-    'use strict';
-    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  'use strict';
+  var tile  = document.getElementById('mtTry');
+  if (!tile) return;
+  var label = document.getElementById('mtTryLabel');
+  var big   = document.getElementById('mtTryBig');
+  var hint  = document.getElementById('mtTryHint');
 
-    // ---------- Marquee ----------
-    var marqueeItems = [
-        '反应时间', '瞄准训练', '序列记忆', '数字记忆',
-        '多目标追踪', '斯特鲁普', '基础训练', '闪视训练',
-        '速读训练', '照相记忆', '冥想训练', '训练计划'
-    ];
-    var track = document.getElementById('marqueeTrack');
-    if (track) {
-        var html = '';
-        // Duplicate twice for seamless loop
-        for (var rep = 0; rep < 2; rep++) {
-            for (var i = 0; i < marqueeItems.length; i++) {
-                html += '<span class="marquee-item">' + marqueeItems[i] + '</span>';
-                html += '<span class="marquee-dot"></span>';
-            }
-        }
-        track.innerHTML = html;
+  var state = 'idle';
+  var timer = null;
+  var goAt  = 0;
+
+  function set(s, l, b, h) {
+    state = s;
+    tile.setAttribute('data-state', s);
+    label.textContent = l;
+    big.textContent = b;
+    hint.textContent = h;
+  }
+
+  function arm() {
+    set('wait', '等待', '别急', '变绿之前不要点。');
+    timer = setTimeout(function () {
+      goAt = performance.now();
+      set('go', '现在', '点！', '');
+    }, 1200 + Math.random() * 2600);
+  }
+
+  tile.addEventListener('click', function () {
+    if (state === 'idle' || state === 'early' || state === 'done') { arm(); return; }
+
+    if (state === 'wait') {
+      clearTimeout(timer);
+      set('early', '点早了', '再来一次', '等方块变绿再点。点击重试。');
+      return;
     }
 
-    // ---------- FAQ Accordion ----------
-    document.querySelectorAll('.faq-q').forEach(function (btn) {
-        btn.addEventListener('click', function () {
-            var item = btn.closest('.faq-item');
-            var ans = item.querySelector('.faq-a');
-            var isOpen = item.classList.contains('open');
-            document.querySelectorAll('.faq-item.open').forEach(function (other) {
-                if (other !== item) {
-                    other.classList.remove('open');
-                    other.querySelector('.faq-a').style.maxHeight = '0';
-                }
-            });
-            if (isOpen) {
-                item.classList.remove('open');
-                ans.style.maxHeight = '0';
-            } else {
-                item.classList.add('open');
-                ans.style.maxHeight = ans.scrollHeight + 'px';
-            }
-        });
-    });
-
-    // ---------- GSAP Scroll Animations ----------
-    function initGSAP() {
-        if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
-        gsap.registerPlugin(ScrollTrigger);
-
-        if (reduce) {
-            // Show everything immediately
-            document.querySelectorAll('[data-anim]').forEach(function (el) {
-                gsap.set(el, { opacity: 1, y: 0, scale: 1 });
-            });
-            document.querySelectorAll('#scrubHeadline .word').forEach(function (w) {
-                w.classList.add('lit');
-            });
-            return;
-        }
-
-        // Bento + SR + Feature + Gallery cards: scale & fade in
-        gsap.utils.toArray('[data-anim]').forEach(function (el) {
-            gsap.fromTo(el,
-                { opacity: 0, y: 36, scale: 0.96 },
-                {
-                    opacity: 1, y: 0, scale: 1,
-                    duration: 0.7,
-                    ease: 'power3.out',
-                    scrollTrigger: {
-                        trigger: el,
-                        start: 'top 88%',
-                        toggleActions: 'play none none none'
-                    }
-                }
-            );
-        });
-
-        // Scrub text reveal — split words, scrub opacity
-        var headline = document.getElementById('scrubHeadline');
-        if (headline) {
-            var text = headline.textContent.trim();
-            var words = text.split(/\s+/);
-            headline.innerHTML = words.map(function (w) {
-                return '<span class="word">' + w + '</span>';
-            }).join(' ');
-
-            gsap.to('#scrubHeadline .word', {
-                opacity: 1,
-                stagger: 0.08,
-                ease: 'none',
-                scrollTrigger: {
-                    trigger: headline,
-                    start: 'top 75%',
-                    end: 'bottom 55%',
-                    scrub: 0.8
-                }
-            });
-
-            // Apply "lit" class for CSS transition fallback
-            gsap.utils.toArray('#scrubHeadline .word').forEach(function (w) {
-                // gsap handles opacity directly; CSS .lit class is a fallback
-            });
-        }
+    if (state === 'go') {
+      var ms = Math.round(performance.now() - goAt);
+      set('done', '你的成绩', ms + ' ms', '这只是一轮。完整测试可以做五轮取平均。');
+      hint.innerHTML = '这只是一轮。<a href="/reaction-time-test/" style="color:inherit;text-decoration:underline;text-underline-offset:3px">做完整测试 &rarr;</a>';
     }
-
-    // Wait for GSAP to load (deferred)
-    if (typeof gsap !== 'undefined') {
-        initGSAP();
-    } else {
-        window.addEventListener('load', initGSAP);
-    }
+  });
 })();
 </script>
+<script>
+/* ==========================================================================
+   Easter egg: triple-click the header logo → The Matrix "digital rain".
+   Half-width katakana + latin + digits, iconic Matrix green, glowing lead
+   glyph, fading drape, a green wash at the top. Runs after mt-nav.js builds
+   the logo. Homepage only. Esc / click to dismiss.
+   ========================================================================== */
+(function () {
+  var active = null;
+
+  function startRain() {
+    if (active) { active.stop(); active = null; return; }
+
+    var canvas = document.createElement('canvas');
+    canvas.style.cssText = 'position:fixed;inset:0;z-index:20000;background:#000;';
+    document.body.appendChild(canvas);
+    var ctx = canvas.getContext('2d');
+
+    // The Matrix glyph set: half-width katakana, latin caps, digits, symbols.
+    var GLYPHS = '\uFF71\uFF72\uFF73\uFF74\uFF75\uFF76\uFF77\uFF78\uFF79\uFF7A' +
+                 '\uFF7B\uFF7C\uFF7D\uFF7E\uFF7F\uFF80\uFF81\uFF82\uFF83\uFF84' +
+                 '\uFF85\uFF86\uFF87\uFF88\uFF89\uFF8A\uFF8B\uFF8C\uFF8D\uFF8E' +
+                 '\uFF8F\uFF90\uFF91\uFF92\uFF93\uFF94\uFF95\uFF96\uFF97\uFF98' +
+                 '\uFF99\uFF9A\uFF9B\uFF9C\uFF9D\uFF9E\uFF9F' +
+                 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    var SYMBOLS = ':-=+*#%@$?';
+    var fontSize = 16, cols = 0, drops = [];
+
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      cols = Math.max(1, Math.floor(canvas.width / fontSize));
+      drops = [];
+      for (var i = 0; i < cols; i++) {
+        drops[i] = { y: (Math.random() * -80) | 0, spd: 0.5 + Math.random() * 1.1 };
+      }
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    var raf = 0, running = true, paused = false, msgTimer = 0;
+    function frame() {
+      if (!running) return;
+      // when the message moment is on, freeze the rain (movie-style glitch pause)
+      if (paused) { raf = requestAnimationFrame(frame); return; }
+      // fade toward black — each bright lead glyph leaves a fading drape above it
+      ctx.fillStyle = 'rgba(0,0,0,0.06)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // a faint green wash at the top, the "source" of the stream
+      var wash = ctx.createLinearGradient(0, 0, 0, canvas.height * 0.11);
+      wash.addColorStop(0, 'rgba(0,255,65,0.06)');
+      wash.addColorStop(1, 'rgba(0,255,65,0)');
+      ctx.fillStyle = wash;
+      ctx.fillRect(0, 0, canvas.width, canvas.height * 0.11);
+
+      ctx.font = 'bold ' + fontSize + 'px "SF Mono","Menlo","Consolas",monospace';
+      ctx.textBaseline = 'top';
+      for (var i = 0; i < cols; i++) {
+        var d = drops[i];
+        var x = i * fontSize;
+        var y = Math.round(d.y * fontSize);
+        // a dim green "echo" a couple glyphs up gives the classic tri-char drape
+        ctx.fillStyle = 'rgba(0,255,65,0.35)';
+        ctx.fillText(GLYPHS.charAt((Math.random()*GLYPHS.length)|0), x, y - fontSize * 1.25);
+        ctx.fillStyle = 'rgba(0,255,65,0.6)';
+        ctx.fillText(GLYPHS.charAt((Math.random()*GLYPHS.length)|0), x, y - fontSize * 0.6);
+        // bright white-green lead glyph
+        ctx.fillStyle = '#d9ffe0';
+        var ch = GLYPHS.charAt((Math.random()*GLYPHS.length)|0);
+        if (Math.random() < 0.04) ch = SYMBOLS.charAt((Math.random()*SYMBOLS.length)|0);
+        ctx.fillText(ch, x, y);
+        if (y > canvas.height && Math.random() > 0.975) d.y = (Math.random() * -30) | 0;
+        d.y += d.spd;
+      }
+      raf = requestAnimationFrame(frame);
+    }
+    raf = requestAnimationFrame(frame);
+
+    // The Matrix-style pause + message: after the rain establishes, freeze it and
+    // fade the iconic green lines in at center, hold, then fade out and resume.
+    var msg = document.createElement('div');
+    msg.style.cssText = 'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:20001;' +
+      'text-align:center;font:700 26px/1.75 "SF Mono",Menlo,Consolas,monospace;color:#00ff41;' +
+      'text-shadow:0 0 12px rgba(0,255,65,.85),0 0 34px rgba(0,255,65,.45);' +
+      'opacity:0;pointer-events:none;transition:opacity 1.6s ease;letter-spacing:.06em;';
+    msg.innerHTML = 'Wake up, Neo...<br>' +
+      '<span style="font-size:15px;opacity:.82;line-height:1.95">The Matrix has you.<br>Follow the white rabbit.</span>' +
+      '<span style="display:block;margin-top:22px;font-size:13px;font-weight:600;letter-spacing:.22em;opacity:.72">MIND TRAINER</span>';
+    document.body.appendChild(msg);
+
+    function openMessage() {
+      paused = true;
+      msg.style.opacity = '1';
+      setTimeout(function () {
+        msg.style.opacity = '0';
+        setTimeout(function () { paused = false; }, 1600);
+      }, 4200);
+    }
+    msgTimer = setTimeout(openMessage, 1500);
+
+    var hint = document.createElement('div');
+    hint.style.cssText = 'position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:20001;' +
+      'font:600 12px/1.4 -apple-system,"PingFang SC",sans-serif;color:#00ff41;opacity:.85;' +
+      'letter-spacing:.12em;text-shadow:0 0 8px rgba(0,255,65,.7);';
+    hint.textContent = '按 Esc 或 点击任意处 退出';
+    document.body.appendChild(hint);
+
+    function onKey(e) { if (e.key === 'Escape') active.stop(); }
+    function onCanvasClick() { active.stop(); }
+    document.addEventListener('keydown', onKey);
+    canvas.addEventListener('click', onCanvasClick);
+
+    active = {
+      stop: function () {
+        running = false;
+        cancelAnimationFrame(raf);
+        window.removeEventListener('resize', resize);
+        document.removeEventListener('keydown', onKey);
+        canvas.removeEventListener('click', onCanvasClick);
+        clearTimeout(msgTimer);
+        canvas.remove();
+        hint.remove();
+        msg.remove();
+        active = null;
+      }
+    };
+  }
+
+  window.addEventListener('DOMContentLoaded', function () {
+    var brand = document.querySelector('.mt-brand');
+    if (!brand) return;
+    var count = 0, timer = null;
+    brand.addEventListener('click', function (e) {
+      // On the homepage the logo links back to itself; keep the page so the
+      // triple-click can be counted and the rain can trigger (a reload resets it).
+      e.preventDefault();
+      count++;
+      clearTimeout(timer);
+      if (count >= 3) {
+        count = 0;
+        startRain();
+      } else {
+        timer = setTimeout(function () { count = 0; }, 650);
+      }
+    });
+  });
+})();
+</script>
+<script src="/assets/js/feedback-marker.js?v=20270101" defer></script>
 </body>
 </html>

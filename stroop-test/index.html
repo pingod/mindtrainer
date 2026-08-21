@@ -32,65 +32,23 @@
     <meta name="twitter:description" content="免费在线斯特鲁普测试，通过识别文字颜色并忽略字义，测试你的专注力和反应速度。">
     <meta name="twitter:image" content="https://picktests.com/assets/images/og/og-image.png">
 
-    <link rel="stylesheet" href="../assets/css/global.min.css?v=20260830">
-    <link rel="stylesheet" href="../assets/css/style.min.css?v=20260830">
+<!-- theme bootstrap: applied before first paint so there is no flash -->
+    <script>try{var t=localStorage.getItem('mt-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
 
-    <link rel="stylesheet" href="../assets/css/stroop-test.min.css?v=20260830">
-    <script src="/assets/js/mt-nav.js?v=20260864" defer></script>
-    <style>
-        /* 模式选择器可点击反馈：未选中项 hover 明显可点（避免灰色误认为禁用） */
-        [class*="mode-picker"] span { transition: color 180ms ease-out, background 180ms ease-out, box-shadow 180ms ease-out; }
-        [class*="mode-picker"]:not(:disabled) label:hover span {
-            background: rgba(35, 122, 94, .09);
-            box-shadow: inset 0 0 0 1.5px rgba(35, 122, 94, .35);
-        }
-        [class*="mode-picker"] input:checked+span { font-weight: 750; }
-    </style>
-<style>
-  /* 测试区域加宽：充分利用宽屏版面 */
-  .common-container { max-width: min(100%, 1650px); }
-  .number-page, .aim-page, .sequence-page, .tracking-page, .stroop-page, .reaction-page { width: min(1650px, 100%); max-width: min(1650px, 100%); }
-</style>
-    <link rel="stylesheet" href="../assets/css/theme.css?v=20260860">
+    <link rel="stylesheet" href="/assets/css/mt.css?v=20270101">
+    <link rel="stylesheet" href="/assets/css/stroop-test.min.css?v=20260830">
+    <link rel="stylesheet" href="/assets/css/mt-stage.css?v=20270101">
+    <script src="/assets/js/mt-nav.js?v=20270101" defer></script>
+    <script src="/assets/js/mt-app.js?v=20270101" defer></script>
 </head>
 <body class="test-page">
 <header id="mt-header"></header>
 
 <main>
-    <section class="hero">
-        <div class="common-container">
-            <div class="hero-content">
-                <h1><span class="hero-title-text">斯特鲁普测试</span></h1>
-                <p class="hero-subtitle">看文字的颜色，<span class="hero-underline">不要被字义带走</span>。</p>
-
-                <nav class="hero-test-links" aria-label="更多测试">
-                    <div class="hero-test-links-viewport">
-                        <div class="hero-test-links-marquee">
-                            <div class="hero-test-links-track">
-                                <a class="hero-test-link--reaction" href="/reaction-time-test/" target="_blank" rel="noopener">反应时间</a>
-                                <a class="hero-test-link--aim" href="/aim-trainer/" target="_blank" rel="noopener">瞄准训练</a>
-                                <a class="hero-test-link--sequence" href="/sequence-memory-test/" target="_blank" rel="noopener">序列记忆</a>
-                                <a class="hero-test-link--number" href="/number-memory-test/" target="_blank" rel="noopener">数字记忆</a>
-                                <a class="hero-test-link--tracking" href="/multiple-object-tracking-test/" target="_blank" rel="noopener">多目标追踪</a>
-                            </div>
-                            <div class="hero-test-links-track" aria-hidden="true">
-                                <a class="hero-test-link--reaction" href="/reaction-time-test/" target="_blank" rel="noopener" tabindex="-1">反应时间</a>
-                                <a class="hero-test-link--aim" href="/aim-trainer/" target="_blank" rel="noopener" tabindex="-1">瞄准训练</a>
-                                <a class="hero-test-link--sequence" href="/sequence-memory-test/" target="_blank" rel="noopener" tabindex="-1">序列记忆</a>
-                                <a class="hero-test-link--number" href="/number-memory-test/" target="_blank" rel="noopener" tabindex="-1">数字记忆</a>
-                                <a class="hero-test-link--tracking" href="/multiple-object-tracking-test/" target="_blank" rel="noopener" tabindex="-1">多目标追踪</a>
-                            </div>
-                            <div class="hero-test-links-track" aria-hidden="true">
-                                <a class="hero-test-link--reaction" href="/reaction-time-test/" target="_blank" rel="noopener" tabindex="-1">反应时间</a>
-                                <a class="hero-test-link--aim" href="/aim-trainer/" target="_blank" rel="noopener" tabindex="-1">瞄准训练</a>
-                                <a class="hero-test-link--sequence" href="/sequence-memory-test/" target="_blank" rel="noopener" tabindex="-1">序列记忆</a>
-                                <a class="hero-test-link--number" href="/number-memory-test/" target="_blank" rel="noopener" tabindex="-1">数字记忆</a>
-                                <a class="hero-test-link--tracking" href="/multiple-object-tracking-test/" target="_blank" rel="noopener" tabindex="-1">多目标追踪</a>
-                            </div>
-                        </div>
-                    </div>
-                </nav>
-            </div>
+    <section class="mt-test-head">
+        <div class="mt-wrap-wide">
+            <h1>斯特鲁普测试</h1>
+            <p>选文字的颜色，不是它写的字。24 题，测注意力和抗干扰。</p>
         </div>
     </section>
 
@@ -242,101 +200,105 @@
         </div>
     </section>
 
-    <section id="features" class="features stroop-features">
-        <div class="common-container">
-            <h2>清楚的规则，恰到好处的专注</h2>
-            <p class="features-subtitle">跟随一个信号，忽略其他干扰，再看看规则改变时会发生什么。</p>
-
-            <div class="features-grid">
-                <div class="feature-card">
-                    <span class="feature-kicker">专注</span>
-                    <h3>只跟随重要信息</h3>
-                    <p>选择文字本身的颜色，同时忽略试图带走注意力的字义。</p>
+    <section class="mt-section">
+        <div class="mt-wrap-wide">
+            <div class="mt-section-head">
+                <h2>关于这个测试</h2>
+            </div>
+            <div class="mt-notes">
+                <div class="mt-note">
+                    <h3>字义是干扰项</h3>
+                    <p>当“红”这个字是蓝色的时候，读字的本能会和看颜色的任务打架。测的就是你压住本能的能力。</p>
                 </div>
-                <div class="feature-card">
-                    <span class="feature-kicker">模式</span>
-                    <h3>一条规则或两条</h3>
-                    <p>经典模式始终看文字颜色；切换模式每题要求选择文字颜色或背景颜色。</p>
+                <div class="mt-note">
+                    <h3>经典和切换</h3>
+                    <p>经典模式全程只看文字颜色。切换模式每题会提示看文字颜色还是背景颜色，需要不断重设规则。</p>
                 </div>
-                <div class="feature-card">
-                    <span class="feature-kicker">节奏</span>
-                    <h3>固定的颜色位置</h3>
-                    <p>四种颜色始终保持相同位置，让测试关注注意力，而不是布局记忆。</p>
+                <div class="mt-note">
+                    <h3>颜色位置固定</h3>
+                    <p>四个颜色按钮位置始终不变，这样测的是注意力，而不是你记不记得住按钮在哪。</p>
                 </div>
-                <div class="feature-card">
-                    <span class="feature-kicker">结果</span>
-                    <h3>两个清楚的结果</h3>
-                    <p>只看正确率和平均反应时间，不让多余的统计打扰判断。</p>
+                <div class="mt-note">
+                    <h3>只看两个数</h3>
+                    <p>结果只有正确率和平均反应时间。这两个一起看才有意义，光快不准没用。</p>
                 </div>
-                <div class="feature-card">
-                    <span class="feature-kicker">操作</span>
-                    <h3>使用顺手的方式</h3>
-                    <p>鼠标、触屏或数字键 1–4 都能完成作答，测试流程保持一致。</p>
+                <div class="mt-note">
+                    <h3>键盘也能答</h3>
+                    <p>鼠标、触屏，或者数字键 1 到 4 都可以，流程完全一样。</p>
                 </div>
-                <div class="feature-card">
-                    <span class="feature-kicker">隐私</span>
-                    <h3>只保存在当前浏览器</h3>
-                    <p>每种模式最近 20 次完整测试只保存在这台设备，不会上传。</p>
+                <div class="mt-note">
+                    <h3>这不是诊断工具</h3>
+                    <p>色觉、阅读习惯、设备和输入方式都会影响结果。它只适合自己和自己比，不能用来评估注意力障碍。</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <section id="faq" class="faq">
-        <div class="common-container">
-            <h2>常见问题</h2>
-
-            <div class="faq-grid">
-                <div class="faq-item">
-                    <h3>斯特鲁普测试如何进行？</h3>
-                    <p>屏幕会显示一个颜色词，文字颜色可能与字义一致，也可能冲突。经典模式始终选择文字颜色，共 24 题。</p>
+    <section id="faq" class="mt-section">
+        <div class="mt-wrap-wide">
+            <div class="mt-section-head">
+                <h2>常见问题</h2>
+            </div>
+            <div class="mt-faq">
+                <div class="mt-faq-item">
+                    <button class="mt-faq-q" type="button">怎么测？
+                        <span class="mt-chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+                    </button>
+                    <div class="mt-faq-a"><div class="mt-faq-a-inner">屏幕给你一个颜色词，它的字义和实际颜色可能一致也可能冲突。经典模式下始终选文字本身的颜色，一共 24 题。</div></div>
                 </div>
-                <div class="faq-item">
-                    <h3>切换模式如何进行？</h3>
-                    <p>按照文字上方的提示作答。“文字颜色”表示选择文字本身的颜色，“背景颜色”表示选择文字背后的颜色。</p>
+                <div class="mt-faq-item">
+                    <button class="mt-faq-q" type="button">切换模式怎么玩？
+                        <span class="mt-chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+                    </button>
+                    <div class="mt-faq-a"><div class="mt-faq-a-inner">看文字上方的提示。写“文字颜色”就选字的颜色，写“背景颜色”就选字后面那块的颜色。规则每题都可能变。</div></div>
                 </div>
-                <div class="faq-item">
-                    <h3>为什么测试使用 24 题？</h3>
-                    <p>24 题可以包含数量均衡的一致与冲突提示，同时让一次完整测试保持简短。</p>
+                <div class="mt-faq-item">
+                    <button class="mt-faq-q" type="button">为什么是 24 题？
+                        <span class="mt-chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+                    </button>
+                    <div class="mt-faq-a"><div class="mt-faq-a-inner">24 题刚好能放下数量均衡的一致题和冲突题，同时一次测试不会拖太久。</div></div>
                 </div>
-                <div class="faq-item">
-                    <h3>个人最佳如何判断？</h3>
-                    <p>每种模式分别保存记录，先比较正确率；正确率相同时，平均反应时间更短的成绩更好。</p>
+                <div class="mt-faq-item">
+                    <button class="mt-faq-q" type="button">个人最佳怎么排？
+                        <span class="mt-chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+                    </button>
+                    <div class="mt-faq-a"><div class="mt-faq-a-inner">先比正确率，正确率一样再比平均反应时间，短的更好。两种模式分开记录。</div></div>
                 </div>
-                <div class="faq-item">
-                    <h3>它可以诊断注意力问题吗？</h3>
-                    <p>不可以。色觉、阅读熟练度、设备和输入方式都会影响结果。本测试仅用于了解自己和个人比较，不是医疗或心理评估。</p>
+                <div class="mt-faq-item">
+                    <button class="mt-faq-q" type="button">它能诊断注意力问题吗？
+                        <span class="mt-chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+                    </button>
+                    <div class="mt-faq-a"><div class="mt-faq-a-inner">不能。这是一个供自己了解和对比的小测试，不是医疗或心理评估工具。有相关困扰请咨询专业人士。</div></div>
                 </div>
-                <div class="faq-item">
-                    <h3>成绩保存在哪里？</h3>
-                    <p>完整成绩只保存在当前浏览器。中断的测试不会保存，你也可以随时清除记录。</p>
+                <div class="mt-faq-item">
+                    <button class="mt-faq-q" type="button">成绩存在哪？
+                        <span class="mt-chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+                    </button>
+                    <div class="mt-faq-a"><div class="mt-faq-a-inner">只在当前浏览器的本地存储里。中途退出的不保存，已有记录可以随时清除。</div></div>
                 </div>
             </div>
+        </div>
+    </section>
+
+    <section class="mt-section">
+        <div class="mt-wrap-wide">
+            <div class="mt-section-head">
+                <h2>换一个测试</h2>
+            </div>
+            <nav class="mt-more" aria-label="其他测试">
+                <a href="/reaction-time-test/">反应时间<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left:auto"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                <a href="/aim-trainer/">瞄准训练<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left:auto"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                <a href="/sequence-memory-test/">序列记忆<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left:auto"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                <a href="/number-memory-test/">数字记忆<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left:auto"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                <a href="/multiple-object-tracking-test/">多目标追踪<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left:auto"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+            </nav>
         </div>
     </section>
 </main>
 
-<footer>
-    <div class="footer-center-box">
-        <div class="footer-center-content-box">
-            <p>
-                <span class="footer-brand-line">&copy;&nbsp;<span id="currentYear"></span>&nbsp;PickTests</span>
-                <span class="footer-link-line">
-                    <a href="/privacy-policy/">隐私</a>
-                    <a href="/terms-of-use/">条款</a>
-                    <a href="/about/">关于</a>
-                    <a href="mailto:hello@picktests.com">联系</a>
-                </span>
-            </p>
-        </div>
-    </div>
-</footer>
+<footer></footer>
 
-<script src="../assets/js/global.min.js?v=20260830" defer></script>
-
-<script src="../assets/js/stroop-test.min.js?v=20260830" defer></script>
-
-
-    <script src="../assets/js/feedback-marker.js?v=20260849" defer></script>
+<script src="/assets/js/stroop-test.min.js?v=20260830" defer></script>
+<script src="/assets/js/feedback-marker.js?v=20270101" defer></script>
 </body>
 </html>

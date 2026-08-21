@@ -114,7 +114,7 @@ void main () {
   vec3 rgb = mix(tex.rgb * sh, uShineColor, clamp(shine, 0.0, 1.0));
   outColor = vec4(rgb * tex.a, tex.a);
 }`;
-const SEG = 96;
+const SEG = 64;
 function supportsHtmlInCanvas() {
   if (typeof document === "undefined") return false;
   const probe = document.createElement("canvas");
@@ -126,9 +126,13 @@ function supportsHtmlInCanvas() {
 function createPeel(elements, options = {}) {
   const config = { ...DEFAULTS, ...options };
   const { source, content, output, under } = elements;
+  // NOTE: no depth buffer. Peel is the only gallery effect that requested one,
+  // and depth-testing a self-folding, self-overlapping vertex-displaced sheet is
+  // a driver-hang vector (whole-browser freeze on some GPUs). It is also
+  // unnecessary: there is no under-layer to occlude and the sheet is opaque
+  // (tex.a = 1), so the fold composites correctly without a depth test.
   const gl = output.getContext("webgl2", {
     alpha: true,
-    depth: true,
     stencil: false,
     antialias: true,
     premultipliedAlpha: true,
@@ -323,12 +327,9 @@ function createPeel(elements, options = {}) {
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     gl.viewport(0, 0, output.width, output.height);
     gl.clearColor(0, 0, 0, 0);
-    gl.clearDepth(1);
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl.clear(gl.COLOR_BUFFER_BIT);
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-    gl.enable(gl.DEPTH_TEST);
-    gl.depthFunc(gl.LEQUAL);
     gl.useProgram(sheet.program);
     gl.bindVertexArray(sheetVao);
     gl.activeTexture(gl.TEXTURE0);
@@ -360,7 +361,6 @@ function createPeel(elements, options = {}) {
     gl.uniform1f(sheet.uniforms.uMaxX, contentMaxX);
     gl.drawElements(gl.TRIANGLES, gridIndices.length, gl.UNSIGNED_INT, 0);
     gl.bindVertexArray(null);
-    gl.disable(gl.DEPTH_TEST);
   }
   function syncContentEvents() {
     const A = peel.a;

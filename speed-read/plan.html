@@ -7,36 +7,48 @@
     <meta name="description" content="自定义训练计划：添加训练步骤与时长，一键按序执行整套训练教程。">
     <link rel="icon" type="image/png" sizes="32x32" href="../assets/images/icons/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="../assets/images/icons/favicon-16x16.png">
-    <link rel="stylesheet" href="../assets/css/global.min.css?v=20260830">
-    <link rel="stylesheet" href="../assets/css/style.min.css?v=20260830">
-    <link rel="stylesheet" href="css/speed-read.css?v=20260830">
+    <script>try{var t=localStorage.getItem('mt-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+    <link rel="stylesheet" href="/assets/css/mt.css?v=20270101">
+    <link rel="stylesheet" href="css/speed-read.css?v=20270101">
     <style>
-        .sr-plan-wrap { flex: 0 0 100%; max-width: 960px; box-sizing: border-box; margin: 0 auto; padding: 20px 20px 60px; display: grid; gap: 18px; }
-        .sr-plan-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 20px; }
-        .sr-plan-card h2 { font-size: 15px; margin: 0 0 12px; color: #0f172a; }
+        /* plan builder, on the shared token system */
+        .sr-plan-wrap { width: 100%; max-width: 960px; margin-inline: auto; padding: 8px 20px clamp(48px, 7vw, 80px); display: grid; gap: 16px; }
+        .sr-plan-card { padding: 20px; border-radius: var(--r-card); background: var(--surface); border: 1px solid var(--line); }
+        .sr-plan-card h2 { margin-bottom: 12px; font-size: 15px; color: var(--ink); }
         .sr-plan-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 12px; }
-        .sr-plan-row input[type="text"], .sr-plan-row input[type="number"], .sr-plan-row select {
-            padding: 8px 10px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px;
+        .sr-plan-row input[type="text"],
+        .sr-plan-row input[type="number"],
+        .sr-plan-row select {
+            padding: 8px 10px; font-size: 14px;
+            border: 1px solid var(--line-2); border-radius: var(--r-input);
+            background: var(--surface); color: var(--ink);
         }
+        .sr-plan-row input:focus-visible,
+        .sr-plan-row select:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent); }
         .sr-plan-row input[type="text"] { flex: 1; min-width: 160px; }
-        .sr-plan-step { display: flex; align-items: center; gap: 12px; padding: 10px; border: 1px solid #f1f5f9; border-radius: 10px; margin-bottom: 6px; background: #fafbfc; }
-        .sr-plan-step-idx { font-size: 13px; color: #94a3b8; min-width: 26px; }
-        .sr-plan-step-info { flex: 1; }
-        .sr-plan-step-name { font-size: 14px; font-weight: 600; color: #0f172a; }
-        .sr-plan-step-desc { font-size: 12px; color: #94a3b8; }
+        .sr-plan-step {
+            display: flex; align-items: center; gap: 12px;
+            margin-bottom: 6px; padding: 11px;
+            border: 1px solid var(--line); border-radius: var(--r-input);
+            background: var(--surface-2);
+        }
+        .sr-plan-step-idx { min-width: 26px; font-size: 13px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+        .sr-plan-step-info { flex: 1; min-width: 0; }
+        .sr-plan-step-name { font-size: 14px; font-weight: 600; color: var(--ink); }
+        .sr-plan-step-desc { font-size: 12px; color: var(--ink-3); }
         .sr-plan-step-ops { display: flex; gap: 6px; }
-        .sr-btn-mini { padding: 4px 9px; font-size: 12px; border-radius: 7px; }
-        .sr-plan-total { font-size: 13px; color: #64748b; margin-top: 10px; }
+        .sr-btn-mini { height: 30px; padding-inline: 11px; font-size: 12px; }
+        .sr-plan-total { margin-top: 10px; font-size: 13px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+
         #execPanel { display: none; }
         .exec-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; flex-wrap: wrap; }
-        .exec-progress-wrap { flex: 1; height: 8px; background: #e2e8f0; border-radius: 999px; overflow: hidden; min-width: 120px; }
-        #execProgress { height: 100%; background: linear-gradient(90deg, #6366f1, #22c55e); width: 0; transition: width .3s; }
-        #execCountdown { font-variant-numeric: tabular-nums; font-size: 14px; color: #0f172a; font-weight: 700; }
-        #execStepName { font-size: 15px; font-weight: 600; color: #0f172a; }
-        #execFrame { width: 100%; height: 62vh; border: 1px solid #e2e8f0; border-radius: 12px; background: #0b0f14; }
+        .exec-progress-wrap { flex: 1; min-width: 120px; height: 6px; border-radius: 999px; background: var(--line); overflow: hidden; }
+        #execProgress { width: 0; height: 100%; background: var(--accent); transition: width .3s var(--ease); }
+        #execCountdown { font-size: 14px; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
+        #execStepName { font-size: 15px; font-weight: 600; color: var(--ink); }
+        #execFrame { width: 100%; height: 62vh; border: 1px solid var(--line); border-radius: var(--r-stage); background: var(--sr-stage); }
     </style>
-    <script src="/assets/js/mt-nav.js?v=20260864" defer></script>
-    <link rel="stylesheet" href="../assets/css/theme.css?v=20260860">
+    <script src="/assets/js/mt-nav.js?v=20270101" defer></script>
 </head>
 <body>
 <header id="mt-header"></header>
@@ -93,29 +105,10 @@
     </div>
 </main>
 
-<footer>
-    <div class="footer-center-box">
-        <div class="footer-center-content-box">
-            <p>
-                <span class="footer-brand-line">&copy;&nbsp;<span id="currentYear"></span>&nbsp;MindTrainer · 飞克视读 Web 重写版</span>
-                <span class="footer-link-line">
-                    <a href="../about/">关于</a>
-                    <a href="index.html">速读训练</a>
-                </span>
-            </p>
-        </div>
-    </div>
-</footer>
+<footer></footer>
 
-<script src="../assets/js/global.min.js?v=20260830" defer></script>
-<script src="js/sr-common.js?v=20260830" defer></script>
-<script src="js/sr-plan.js?v=20260830" defer></script>
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    const y = document.getElementById('currentYear');
-    if (y) y.textContent = new Date().getFullYear();
-});
-</script>
-    <script src="../assets/js/feedback-marker.js?v=20260849" defer></script>
+<script src="js/sr-common.js?v=20270101" defer></script>
+<script src="js/sr-plan.js?v=20270101" defer></script>
+<script src="/assets/js/feedback-marker.js?v=20270101" defer></script>
 </body>
 </html>

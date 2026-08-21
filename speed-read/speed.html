@@ -7,16 +7,29 @@
     <meta name="description" content="速读训练 4 大模块：字块移动、视野扩展、阅读训练、实战训练（模拟书刊排版）。">
     <link rel="icon" type="image/png" sizes="32x32" href="../assets/images/icons/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="../assets/images/icons/favicon-16x16.png">
-    <link rel="stylesheet" href="../assets/css/global.min.css?v=20260830">
-    <link rel="stylesheet" href="../assets/css/style.min.css?v=20260830">
-    <link rel="stylesheet" href="css/speed-read.css?v=20260830">
+    <script>try{var t=localStorage.getItem('mt-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+    <link rel="stylesheet" href="/assets/css/mt.css?v=20270101">
+    <link rel="stylesheet" href="css/speed-read.css?v=20270101">
     <style>
-        .sr-article-select { width: 100%; padding: 7px 9px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 13px; margin-bottom: 8px; }
-        .sr-article-text { width: 100%; box-sizing: border-box; padding: 9px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 13px; resize: vertical; font-family: inherit; }
+        /* article picker, on the same tokens as the rest of the param panel */
+        .sr-article-select,
+        .sr-article-text {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 7px 9px;
+            border: 1px solid var(--line-2);
+            border-radius: var(--r-input);
+            background: var(--surface);
+            color: var(--ink);
+            font-size: 13px;
+        }
+        .sr-article-select { margin-bottom: 8px; }
+        .sr-article-text { padding: 9px; resize: vertical; font-family: inherit; line-height: 1.6; }
+        .sr-article-select:focus-visible,
+        .sr-article-text:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent); }
         .sr-article-clip { width: 100%; margin-top: 8px; }
     </style>
-    <script src="/assets/js/mt-nav.js?v=20260864" defer></script>
-    <link rel="stylesheet" href="../assets/css/theme.css?v=20260860">
+    <script src="/assets/js/mt-nav.js?v=20270101" defer></script>
 </head>
 <body>
 <header id="mt-header"></header>
@@ -54,29 +67,10 @@
     </div>
 </main>
 
-<footer>
-    <div class="footer-center-box">
-        <div class="footer-center-content-box">
-            <p>
-                <span class="footer-brand-line">&copy;&nbsp;<span id="currentYear"></span>&nbsp;MindTrainer · 飞克视读 Web 重写版</span>
-                <span class="footer-link-line">
-                    <a href="../about/">关于</a>
-                    <a href="index.html">速读训练</a>
-                </span>
-            </p>
-        </div>
-    </div>
-</footer>
+<footer></footer>
 
-<script src="../assets/js/global.min.js?v=20260830" defer></script>
-<script src="js/sr-common.js?v=20260830" defer></script>
-<script src="js/sr-speed.js?v=20260830" defer></script>
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    const y = document.getElementById('currentYear');
-    if (y) y.textContent = new Date().getFullYear();
-});
-</script>
-    <script src="../assets/js/feedback-marker.js?v=20260849" defer></script>
+<script src="js/sr-common.js?v=20270101" defer></script>
+<script src="js/sr-speed.js?v=20270101" defer></script>
+<script src="/assets/js/feedback-marker.js?v=20270101" defer></script>
 </body>
 </html>

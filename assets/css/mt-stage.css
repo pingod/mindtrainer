@@ -1,0 +1,353 @@
+/* ==========================================================================
+   MindTrainer — Test Stage Skin
+   Loads AFTER the legacy per-test stylesheet.
+
+   The legacy per-test CSS keeps what it is good at: stage geometry, grid
+   layouts, responsive breakpoints, state machinery and keyframes.
+   This file takes over everything visual: surface, colour, radius, type,
+   and — the part the legacy files never had at all — dark mode.
+
+   The 6 tests share a naming convention (.X-stage, .X-mode-help,
+   .X-history-list ...), so most rules here are written once against that
+   convention rather than six times.
+
+   Signal colours (amber wait / green go / red too-soon) stay signals.
+   They are functional feedback, not decoration, so they keep their hue
+   and only get retuned to the token palette.
+   ========================================================================== */
+
+/* ---------------------------------------------- legacy var re-mapping ---- */
+/* The legacy sheets expose local vars; re-point them at the design tokens. */
+.reaction-page  { --reaction-ink: var(--ink);  --reaction-muted: var(--ink-2);  --reaction-green: var(--sig-go-bg);  --reaction-green-dark: var(--accent); }
+.aim-page       { --aim-ink: var(--ink);       --aim-muted: var(--ink-2);       --aim-green: var(--sig-go-bg);       --aim-green-dark: var(--accent); }
+.sequence-page  { --sequence-ink: var(--ink);  --sequence-muted: var(--ink-2);  --sequence-green: var(--sig-go-bg);  --sequence-green-dark: var(--accent); }
+.number-page    { --number-ink: var(--ink);    --number-muted: var(--ink-2);    --number-green: var(--sig-go-bg);    --number-green-dark: var(--accent); }
+.tracking-page  { --tracking-ink: var(--ink);  --tracking-muted: var(--ink-2);  --tracking-green: var(--sig-go-bg);  --tracking-green-dark: var(--accent); }
+.stroop-page    { --stroop-ink: var(--ink);    --stroop-muted: var(--ink-2);    --stroop-green: var(--sig-go-bg);    --stroop-green-dark: var(--accent); }
+
+/* -------------------------------------------------- page card container -- */
+.test-page main { display: block; }
+
+/* The legacy markup wraps the stage in .common-container, which used to be
+   defined by global.min.css. That file is gone, so the class is redefined
+   here rather than left dangling. */
+.test-page .common-container { width: 100%; min-width: 0; margin-inline: auto; }
+
+.reaction-page, .aim-page, .sequence-page,
+.number-page, .tracking-page, .stroop-page {
+  width: 100%;
+  max-width: var(--wrap-wide);
+  margin: 0 auto;
+  padding: clamp(20px, 3.5vw, 48px) clamp(16px, 3vw, 40px);
+  border-radius: var(--r-card);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: var(--sh-1);
+  scroll-margin-top: calc(var(--nav-h) + 16px);
+}
+
+@media (max-width: 767px) {
+  .reaction-page, .aim-page, .sequence-page,
+  .number-page, .tracking-page, .stroop-page {
+    border-radius: 0;
+    border-inline: 0;
+    padding-inline: 16px;
+  }
+}
+
+/* --------------------------------------------------------- intro block -- */
+.test-page [class$="-intro"] { max-width: 46rem; margin-inline: auto; }
+.test-page [class$="-intro"] h2 {
+  color: var(--ink);
+  font-size: clamp(1.5rem, 1.1rem + 1.7vw, 2.25rem);
+  letter-spacing: -.03em;
+}
+.test-page [class$="-intro"] > p:last-child { color: var(--ink-2); font-size: 1.0625rem; }
+
+.test-page [class*="-eyebrow"],
+.test-page .section-eyebrow {
+  color: var(--ink-3);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+/* ----------------------------------------------------- mode selectors --- */
+.test-page .mode-picker,
+.test-page [class$="-mode-picker"],
+.test-page .aim-mode-switch {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-btn);
+}
+.test-page .mode-picker::before,
+.test-page [class$="-mode-picker"]::before {
+  background: var(--surface);
+  box-shadow: var(--sh-1);
+}
+.test-page .mode-picker span,
+.test-page [class$="-mode-picker"] span { color: var(--ink-2); font-weight: 600; }
+.test-page .mode-picker input:checked + span,
+.test-page [class$="-mode-picker"] input:checked + span { color: var(--ink); font-weight: 700; }
+
+.test-page .aim-mode-option {
+  border-radius: var(--r-btn);
+  color: var(--ink-2);
+  font-weight: 600;
+  transition: background .18s var(--ease), color .18s var(--ease);
+}
+.test-page .aim-mode-option[aria-pressed="true"] {
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--sh-1);
+}
+
+.test-page [class*="-mode-help"],
+.test-page .mode-help { color: var(--ink-3); font-size: 13px; }
+
+/* hover affordance on unselected options */
+@media (hover: hover) and (pointer: fine) {
+  .test-page .mode-picker:not(:disabled) label:hover span,
+  .test-page [class$="-mode-picker"]:not(:disabled) label:hover span { color: var(--ink); }
+  .test-page .aim-mode-option:not([aria-pressed="true"]):hover { color: var(--ink); background: var(--accent-soft); }
+}
+
+/* ------------------------------------------------------------- the stage -- */
+.test-page .reaction-stage,
+.test-page .aim-stage,
+.test-page .sequence-stage,
+.test-page .number-stage,
+.test-page .tracking-stage,
+.test-page .stroop-stage {
+  border-radius: var(--r-stage);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  color: var(--ink);
+}
+
+.test-page [class$="-stage"][data-state="idle"] { background: var(--surface-2); }
+
+/* signal states — hue is meaning here, so it stays */
+.test-page [class$="-stage"][data-state="waiting"] {
+  background: color-mix(in srgb, var(--sig-wait) 12%, var(--surface));
+  border-color: color-mix(in srgb, var(--sig-wait) 30%, transparent);
+  color: var(--sig-wait);
+}
+.test-page [class$="-stage"][data-state="ready"] {
+  background: var(--sig-go-bg);
+  border-color: var(--sig-go-bg);
+  color: #fff;
+}
+.test-page [class$="-stage"][data-state="too-soon"] {
+  background: color-mix(in srgb, var(--sig-error) 12%, var(--surface));
+  border-color: color-mix(in srgb, var(--sig-error) 30%, transparent);
+  color: var(--sig-error);
+}
+.test-page [class$="-stage"][data-state="complete"],
+.test-page [class$="-stage"][data-state="round-result"] {
+  background: var(--accent-soft);
+  border-color: var(--accent-line);
+  color: var(--accent);
+}
+.test-page [class$="-stage"][data-state="interrupted"],
+.test-page [class$="-stage"][data-state="timed-out"] {
+  background: var(--surface-2);
+  border-color: var(--line-2);
+  color: var(--ink-2);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .test-page .reaction-stage[data-state="idle"]:hover,
+  .test-page .reaction-stage[data-state="interrupted"]:hover,
+  .test-page .reaction-stage[data-state="timed-out"]:hover,
+  .test-page .reaction-stage[data-state="too-soon"]:hover { background: var(--surface); border-color: var(--line-2); }
+  .test-page .reaction-stage[data-state="complete"]:hover,
+  .test-page .reaction-stage[data-state="round-result"]:hover { background: color-mix(in srgb, var(--accent) 14%, var(--surface)); }
+}
+
+/* stage typography */
+.test-page .stage-title,
+.test-page [class$="-stage-title"] {
+  font-weight: 800;
+  letter-spacing: -.045em;
+  font-variant-numeric: tabular-nums;
+}
+.test-page .stage-kicker,
+.test-page [class$="-stage-kicker"] { font-weight: 600; letter-spacing: .14em; text-transform: uppercase; opacity: .8; }
+.test-page .stage-hint,
+.test-page [class$="-stage-hint"] { opacity: .82; }
+
+/* the "开始" pill inside the stage */
+.test-page .stage-action,
+.test-page [class$="-stage-action"] {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-btn);
+  color: var(--ink);
+  font-weight: 650;
+  box-shadow: var(--sh-1);
+}
+.test-page [class$="-stage"][data-state="ready"] .stage-action { background: rgba(255, 255, 255, .95); border-color: transparent; color: var(--sig-go); }
+
+/* fullscreen keeps a flat edge-to-edge stage */
+.test-page [data-fullscreen="true"] { background: var(--bg); }
+.test-page [data-fullscreen="true"] [class$="-stage"] { border: 0; border-radius: 0; }
+
+/* --------------------------------------------------- floating tool buttons -- */
+.test-page .fullscreen-button,
+.test-page .stats-toggle-button,
+.test-page [class$="-fullscreen"],
+.test-page [class$="-stats-toggle"],
+.test-page [class$="-sound"],
+.test-page .sequence-answer {
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--line);
+  color: var(--ink-2);
+}
+.test-page .stats-toggle-button[aria-expanded="true"],
+.test-page [class$="-stats-toggle"][aria-expanded="true"],
+.test-page [class$="-sound"][aria-pressed="true"],
+.test-page .sequence-answer[aria-pressed="true"] {
+  background: var(--surface);
+  border-color: var(--accent-line);
+  color: var(--accent);
+}
+@media (hover: hover) and (pointer: fine) {
+  .test-page .fullscreen-button:not(:disabled):hover,
+  .test-page .stats-toggle-button:hover,
+  .test-page [class$="-fullscreen"]:not(:disabled):hover,
+  .test-page [class$="-stats-toggle"]:hover,
+  .test-page [class$="-sound"]:hover { background: var(--surface); color: var(--ink); border-color: var(--line-2); }
+}
+
+/* -------------------------------------------------------- result panels -- */
+.test-page .five-round-results,
+.test-page .results-panel,
+.test-page [class$="-stats-inner"] {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+}
+
+.test-page .result-summary > div,
+.test-page .reaction-chart {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+}
+
+.test-page .result-summary dt,
+.test-page .stat-item dt,
+.test-page [class*="-progress-label"] { color: var(--ink-2); font-size: 13px; }
+
+.test-page .result-summary dd,
+.test-page .stat-item dd,
+.test-page [class*="-progress-latest"] strong,
+.test-page [class*="-progress-benchmarks"] dd,
+.test-page [class*="-progress-best"] dd {
+  color: var(--ink);
+  font-weight: 750;
+  letter-spacing: -.035em;
+  font-variant-numeric: tabular-nums;
+}
+
+.test-page .stat-best dt,
+.test-page .stat-best dd { color: var(--accent); }
+
+.test-page .section-heading h2 { color: var(--ink); letter-spacing: -.028em; }
+.test-page .section-heading > p,
+.test-page .device-note { color: var(--ink-3); }
+
+/* chart */
+.test-page .chart-bar { background: var(--line-2); border-radius: 8px 8px 3px 3px; }
+.test-page .chart-bar-item.is-best .chart-bar { background: var(--accent); }
+.test-page .chart-bar-value { color: var(--ink-2); }
+.test-page .chart-bar-item.is-best .chart-bar-value { color: var(--accent); }
+.test-page .chart-bar-label { color: var(--ink-3); }
+.test-page .chart-bar-label strong { color: var(--accent); }
+.test-page .chart-bars::after { background: var(--line); }
+
+/* ------------------------------------------------------------- history --- */
+.test-page .history-summary,
+.test-page [class$="-history"] > summary { color: var(--ink); }
+.test-page .history-summary-icon,
+.test-page [class$="-history-summary-icon"] { color: var(--ink-3); }
+
+.test-page .history-item,
+.test-page [class$="-history-list"] > li { border-bottom: 1px solid var(--line); }
+.test-page .history-list > .history-item:last-child,
+.test-page [class$="-history-list"] > li:last-child { border-bottom: 0; }
+
+.test-page .history-mode { color: var(--ink-3); }
+.test-page .history-time,
+.test-page .history-range,
+.test-page .history-score span,
+.test-page .history-rounds span { color: var(--ink-3); }
+.test-page .history-score strong,
+.test-page .history-rounds strong { color: var(--ink); font-variant-numeric: tabular-nums; }
+.test-page .history-range span:first-child { color: var(--accent); }
+
+.test-page .history-clear-button,
+.test-page [class$="-clear-data"] { color: var(--ink-3); border-radius: var(--r-btn); }
+@media (hover: hover) and (pointer: fine) {
+  .test-page .history-clear-button:not(:disabled):hover,
+  .test-page [class$="-clear-data"]:not(:disabled):hover {
+    background: color-mix(in srgb, var(--sig-error) 10%, transparent);
+    color: var(--sig-error);
+  }
+}
+
+/* --------------------------------------------------- sequence-specific --- */
+.test-page .sequence-tile {
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  border-radius: 14px;
+  transition: background .12s ease, transform .12s ease, border-color .12s ease;
+}
+.test-page .sequence-tile:not(:disabled):hover { border-color: var(--accent-line); }
+.test-page .sequence-tile.is-lit,
+.test-page .sequence-tile[data-lit="true"],
+.test-page .sequence-tile.lit { background: var(--accent); border-color: var(--accent); }
+.test-page .sequence-tile.is-correct { background: var(--sig-go-bg); border-color: var(--sig-go-bg); }
+.test-page .sequence-tile.is-wrong { background: var(--sig-error-bg); border-color: var(--sig-error-bg); }
+.test-page .sequence-status { color: var(--ink-2); font-variant-numeric: tabular-nums; }
+
+/* -------------------------------------------------------- aim-specific --- */
+.test-page .aim-hud { color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.test-page .aim-elapsed-value { color: var(--ink); font-weight: 700; }
+.test-page .aim-life svg { fill: var(--sig-error-bg); }
+.test-page .aim-life.is-lost svg { fill: var(--line-2); }
+.test-page .aim-session-details strong { color: var(--ink); font-variant-numeric: tabular-nums; }
+.test-page .aim-session-details span span { color: var(--ink-3); }
+
+/* -------------------------------------------- dark mode for the stage ---- */
+/* The legacy sheets are light-only; everything tinted must be restated. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .test-page .reaction-stage-shell[data-fullscreen="true"] { background: var(--bg); }
+  :root:not([data-theme="light"]) .test-page .stage-action { background: var(--surface); }
+  :root:not([data-theme="light"]) .test-page [class$="-stage"][data-state="ready"] { color: #06210f; }
+  :root:not([data-theme="light"]) .test-page [class$="-stage"][data-state="ready"] .stage-action { background: rgba(255,255,255,.92); color: #06210f; }
+}
+[data-theme="dark"] .test-page .reaction-stage-shell[data-fullscreen="true"] { background: var(--bg); }
+[data-theme="dark"] .test-page .stage-action { background: var(--surface); }
+[data-theme="dark"] .test-page [class$="-stage"][data-state="ready"] { color: #06210f; }
+[data-theme="dark"] .test-page [class$="-stage"][data-state="ready"] .stage-action { background: rgba(255,255,255,.92); color: #06210f; }
+
+/* ----------------------------------------------------- focus ring unify -- */
+.test-page [class$="-stage"]:focus-visible,
+.test-page .mode-picker input:focus-visible + span,
+.test-page [class$="-mode-picker"] input:focus-visible + span,
+.test-page .history-summary:focus-visible,
+.test-page .fullscreen-button:focus-visible,
+.test-page .stats-toggle-button:focus-visible,
+.test-page .history-clear-button:focus-visible,
+.test-page [class$="-clear-data"]:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* legacy sheets ship their own .visually-hidden; keep ours authoritative */
+.test-page .visually-hidden { clip-path: inset(50%); }

@@ -8,7 +8,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="assets/images/icons/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="assets/images/icons/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="assets/images/icons/favicon-16x16.png">
-    <link rel="stylesheet" href="assets/css/redesign.css?v=20260864">
+    <link rel="stylesheet" href="/assets/css/mt.css?v=20270101">
 
     <script type="importmap">
     {
@@ -20,6 +20,21 @@
     </script>
 
     <style>
+        /* The gallery is a full-screen dark showcase: it deliberately keeps its
+           own world rather than following the site theme, because the WebGL
+           demos are authored against a dark stage. Tokens it needs are declared
+           here so the page no longer depends on the retired redesign.css. */
+        :root {
+            --dark-bg: #080b16;
+            --dark-surface: #0f1424;
+            --dark-ink: #f1f5f9;
+            --dark-ink-2: #94a3b8;
+            --dark-ink-3: #475569;
+            --dark-line: rgba(255, 255, 255, .07);
+            --r-pill: 999px;
+            --r-sm: 10px;
+        }
+
         /* ===== Page-specific full-screen gallery ===== */
         *, *::before, *::after { box-sizing: border-box; }
         html, body { height: 100%; margin: 0; overflow: hidden; }
@@ -247,6 +262,51 @@
         @media (prefers-reduced-motion: reduce) {
             * { transition-duration: .01ms !important; }
         }
+
+        /* ===== Self-test report ===== */
+        .selftest {
+            position: fixed; inset: 0; z-index: 100;
+            display: none;
+            background: rgba(4, 6, 14, .82);
+            -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+            align-items: center; justify-content: center;
+            padding: 24px;
+        }
+        .selftest.show { display: flex; }
+        .selftest-panel {
+            width: min(760px, 100%); max-height: 84vh;
+            display: flex; flex-direction: column;
+            background: var(--dark-surface);
+            border: 1px solid rgba(255,255,255,.1);
+            border-radius: var(--r-card);
+            overflow: hidden;
+        }
+        .selftest-head {
+            display: flex; align-items: center; gap: 12px;
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(255,255,255,.08);
+        }
+        .selftest-head h2 { font-size: 15px; font-weight: 700; margin: 0; flex: 1; }
+        .selftest-sum { font-size: 12.5px; color: var(--dark-ink-2); font-variant-numeric: tabular-nums; }
+        .selftest-close {
+            width: 30px; height: 30px; border-radius: var(--r-pill);
+            border: 1px solid rgba(255,255,255,.12);
+            background: transparent; color: var(--dark-ink-2); cursor: pointer;
+            display: grid; place-items: center;
+        }
+        .selftest-close:hover { background: rgba(255,255,255,.08); color: #fff; }
+        .selftest-body { overflow-y: auto; padding: 8px 0; }
+        .st-row {
+            display: grid; grid-template-columns: 18px 150px 1fr;
+            gap: 10px; align-items: baseline;
+            padding: 7px 20px; font-size: 12.5px;
+        }
+        .st-row + .st-row { border-top: 1px solid rgba(255,255,255,.04); }
+        .st-ok   { color: #4ade80; }
+        .st-bad  { color: #f87171; }
+        .st-warn { color: #fbbf24; }
+        .st-name { color: #fff; font-weight: 600; }
+        .st-msg  { color: var(--dark-ink-2); word-break: break-word; }
     </style>
 </head>
 <body>
@@ -258,6 +318,10 @@
             返回首页
         </a>
         <span class="gallery-title">特效画廊</span>
+        <button class="gallery-random" id="selftestBtn" title="依次加载全部组件并报告失败项">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+            自检
+        </button>
         <button class="gallery-random" id="randomBtn" title="随机组件">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>
             随机
@@ -289,6 +353,19 @@
                 </div>
             </div>
         </main>
+    </div>
+
+    <div class="selftest" id="selftest">
+        <div class="selftest-panel">
+            <div class="selftest-head">
+                <h2>组件自检</h2>
+                <span class="selftest-sum" id="stSum">准备中…</span>
+                <button class="selftest-close" id="stClose" aria-label="关闭">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div class="selftest-body" id="stBody"></div>
+        </div>
     </div>
 
     <script type="module">
@@ -364,7 +441,7 @@
             'particle-reveal':  { background: '#0a0e1a' },
             'decryptreveal':    { background: '#0a0e1a' },
             'shatter':          {},
-            'peel':             {},
+            'peel':             { reveal: 210, curl: 360, bow: 55, bulge: 50, shade: 0.32, shine: 1.25, zone: 240, perspective: 1750 },
             'liquid':           { rainbow: true, radius: 0.3 },
             'bend':             {},
             'displacement':     {},
@@ -391,6 +468,56 @@
             'asciify':          { background: [0.04, 0.05, 0.1], backgroundOpacity: 1 },
         };
 
+        /* ----- Per-effect showcase contract (the architecture fix) -----
+         * Each effect needs different things. The old gallery forced every effect
+         * onto one static, non-interactive #content + one shared source card and
+         * only dispatched events to the canvas, so content-listening effects
+         * (ripple/bend/magnify/…) never got their interaction and scroll-driven
+         * effects had nothing to scroll. This manifest tells the gallery what live
+         * content and synthetic events each effect needs.
+         *   content: 'card'   → rich static card (default)
+         *            'scroll' → tall scrollable long card (scroll-driven effects)
+         *   events: which pointer/click/scroll events to synthesize.
+         */
+        const COMPONENT_META = {
+            'bend':             { content: 'scroll', events: ['pointermove', 'scroll'] },
+            'ripple':           { events: ['pointermove', 'pointerdown', 'pointerup', 'click'] },
+            'magnify':          { events: ['pointermove'] },
+            'liquid':           { events: ['pointermove'] },
+            'displacement':     { events: ['pointermove'] },
+            'frost':            { events: ['pointermove'] },
+            'peel':             { events: ['pointermove'] },
+            'particle-reveal':  { events: ['pointermove'] },
+            'decryptreveal':    { events: ['pointermove'] },
+        };
+        const META = (name) => Object.assign({ content: 'card', events: ['pointermove'] }, COMPONENT_META[name] || {});
+
+        /* ----- Configure #content per effect before the component loads ----- */
+        function setupContent(name) {
+            const meta = META(name);
+            const c = content;
+            if (meta.content === 'scroll') {
+                c.style.display = 'block';
+                c.style.alignItems = 'normal';
+                c.style.justifyContent = 'normal';
+                c.style.textAlign = 'left';
+                c.style.overflowY = 'auto';
+                c.innerHTML = '<div style="padding:40px;font-size:27px;line-height:1.9;color:#f1f5f9;font-weight:800;letter-spacing:.01em">'
+                    + '选一个测试 · 挑一个现在就测<br>MINDTRAINER<br>'
+                    + ('—— 认知测试 ——<br>'.repeat(16))
+                    + '反应时间 · 瞄准 · 序列记忆 · 数字记忆 · 多目标追踪 · 斯特鲁普</div>';
+                c.scrollTop = 0;
+            } else {
+                c.style.display = 'flex';
+                c.style.alignItems = 'center';
+                c.style.justifyContent = 'center';
+                c.style.textAlign = 'center';
+                c.style.overflowY = '';
+                c.innerHTML = 'MINDTRAINER<br>选一个测试';
+                c.scrollTop = 0;
+            }
+        }
+
         // State
         let source = document.getElementById('source-canvas');
         let output = document.getElementById('output-canvas');
@@ -415,18 +542,55 @@
             const ctx = source.getContext('2d');
             ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
             ctx.clearRect(0, 0, w, h);
-            // Dark background matching stage
+            // Dark base matching the stage
             ctx.fillStyle = '#0a0e1a';
             ctx.fillRect(0, 0, w, h);
-            // Light text
+            // Full-bleed accent gradient so the whole sheet — including the left
+            // peel zone — carries visible tone for the curl to read against.
+            const g = ctx.createLinearGradient(0, 0, w, h);
+            g.addColorStop(0, '#111d3a');
+            g.addColorStop(.45, '#0a0e1a');
+            g.addColorStop(1, '#191024');
+            ctx.fillStyle = g;
+            ctx.fillRect(0, 0, w, h);
+            // Soft mesh glows top-left / bottom-right give the sheet soft shapes.
+            const gl = ctx.createRadialGradient(w * .12, h * .18, 0, w * .12, h * .18, Math.max(w, h) * .55);
+            gl.addColorStop(0, 'rgba(59,130,246,.30)');
+            gl.addColorStop(1, 'rgba(59,130,246,0)');
+            ctx.fillStyle = gl; ctx.fillRect(0, 0, w, h);
+            const gr = ctx.createRadialGradient(w * .9, h * .85, 0, w * .9, h * .85, Math.max(w, h) * .55);
+            gr.addColorStop(0, 'rgba(139,92,246,.24)');
+            gr.addColorStop(1, 'rgba(139,92,246,0)');
+            ctx.fillStyle = gr; ctx.fillRect(0, 0, w, h);
+            // Faint grid so the curl visibly bends the lines — makes the peel obvious.
+            ctx.strokeStyle = 'rgba(148,163,184,.12)';
+            ctx.lineWidth = Math.max(1, Math.round(dpr));
+            const step = Math.max(34, Math.round(Math.min(w, h) * .052));
+            for (let x = step; x < w; x += step) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke(); }
+            for (let y = step; y < h; y += step) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
+            // A row of coloured test swatches across the sheet: the left cells sit in
+            // the peel zone, so the fold visibly lifts and bends them.
+            const colors = ['#3b82f6', '#8b5cf6', '#06b6d4', '#f59e0b', '#ef4444', '#22c55e'];
+            const sh = Math.max(24, Math.round(h * .055));
+            const gap = Math.max(14, Math.round(w * .012));
+            const sw = sh, sy = h * .76;
+            let sx = w * .055;
+            for (const c of colors) {
+                ctx.fillStyle = c;
+                ctx.beginPath();
+                ctx.roundRect(sx, sy, sw, sh, Math.round(sw * .24));
+                ctx.fill();
+                sx += sw + gap;
+            }
+            // Brand title + subtitle
             ctx.fillStyle = '#f1f5f9';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.font = '800 ' + Math.round(Math.min(w * 0.07, 72)) + 'px -apple-system, sans-serif';
-            ctx.fillText('MINDTRAINER', w / 2, h / 2 - 22);
-            ctx.font = '500 ' + Math.round(Math.min(w * 0.024, 22)) + 'px -apple-system, sans-serif';
-            ctx.fillStyle = 'rgba(241,245,249,.5)';
-            ctx.fillText('选一个测试', w / 2, h / 2 + 30);
+            ctx.font = '800 ' + Math.round(Math.min(w * .058, 58)) + 'px -apple-system, sans-serif';
+            ctx.fillText('MINDTRAINER', w / 2, h * .40);
+            ctx.font = '500 ' + Math.round(Math.min(w * .021, 19)) + 'px -apple-system, sans-serif';
+            ctx.fillStyle = 'rgba(241,245,249,.55)';
+            ctx.fillText('选一个测试 · 挑一个现在就测', w / 2, h * .40 + Math.max(30, h * .048));
         }
 
         /* ----- FIX: fresh output canvas per component + force WebGL context loss ----- */
@@ -436,9 +600,11 @@
                 current = null;
             }
             // BUG FIX: Force WebGL context loss on old canvas to prevent context exhaustion
-            // After switching through ~16 components, browsers refuse new WebGL contexts → black screen
+            // After switching through ~16 components, browsers refuse new WebGL contexts → black screen.
+            // Try webgl2 AND webgl1: the Three.js components may have fallen back to webgl1,
+            // and getContext() only ever returns the context type the canvas already has.
             try {
-                const oldGl = output.getContext('webgl2');
+                const oldGl = output.getContext('webgl2') || output.getContext('webgl');
                 if (oldGl) {
                     const ext = oldGl.getExtension('WEBGL_lose_context');
                     if (ext) ext.loseContext();
@@ -452,24 +618,54 @@
             output = fresh;
         }
 
-        /* ----- Auto interaction (pointermove → click → move) ----- */
-        function autoInteract(inst, el) {
+        /* ----- Auto interaction (pointermove → pointerdown/up/click → move) -----
+         * Dispatch synthetic events to BOTH the output canvas AND the #content div.
+         * Different components listen on different elements: Peel listens on the stage
+         * (output.parentElement), while ripple/bend/magnify/etc. listen on #content.
+         * Sending to both (plus pointerdown/up, and isPrimary) ensures every effect's
+         * own listeners fire, so interactive effects actually show their effect.
+         * #content is pointer-events:none and a sibling of the canvas, so events on the
+         * canvas never reach it; dispatching straight to it (and to output) is the fix.
+         * Events on content bubble up to the stage, so stage listeners still fire too.
+         */
+        function autoInteract(inst, el, contentEl, events) {
             if (!inst || !el) return;
+            events = events || ['pointermove'];
+            const has = (t) => events.includes(t);
+            const targets = contentEl ? [el, contentEl] : [el];
             const rect = () => el.getBoundingClientRect();
+            const pt = (x, y) => ({ clientX: x, clientY: y, bubbles: true, cancelable: true, pointerType: 'mouse', button: 0, isPrimary: true });
             const fire = (type, x, y) => {
-                try {
-                    el.dispatchEvent(new PointerEvent(type, { clientX: x, clientY: y, bubbles: true, cancelable: true }));
-                } catch (e) {}
+                for (const t of targets) { try { t.dispatchEvent(new PointerEvent(type, pt(x, y))); } catch (e) {} }
             };
             const cx = () => rect().left + rect().width / 2;
             const cy = () => rect().top + rect().height / 2;
-            aiTimers.push(setTimeout(() => fire('pointermove', cx(), cy()), 300));
-            aiTimers.push(setTimeout(() => {
-                try {
-                    el.dispatchEvent(new MouseEvent('click', { clientX: cx(), clientY: cy(), bubbles: true, cancelable: true }));
-                } catch (e) {}
-            }, 650));
-            aiTimers.push(setTimeout(() => fire('pointermove', cx() + Math.min(120, rect().width * 0.2), cy() - Math.min(60, rect().height * 0.15)), 1100));
+            if (has('pointermove')) {
+                aiTimers.push(setTimeout(() => fire('pointermove', cx(), cy()), 300));
+            }
+            if (has('pointerdown') || has('pointerup') || has('click')) {
+                aiTimers.push(setTimeout(() => {
+                    for (const t of targets) {
+                        if (has('pointerdown')) { try { t.dispatchEvent(new PointerEvent('pointerdown', pt(cx(), cy()))); } catch (e) {} }
+                        if (has('pointerup')) { try { t.dispatchEvent(new PointerEvent('pointerup', pt(cx(), cy()))); } catch (e) {} }
+                        if (has('click')) { try { t.dispatchEvent(new MouseEvent('click', { clientX: cx(), clientY: cy(), bubbles: true, cancelable: true })); } catch (e) {} }
+                    }
+                }, 650));
+            }
+            if (has('scroll') && contentEl) {
+                // Scroll the long card up and back so scroll-driven effects (Bend) fold.
+                const total = 16;
+                for (let i = 0; i < total; i++) {
+                    const frac = Math.sin((i / (total - 1)) * Math.PI); // 0 → 1 → 0
+                    aiTimers.push(setTimeout(() => {
+                        const max = Math.max(0, contentEl.scrollHeight - contentEl.clientHeight);
+                        contentEl.scrollTop = max * frac;
+                    }, 500 + i * 140));
+                }
+            }
+            if (has('pointermove')) {
+                aiTimers.push(setTimeout(() => fire('pointermove', cx() + Math.min(120, rect().width * 0.2), cy() - Math.min(60, rect().height * 0.15)), 1300));
+            }
         }
 
         /* ----- Load a component ----- */
@@ -491,7 +687,8 @@
             await new Promise(r => requestAnimationFrame(() => r()));
 
             try {
-                const m = await import(`./assets/js/canvasui/${name}.js`);
+                // Bump this to refresh cached component modules after editing one.
+                const m = await import(`./assets/js/canvasui/${name}.js?v=20270102`);
                 let createFn = m[createName];
                 if (typeof createFn !== 'function') {
                     const alt = Object.keys(m).find(k => k.startsWith('create') && typeof m[k] === 'function');
@@ -504,7 +701,9 @@
                     current = createFn({ canvas: output }, { src: MODEL_URL, autoRotate: true, autoRotateSpeed: 1.5 });
                     infoErr.textContent = current ? '' : '（create 返回 null）';
                 } else {
-                    // BUG FIX: redraw source AFTER canvas replacement to ensure correct dimensions
+                    // Configure #content for this effect first, then redraw the source
+                    // card AFTER canvas replacement to ensure correct dimensions.
+                    setupContent(name);
                     drawSource();
                     // Pass content div (not stage), and per-component options
                     const opts = COMPONENT_OPTIONS[name] || {};
@@ -513,7 +712,7 @@
                 }
 
                 if (current) {
-                    autoInteract(current, output);
+                    autoInteract(current, output, content, META(name).events);
                 }
             } catch (e) {
                 infoErr.textContent = '错误: ' + (e.message || e);
@@ -622,9 +821,121 @@
             }
         });
 
+        /* ============================================================
+         * Self-test
+         * A silently-black effect almost always means a shader failed to
+         * compile or link, and that failure never reaches the UI. So rather
+         * than eyeballing 33 demos, hook compileShader/linkProgram globally
+         * and load every component in turn, reporting what actually broke.
+         * ============================================================ */
+        const shaderFails = [];
+        (function instrumentGL() {
+            const targets = [
+                window.WebGL2RenderingContext && window.WebGL2RenderingContext.prototype,
+                window.WebGLRenderingContext && window.WebGLRenderingContext.prototype,
+            ].filter(Boolean);
+
+            for (const proto of targets) {
+                const compile = proto.compileShader;
+                proto.compileShader = function (shader) {
+                    compile.call(this, shader);
+                    if (!this.getShaderParameter(shader, this.COMPILE_STATUS)) {
+                        shaderFails.push('着色器编译失败: ' +
+                            (this.getShaderInfoLog(shader) || '').trim().split('\n')[0]);
+                    }
+                };
+                const link = proto.linkProgram;
+                proto.linkProgram = function (program) {
+                    link.call(this, program);
+                    if (!this.getProgramParameter(program, this.LINK_STATUS)) {
+                        shaderFails.push('程序链接失败: ' +
+                            (this.getProgramInfoLog(program) || '').trim().split('\n')[0]);
+                    }
+                };
+            }
+        })();
+
+        const stEl    = document.getElementById('selftest');
+        const stBody  = document.getElementById('stBody');
+        const stSum   = document.getElementById('stSum');
+        document.getElementById('stClose').addEventListener('click', () => stEl.classList.remove('show'));
+        stEl.addEventListener('click', (e) => { if (e.target === stEl) stEl.classList.remove('show'); });
+
+        /* Has the browser run out of WebGL contexts? (a real limit, not a component bug) */
+        function isContextExhausted() {
+            try {
+                const probe = document.createElement('canvas');
+                const gl = probe.getContext('webgl2') || probe.getContext('webgl');
+                if (gl && gl.isContextLost && gl.isContextLost()) return true;
+                if (gl) { const ext = gl.getExtension('WEBGL_lose_context'); if (ext) ext.loseContext(); return false; }
+                return true;
+            } catch (e) { return true; }
+        }
+
+        /* Does the output canvas actually have a live, uncorrupted GL context? */
+        function inspectCanvas(cv) {
+            if (!cv.clientWidth || !cv.clientHeight) return '画布尺寸为 0';
+            let gl = null;
+            try { gl = cv.getContext('webgl2') || cv.getContext('webgl'); } catch (e) {}
+            if (!gl) return '没有 WebGL 上下文';
+            if (gl.isContextLost && gl.isContextLost()) return 'WebGL 上下文已丢失（可能超出浏览器并发上限）';
+            const err = gl.getError();
+            if (err && err !== gl.NO_ERROR) return 'GL 错误码 ' + err;
+            return null;
+        }
+
+        async function runSelfTest() {
+            stEl.classList.add('show');
+            stBody.innerHTML = '';
+            let ok = 0, bad = 0, warn = 0;
+
+            for (let i = 0; i < COMPONENTS.length; i++) {
+                const [file, fnName, dispName] = COMPONENTS[i];
+                stSum.textContent = `检测中 ${i + 1}/${COMPONENTS.length}…`;
+
+                shaderFails.length = 0;
+                let problem = null;
+
+                try {
+                    await new Promise(r => setTimeout(r, 0));
+                    selectComponent(i);
+                    // give the component time to compile shaders and render a frame
+                    await new Promise(r => setTimeout(r, 700));
+
+                    if (infoErr.textContent) problem = infoErr.textContent;
+                    else if (!current) problem = isContextExhausted()
+                        ? 'WebGL 上下文已达浏览器并发上限（非组件故障，被跳过）'
+                        : 'create 返回 null';
+                    else if (shaderFails.length) problem = shaderFails[0];
+                    else problem = inspectCanvas(output);
+                } catch (e) {
+                    problem = '异常: ' + (e.message || e);
+                }
+
+                const isWarn = problem && /上下文已丢失|并发上限|被跳过/.test(problem);
+                const cls  = problem ? (isWarn ? 'st-warn' : 'st-bad') : 'st-ok';
+                const mark = problem ? (isWarn ? '!' : '✕') : '✓';
+                if (problem) { isWarn ? warn++ : bad++; } else { ok++; }
+
+                const row = document.createElement('div');
+                row.className = 'st-row';
+                row.innerHTML =
+                    `<span class="${cls}">${mark}</span>` +
+                    `<span class="st-name">${dispName}</span>` +
+                    `<span class="st-msg">${problem ? String(problem).replace(/</g, '&lt;') : '正常'}</span>`;
+                stBody.appendChild(row);
+                stBody.scrollTop = stBody.scrollHeight;
+            }
+
+            stSum.textContent = `正常 ${ok} · 失败 ${bad}` + (warn ? ` · 上下文受限 ${warn}` : '');
+        }
+
+        document.getElementById('selftestBtn').addEventListener('click', runSelfTest);
+
         /* ----- Init ----- */
         buildList();
         selectComponent(0);
     </script>
+<script src="/assets/js/feedback-marker.js?v=20270101" defer></script>
 </body>
 </html>

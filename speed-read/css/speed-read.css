@@ -1,184 +1,279 @@
-/* ============================================================
- * MindTrainer — 飞克视读 Web 重写 · 训练区样式
- * 页面框架沿用 PickTests 浅色风格；训练舞台为深色沉浸式
- * ============================================================ */
+/* ==========================================================================
+   MindTrainer — 飞克视读 training UI
+   Rebuilt on the mt.css token system. Every class name here is part of the
+   contract with sr-common.js and the sr-*.js trainers, so names are kept
+   exactly; only the visual language changed.
 
-/* ---------- 训练中心（speed-read/index.html） ---------- */
-/* 原站 <main> 是 flex+wrap 容器（margin-top:128px 为 fixed header 让位），
-   所有直接子元素必须占满整行；用 flex-basis:100% 随窗口收缩（窄窗口不溢出），
-   max-width 封顶（宽窗口与原站 1200 对齐） */
+   One deliberate exception to the page theme: the training stage stays dark
+   in both light and dark mode. The canvas draws light figures on #0b0f14 and
+   the trainers hard-code that clear colour, so a light stage would both break
+   the drawings and defeat the point (low-glare surface for long eye drills).
+   ========================================================================== */
+
+:root { --sr-stage: #0b0f14; }
+
+/* ------------------------------------------------------------ hub page --- */
 .sr-hero {
-  flex: 0 0 100%;
-  max-width: 1200px;
-  box-sizing: border-box;
-  padding: 40px 20px;
-  text-align: center;
+  width: 100%;
+  max-width: var(--wrap);
+  margin-inline: auto;
+  padding: clamp(28px, 4vw, 48px) 20px clamp(16px, 2vw, 24px);
 }
-.sr-hero h1 {
-  font-size: clamp(34px, 5vw, 52px);
-  font-weight: 700;
-  color: #0f172a;
-  letter-spacing: -0.025em;
-  margin-bottom: 12px;
-}
-.sr-hero p { color: #64748b; font-size: 17px; }
+.sr-hero h1 { font-size: clamp(1.75rem, 1.3rem + 2vw, 2.75rem); }
+.sr-hero p { margin-top: 10px; color: var(--ink-2); font-size: 1.0625rem; max-width: 56ch; }
 
 .sr-module-grid {
-  flex: 0 0 100%;
-  max-width: 1200px;
-  box-sizing: border-box;
-  margin: 0 auto;
-  padding: 10px 20px 60px;
+  width: 100%;
+  max-width: var(--wrap);
+  margin-inline: auto;
+  padding: 8px 20px clamp(48px, 7vw, 88px);
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 18px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
 }
 .sr-module-card {
-  display: block;
-  background: #fff;
-  border: 1px solid #e2e8f0;
-  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
   padding: 22px;
-  text-decoration: none;
-  color: inherit;
-  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+  border-radius: var(--r-card);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  transition: border-color .2s var(--ease), box-shadow .2s var(--ease), transform .2s var(--ease);
 }
 .sr-module-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 12px 28px rgb(15 23 42 / 10%);
-  border-color: #b7c4d8;
+  border-color: var(--line-2);
+  box-shadow: var(--sh-2);
 }
-.sr-module-card .sr-module-icon { font-size: 30px; display: block; margin-bottom: 10px; }
-.sr-module-card h3 { font-size: 18px; margin: 0 0 6px; color: #0f172a; }
-.sr-module-card p { margin: 0; font-size: 14px; line-height: 1.55; color: #64748b; }
-.sr-module-card .sr-module-count {
-  display: inline-block; margin-top: 12px; font-size: 12px; color: #475569;
-  background: #f1f5f9; border-radius: 999px; padding: 3px 10px;
+.sr-module-icon {
+  width: 36px; height: 36px;
+  display: grid; place-items: center;
+  margin-bottom: 14px;
+  border-radius: 10px;
+  background: var(--surface-2);
+  color: var(--ink-2);
+}
+.sr-module-card:hover .sr-module-icon { background: var(--accent-soft); color: var(--accent); }
+.sr-module-card h3 { font-size: 1.125rem; margin-bottom: 6px; }
+.sr-module-card p { font-size: .9375rem; line-height: 1.6; color: var(--ink-2); }
+.sr-module-count {
+  align-self: flex-start;
+  margin-top: 14px;
+  padding: 4px 11px;
+  border-radius: var(--r-btn);
+  background: var(--surface-2);
+  color: var(--ink-3);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
 }
 
-/* ---------- 训练页布局 ---------- */
+/* -------------------------------------------------------- training page -- */
 .sr-layout {
-  flex: 0 0 100%;
-  max-width: 1650px;
-  box-sizing: border-box;
-  margin: 0 auto;
-  padding: 28px 20px 60px;
+  width: 100%;
+  max-width: var(--wrap-wide);
+  margin-inline: auto;
+  padding: 4px 20px clamp(48px, 7vw, 80px);
   display: grid;
-  grid-template-columns: 220px minmax(0, 1fr) 240px;
-  gap: 18px;
+  grid-template-columns: 220px minmax(0, 1fr) 250px;
+  gap: 16px;
   align-items: start;
 }
-/* 关键：grid 列默认 minmax(auto,1fr) 会被 canvas 默认宽(300px)/长内容撑开，
-   必须 minmax(0,1fr) + 列容器 min-width:0 才能防横向溢出与列间错位 */
+/* minmax(0,1fr) plus min-width:0 keeps the canvas from forcing the grid wide */
 .sr-list-panel, .sr-param-panel, .sr-stage-wrap { min-width: 0; }
 .sr-stage-wrap { width: 100%; }
-.sr-stage { width: 100%; }
+
 .sr-list-panel, .sr-param-panel {
-  background: #fff;
-  border: 1px solid #e2e8f0;
-  border-radius: 14px;
   padding: 14px;
+  border-radius: var(--r-card);
+  background: var(--surface);
+  border: 1px solid var(--line);
 }
 .sr-list-panel h2, .sr-param-panel h2 {
-  font-size: 13px; font-weight: 700; color: #94a3b8;
-  text-transform: uppercase; letter-spacing: .06em;
   margin: 4px 4px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
 }
-.sr-train-list { display: flex; flex-direction: column; gap: 2px; max-height: 70vh; overflow-y: auto; }
-.sr-train-item {
-  display: flex; align-items: center; gap: 8px;
-  padding: 8px 10px; border-radius: 8px; cursor: pointer;
-  font-size: 14px; color: #334155; border: 0; background: transparent;
-  text-align: left; width: 100%;
-}
-.sr-train-item:hover { background: #f1f5f9; }
-.sr-train-item.active { background: #0f172a; color: #fff; }
-.sr-train-item .sr-train-num {
-  font-size: 11px; color: #94a3b8; min-width: 18px;
-}
-.sr-train-item.active .sr-train-num { color: #cbd5e1; }
 
-.sr-stage-wrap { min-width: 0; }
+.sr-train-list {
+  display: flex; flex-direction: column; gap: 2px;
+  max-height: 70vh; overflow-y: auto;
+}
+.sr-train-item {
+  display: flex; align-items: center; gap: 9px;
+  width: 100%; padding: 9px 10px;
+  border: 0; border-radius: 9px;
+  background: transparent;
+  color: var(--ink-2);
+  font-size: 14px; text-align: left; cursor: pointer;
+  transition: background .14s var(--ease), color .14s var(--ease);
+}
+.sr-train-item:hover { background: var(--surface-2); color: var(--ink); }
+.sr-train-item.active { background: var(--ink); color: var(--bg); font-weight: 600; }
+.sr-train-num {
+  min-width: 18px;
+  font-size: 11px;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+.sr-train-item.active .sr-train-num { color: inherit; opacity: .65; }
+
+/* the stage: dark in both themes, on purpose (see file header) */
 .sr-stage {
   position: relative;
-  background: #0b0f14;
-  border-radius: 14px;
   overflow: hidden;
+  width: 100%;
   aspect-ratio: 16 / 10;
   min-height: 420px;
+  border-radius: var(--r-stage);
+  background: var(--sr-stage);
+  border: 1px solid var(--line);
 }
 .sr-stage canvas { display: block; width: 100%; height: 100%; }
 .sr-stage-hint {
-  position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
-  color: rgb(148 163 184 / 70%); font-size: 12px; white-space: nowrap;
-  pointer-events: none;
+  position: absolute; bottom: 10px; left: 50%;
+  transform: translateX(-50%);
+  color: rgb(148 163 184 / 62%);
+  font-size: 12px; white-space: nowrap; pointer-events: none;
 }
-
-/* ---------- 参数面板 ---------- */
-.sr-params { display: flex; flex-direction: column; gap: 10px; }
-.sr-param-row { display: flex; flex-direction: column; gap: 4px; }
-.sr-param-label { font-size: 12px; color: #64748b; }
-.sr-param-ctl { display: flex; align-items: center; gap: 8px; }
-.sr-param-ctl input[type="range"] { flex: 1; accent-color: #0f172a; }
-.sr-param-ctl input[type="color"] { width: 100%; height: 30px; border: 0; padding: 0; background: none; cursor: pointer; }
-.sr-param-ctl input[type="text"] {
-  width: 100%; padding: 5px 8px; border: 1px solid #e2e8f0; border-radius: 6px;
-  font-size: 13px;
-}
-.sr-param-ctl input[type="checkbox"] { width: 18px; height: 18px; accent-color: #0f172a; }
-.sr-param-ctl select {
-  width: 100%; padding: 5px 8px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 13px;
-}
-.sr-param-val { font-size: 12px; color: #475569; min-width: 28px; text-align: right; }
-
-/* ---------- 控制条 ---------- */
-.sr-control-bar {
-  display: flex; align-items: center; gap: 10px;
-  margin-top: 14px; flex-wrap: wrap;
-}
-.sr-btn {
-  padding: 9px 16px; border-radius: 9px; border: 1px solid #e2e8f0;
-  background: #fff; color: #0f172a; font-size: 14px; font-weight: 600;
-  cursor: pointer; transition: background .12s ease, transform .05s ease;
-}
-.sr-btn:hover { background: #f1f5f9; }
-.sr-btn:active { transform: scale(.97); }
-.sr-btn-start { background: #0f172a; color: #fff; border-color: #0f172a; }
-.sr-btn-start:hover { background: #1e293b; }
-.sr-state {
-  margin-left: auto; display: flex; gap: 14px;
-  font-size: 13px; color: #475569; font-variant-numeric: tabular-nums;
-}
-
-/* ---------- 训练内文字/状态 ---------- */
 .sr-inline-status {
   position: absolute; top: 12px; left: 14px; right: 14px;
   display: flex; justify-content: space-between;
-  color: rgb(148 163 184 / 65%); font-size: 12px;
-  pointer-events: none;
+  color: rgb(148 163 184 / 62%);
+  font-size: 12px; pointer-events: none;
+  font-variant-numeric: tabular-nums;
 }
 
-/* 训练方法说明 */
+/* ------------------------------------------------------------- controls -- */
+.sr-control-bar {
+  display: flex; align-items: center; gap: 8px;
+  margin-top: 14px; flex-wrap: wrap;
+}
+.sr-btn {
+  height: 40px; padding-inline: 18px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border-radius: var(--r-btn);
+  border: 1px solid var(--line-2);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 14px; font-weight: 600; white-space: nowrap;
+  cursor: pointer;
+  transition: background .16s var(--ease), border-color .16s var(--ease), transform .1s ease;
+}
+.sr-btn:hover { background: var(--surface-2); border-color: var(--ink-3); }
+.sr-btn:active { transform: scale(.975); }
+.sr-btn-start { background: var(--btn-bg); border-color: var(--btn-bg); color: var(--btn-fg); }
+.sr-btn-start:hover { background: var(--btn-bg-h); border-color: var(--btn-bg-h); color: var(--btn-fg); }
+
+.sr-state {
+  margin-left: auto;
+  display: flex; gap: 14px;
+  font-size: 13px; color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+
+/* --------------------------------------------------------------- params -- */
+.sr-params { display: flex; flex-direction: column; gap: 12px; }
+.sr-param-row { display: flex; flex-direction: column; gap: 5px; }
+.sr-param-label { font-size: 12px; color: var(--ink-2); }
+.sr-param-ctl { display: flex; align-items: center; gap: 8px; }
+.sr-param-val {
+  min-width: 30px; text-align: right;
+  font-size: 12px; color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.sr-param-ctl input[type="range"] { flex: 1; accent-color: var(--accent); }
+.sr-param-ctl input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent); }
+.sr-param-ctl input[type="color"] {
+  width: 100%; height: 32px;
+  padding: 0; border: 1px solid var(--line);
+  border-radius: var(--r-input);
+  background: none; cursor: pointer;
+}
+.sr-param-ctl input[type="text"],
+.sr-param-ctl select {
+  width: 100%; padding: 7px 9px;
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-input);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 13px;
+}
+.sr-param-ctl input[type="text"]::placeholder { color: var(--ink-3); }
+.sr-param-ctl input:focus-visible,
+.sr-param-ctl select:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+  border-color: var(--accent);
+}
+
+/* --------------------------------------------------------- method notes -- */
 .sr-method {
-  margin-top: 14px; padding: 12px 14px;
-  background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px;
-  font-size: 13px; line-height: 1.7; color: #475569;
+  margin-top: 14px;
+  padding: 16px 18px;
+  border-radius: var(--r-card);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  font-size: 13.5px; line-height: 1.75; color: var(--ink-2);
 }
-.sr-method b { color: #0f172a; }
+.sr-method b { color: var(--ink); font-weight: 650; }
 
-/* ---------- 响应式 ---------- */
-@media (max-width: 1024px) {
-  .sr-layout { grid-template-columns: 1fr; }
+/* ------------------------------------------------- evidence note (hub) --- */
+/* Deliberately plain and readable rather than styled like a disclaimer nobody
+   reads. It is real content, so it gets real typography. */
+.sr-note-wrap {
+  width: 100%;
+  max-width: var(--wrap);
+  margin-inline: auto;
+  padding: 0 20px clamp(48px, 7vw, 88px);
+}
+.sr-note {
+  max-width: 72ch;
+  padding: clamp(24px, 3vw, 34px);
+  border-radius: var(--r-card);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+}
+.sr-note h2 { font-size: 1.25rem; margin-bottom: 14px; }
+.sr-note p { margin-bottom: 14px; color: var(--ink-2); line-height: 1.75; font-size: .9375rem; }
+.sr-note ul { margin: 0 0 14px; padding-left: 1.15em; }
+.sr-note li {
+  margin-bottom: 10px;
+  list-style: disc;
+  color: var(--ink-2);
+  line-height: 1.7;
+  font-size: .9375rem;
+}
+.sr-note b { color: var(--ink); font-weight: 650; }
+.sr-note i { font-style: italic; }
+.sr-note-foot {
+  margin-bottom: 0 !important;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+  color: var(--ink-3) !important;
+}
+
+/* ---------------------------------------------------------- responsive --- */
+@media (max-width: 1100px) {
+  .sr-layout { grid-template-columns: 200px minmax(0, 1fr); }
+  .sr-param-panel { grid-column: 1 / -1; order: 3; }
+}
+@media (max-width: 820px) {
+  .sr-layout { grid-template-columns: minmax(0, 1fr); padding-inline: 16px; }
+  .sr-hero, .sr-module-grid { padding-inline: 16px; }
   .sr-list-panel { order: 2; }
-  .sr-list-panel h2, .sr-param-panel h2 { margin-top: 4px; }
   .sr-train-list { max-height: none; flex-direction: row; flex-wrap: wrap; }
   .sr-train-item { width: auto; }
+  .sr-state { margin-left: 0; width: 100%; }
 }
 @media (max-width: 640px) {
   .sr-stage { aspect-ratio: auto; min-height: 320px; }
-  .sr-param-panel { order: 3; }
 }
 
-/* 冥想页特殊 */
+/* meditation runs a wider canvas */
 .sr-meditation-stage { aspect-ratio: 16 / 9; min-height: 480px; }
-.sr-meditation-stage canvas { width: 100%; height: 100%; display: block; }
+.sr-meditation-stage canvas { display: block; width: 100%; height: 100%; }

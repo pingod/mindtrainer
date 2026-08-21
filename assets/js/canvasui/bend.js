@@ -267,10 +267,13 @@ function createBend(elements, options = {}) {
   gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
   const contentTexture = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, contentTexture);
+  // LINEAR (not LINEAR_MIPMAP_LINEAR): the canvas re-uploads the real (non-power-of-two)
+  // content texture without regenerating the mipmap chain, leaving it incomplete and
+  // sampling black. LINEAR matches the other effects and renders at ~1:1.
   gl.texParameteri(
     gl.TEXTURE_2D,
     gl.TEXTURE_MIN_FILTER,
-    gl.LINEAR_MIPMAP_LINEAR
+    gl.LINEAR
   );
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);

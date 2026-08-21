@@ -32,65 +32,23 @@
     <meta name="twitter:description" content="免费在线序列记忆测试。记住方块亮起的顺序，再按原顺序或倒序重新点击，看看你最多能记住多少步。">
     <meta name="twitter:image" content="https://picktests.com/assets/images/og/og-image.png">
 
-    <link rel="stylesheet" href="../assets/css/global.min.css?v=20260830">
-    <link rel="stylesheet" href="../assets/css/style.min.css?v=20260830">
+<!-- theme bootstrap: applied before first paint so there is no flash -->
+    <script>try{var t=localStorage.getItem('mt-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
 
-    <link rel="stylesheet" href="../assets/css/sequence-memory-test.min.css?v=20260830">
-    <script src="/assets/js/mt-nav.js?v=20260864" defer></script>
-    <style>
-        /* 模式选择器可点击反馈：未选中项 hover 明显可点（避免灰色误认为禁用） */
-        [class*="mode-picker"] span { transition: color 180ms ease-out, background 180ms ease-out, box-shadow 180ms ease-out; }
-        [class*="mode-picker"]:not(:disabled) label:hover span {
-            background: rgba(35, 122, 94, .09);
-            box-shadow: inset 0 0 0 1.5px rgba(35, 122, 94, .35);
-        }
-        [class*="mode-picker"] input:checked+span { font-weight: 750; }
-    </style>
-<style>
-  /* 测试区域加宽：充分利用宽屏版面 */
-  .common-container { max-width: min(100%, 1650px); }
-  .number-page, .aim-page, .sequence-page, .tracking-page, .stroop-page, .reaction-page { width: min(1650px, 100%); max-width: min(1650px, 100%); }
-</style>
-    <link rel="stylesheet" href="../assets/css/theme.css?v=20260860">
+    <link rel="stylesheet" href="/assets/css/mt.css?v=20270101">
+    <link rel="stylesheet" href="/assets/css/sequence-memory-test.min.css?v=20260830">
+    <link rel="stylesheet" href="/assets/css/mt-stage.css?v=20270101">
+    <script src="/assets/js/mt-nav.js?v=20270101" defer></script>
+    <script src="/assets/js/mt-app.js?v=20270101" defer></script>
 </head>
 <body class="test-page">
 <header id="mt-header"></header>
 
 <main>
-    <section class="hero">
-        <div class="common-container">
-            <div class="hero-content">
-                <h1><span class="hero-title-text">序列记忆测试</span></h1>
-                <p class="hero-subtitle">观察每一个序列，<span class="hero-underline">把它记在心里，再完整重复</span>。</p>
-
-                <nav class="hero-test-links" aria-label="更多测试">
-                    <div class="hero-test-links-viewport">
-                        <div class="hero-test-links-marquee">
-                            <div class="hero-test-links-track">
-                                <a class="hero-test-link--reaction" href="/reaction-time-test/" target="_blank" rel="noopener">反应时间</a>
-                                <a class="hero-test-link--aim" href="/aim-trainer/" target="_blank" rel="noopener">瞄准训练</a>
-                                <a class="hero-test-link--stroop" href="/stroop-test/" target="_blank" rel="noopener">斯特鲁普</a>
-                                <a class="hero-test-link--number" href="/number-memory-test/" target="_blank" rel="noopener">数字记忆</a>
-                                <a class="hero-test-link--tracking" href="/multiple-object-tracking-test/" target="_blank" rel="noopener">多目标追踪</a>
-                            </div>
-                            <div class="hero-test-links-track" aria-hidden="true">
-                                <a class="hero-test-link--reaction" href="/reaction-time-test/" target="_blank" rel="noopener" tabindex="-1">反应时间</a>
-                                <a class="hero-test-link--aim" href="/aim-trainer/" target="_blank" rel="noopener" tabindex="-1">瞄准训练</a>
-                                <a class="hero-test-link--stroop" href="/stroop-test/" target="_blank" rel="noopener" tabindex="-1">斯特鲁普</a>
-                                <a class="hero-test-link--number" href="/number-memory-test/" target="_blank" rel="noopener" tabindex="-1">数字记忆</a>
-                                <a class="hero-test-link--tracking" href="/multiple-object-tracking-test/" target="_blank" rel="noopener" tabindex="-1">多目标追踪</a>
-                            </div>
-                            <div class="hero-test-links-track" aria-hidden="true">
-                                <a class="hero-test-link--reaction" href="/reaction-time-test/" target="_blank" rel="noopener" tabindex="-1">反应时间</a>
-                                <a class="hero-test-link--aim" href="/aim-trainer/" target="_blank" rel="noopener" tabindex="-1">瞄准训练</a>
-                                <a class="hero-test-link--stroop" href="/stroop-test/" target="_blank" rel="noopener" tabindex="-1">斯特鲁普</a>
-                                <a class="hero-test-link--number" href="/number-memory-test/" target="_blank" rel="noopener" tabindex="-1">数字记忆</a>
-                                <a class="hero-test-link--tracking" href="/multiple-object-tracking-test/" target="_blank" rel="noopener" tabindex="-1">多目标追踪</a>
-                            </div>
-                        </div>
-                    </div>
-                </nav>
-            </div>
+    <section class="mt-test-head">
+        <div class="mt-wrap-wide">
+            <h1>序列记忆测试</h1>
+            <p>看方块按什么顺序亮，然后按同样的顺序点回去。每过一关就多一个方块。</p>
         </div>
     </section>
 
@@ -229,101 +187,105 @@
         </div>
     </section>
 
-    <section id="features" class="features sequence-features">
-        <div class="common-container">
-            <h2>记忆，不加干扰</h2>
-            <p class="features-subtitle">清楚的节奏、全新的序列，以及一份简单的个人记录。</p>
-
-            <div class="features-grid">
-                <div class="feature-card">
-                    <span class="feature-kicker">序列</span>
-                    <h3>每级都是新序列</h3>
-                    <p>每个等级都会随机生成新的序列，并比上一级多一个方块。</p>
+    <section class="mt-section">
+        <div class="mt-wrap-wide">
+            <div class="mt-section-head">
+                <h2>关于这个测试</h2>
+            </div>
+            <div class="mt-notes">
+                <div class="mt-note">
+                    <h3>每关都是新序列</h3>
+                    <p>不是在旧序列后面接一个，而是重新随机生成，长度加一。所以背不下来，只能真记。</p>
                 </div>
-                <div class="feature-card">
-                    <span class="feature-kicker">模式</span>
-                    <h3>两种回忆方式</h3>
-                    <p>经典模式按原顺序重复，倒序模式则从最后一个方块开始。</p>
+                <div class="mt-note">
+                    <h3>正着或倒着</h3>
+                    <p>经典模式按显示顺序点，倒序模式要从最后一个开始往回点。一次测试里模式不变。</p>
                 </div>
-                <div class="feature-card">
-                    <span class="feature-kicker">节奏</span>
-                    <h3>按自己的节奏作答</h3>
-                    <p>重复序列时没有倒计时，你可以专心回忆，不必匆忙点击。</p>
+                <div class="mt-note">
+                    <h3>作答不计时</h3>
+                    <p>重复序列的时候没有倒计时，可以慢慢想。这里测的是记得住多少，不是手速。</p>
                 </div>
-                <div class="feature-card">
-                    <span class="feature-kicker">反馈</span>
-                    <h3>每一步都清楚</h3>
-                    <p>观察、重复、查看结果，每个阶段都给出恰到好处的提示。</p>
+                <div class="mt-note">
+                    <h3>错一次就结束</h3>
+                    <p>点错一个方块本次测试就结束，成绩记为你完整通过的最高关。</p>
                 </div>
-                <div class="feature-card">
-                    <span class="feature-kicker">进度</span>
-                    <h3>只比较重要的</h3>
-                    <p>查看上一次、个人最佳，以及这次是否比上一次更进一步。</p>
+                <div class="mt-note">
+                    <h3>声音只帮你卡节奏</h3>
+                    <p>可选音效对每个方块用同一个音，只是提示节奏，不会泄露位置。</p>
                 </div>
-                <div class="feature-card">
-                    <span class="feature-kicker">隐私</span>
-                    <h3>只保存在当前浏览器</h3>
-                    <p>最近 20 次完整测试只保存在这台设备，不会上传。</p>
+                <div class="mt-note">
+                    <h3>数据不出这台设备</h3>
+                    <p>最近 20 次完整测试只写进当前浏览器，不需要账号，也不会上传。</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <section id="faq" class="faq">
-        <div class="common-container">
-            <h2>常见问题</h2>
-
-            <div class="faq-grid">
-                <div class="faq-item">
-                    <h3>测试如何进行？</h3>
-                    <p>选择经典或倒序模式，观察方块亮起，再按要求重复。每个等级都会换成新的随机序列，并增加一个方块。</p>
+    <section id="faq" class="mt-section">
+        <div class="mt-wrap-wide">
+            <div class="mt-section-head">
+                <h2>常见问题</h2>
+            </div>
+            <div class="mt-faq">
+                <div class="mt-faq-item">
+                    <button class="mt-faq-q" type="button">怎么测？
+                        <span class="mt-chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+                    </button>
+                    <div class="mt-faq-a"><div class="mt-faq-a-inner">选经典或倒序，看方块依次亮起，然后按要求点回去。每过一关会换一个新的随机序列，长度加一。</div></div>
                 </div>
-                <div class="faq-item">
-                    <h3>成绩如何计算？</h3>
-                    <p>成绩是你完整通过的最高等级。等级 8 表示你正确重复了一个由八个方块组成的序列。</p>
+                <div class="mt-faq-item">
+                    <button class="mt-faq-q" type="button">成绩怎么算？
+                        <span class="mt-chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+                    </button>
+                    <div class="mt-faq-a"><div class="mt-faq-a-inner">成绩是你完整通过的最高等级。等级 8 就是你正确重复了一个八个方块的序列。</div></div>
                 </div>
-                <div class="faq-item">
-                    <h3>点错方块会怎样？</h3>
-                    <p>一次错误就会结束本次测试，你可以立即开始一段新的序列。</p>
+                <div class="mt-faq-item">
+                    <button class="mt-faq-q" type="button">点错一个就结束吗？
+                        <span class="mt-chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+                    </button>
+                    <div class="mt-faq-a"><div class="mt-faq-a-inner">是的，错一次这轮就结束，可以立刻开一局新的。</div></div>
                 </div>
-                <div class="faq-item">
-                    <h3>倒序模式有什么不同？</h3>
-                    <p>序列仍按正常顺序显示，但你需要从最后一个方块开始反向点击。整次测试会保持同一种模式。</p>
+                <div class="mt-faq-item">
+                    <button class="mt-faq-q" type="button">倒序模式有什么不一样？
+                        <span class="mt-chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+                    </button>
+                    <div class="mt-faq-a"><div class="mt-faq-a-inner">序列还是正着放给你看，但你要从最后一个开始反着点。通常会比经典模式难一些。</div></div>
                 </div>
-                <div class="faq-item">
-                    <h3>声音会改变测试吗？</h3>
-                    <p>可选声音为每个方块使用相同提示音，只帮助把握节奏，不会透露位置。</p>
+                <div class="mt-faq-item">
+                    <button class="mt-faq-q" type="button">开声音会更简单吗？
+                        <span class="mt-chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+                    </button>
+                    <div class="mt-faq-a"><div class="mt-faq-a-inner">所有方块共用同一个提示音，只帮你感知节奏，不会告诉你亮的是哪一个。</div></div>
                 </div>
-                <div class="faq-item">
-                    <h3>成绩保存在哪里？</h3>
-                    <p>完整成绩只保存在当前浏览器。中断的测试不会保存，你也可以随时清除已有记录。</p>
+                <div class="mt-faq-item">
+                    <button class="mt-faq-q" type="button">成绩存在哪？
+                        <span class="mt-chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+                    </button>
+                    <div class="mt-faq-a"><div class="mt-faq-a-inner">只在当前浏览器的本地存储里。中途退出的不保存，已有记录随时可以清除。</div></div>
                 </div>
             </div>
+        </div>
+    </section>
+
+    <section class="mt-section">
+        <div class="mt-wrap-wide">
+            <div class="mt-section-head">
+                <h2>换一个测试</h2>
+            </div>
+            <nav class="mt-more" aria-label="其他测试">
+                <a href="/reaction-time-test/">反应时间<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left:auto"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                <a href="/aim-trainer/">瞄准训练<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left:auto"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                <a href="/number-memory-test/">数字记忆<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left:auto"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                <a href="/multiple-object-tracking-test/">多目标追踪<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left:auto"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                <a href="/stroop-test/">斯特鲁普<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left:auto"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+            </nav>
         </div>
     </section>
 </main>
 
-<footer>
-    <div class="footer-center-box">
-        <div class="footer-center-content-box">
-            <p>
-                <span class="footer-brand-line">&copy;&nbsp;<span id="currentYear"></span>&nbsp;PickTests</span>
-                <span class="footer-link-line">
-                    <a href="/privacy-policy/">隐私</a>
-                    <a href="/terms-of-use/">条款</a>
-                    <a href="/about/">关于</a>
-                    <a href="mailto:hello@picktests.com">联系</a>
-                </span>
-            </p>
-        </div>
-    </div>
-</footer>
+<footer></footer>
 
-<script src="../assets/js/global.min.js?v=20260830" defer></script>
-
-<script src="../assets/js/sequence-memory-test.min.js?v=20260830" defer></script>
-
-
-    <script src="../assets/js/feedback-marker.js?v=20260849" defer></script>
+<script src="/assets/js/sequence-memory-test.min.js?v=20260830" defer></script>
+<script src="/assets/js/feedback-marker.js?v=20270101" defer></script>
 </body>
 </html>

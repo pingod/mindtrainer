@@ -7,11 +7,10 @@
     <meta name="description" content="照相记忆 8 项：三色卡、几何卡、黄卡、曼陀罗、3D 卡、图片浏览、记忆训练、瞬间计算。">
     <link rel="icon" type="image/png" sizes="32x32" href="../assets/images/icons/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="../assets/images/icons/favicon-16x16.png">
-    <link rel="stylesheet" href="../assets/css/global.min.css?v=20260830">
-    <link rel="stylesheet" href="../assets/css/style.min.css?v=20260830">
-    <link rel="stylesheet" href="css/speed-read.css?v=20260830">
-    <script src="/assets/js/mt-nav.js?v=20260864" defer></script>
-    <link rel="stylesheet" href="../assets/css/theme.css?v=20260860">
+    <script>try{var t=localStorage.getItem('mt-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+    <link rel="stylesheet" href="/assets/css/mt.css?v=20270101">
+    <link rel="stylesheet" href="css/speed-read.css?v=20270101">
+    <script src="/assets/js/mt-nav.js?v=20270101" defer></script>
 </head>
 <body>
 <header id="mt-header"></header>
@@ -48,29 +47,10 @@
     </div>
 </main>
 
-<footer>
-    <div class="footer-center-box">
-        <div class="footer-center-content-box">
-            <p>
-                <span class="footer-brand-line">&copy;&nbsp;<span id="currentYear"></span>&nbsp;MindTrainer · 飞克视读 Web 重写版</span>
-                <span class="footer-link-line">
-                    <a href="../about/">关于</a>
-                    <a href="index.html">速读训练</a>
-                </span>
-            </p>
-        </div>
-    </div>
-</footer>
+<footer></footer>
 
-<script src="../assets/js/global.min.js?v=20260830" defer></script>
-<script src="js/sr-common.js?v=20260830" defer></script>
-<script src="js/sr-photo.js?v=20260830" defer></script>
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    const y = document.getElementById('currentYear');
-    if (y) y.textContent = new Date().getFullYear();
-});
-</script>
-    <script src="../assets/js/feedback-marker.js?v=20260849" defer></script>
+<script src="js/sr-common.js?v=20270101" defer></script>
+<script src="js/sr-photo.js?v=20270101" defer></script>
+<script src="/assets/js/feedback-marker.js?v=20270101" defer></script>
 </body>
 </html>

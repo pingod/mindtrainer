@@ -32,65 +32,23 @@
     <meta name="twitter:description" content="免费在线反应时间测试，测量你作出反应所需的时间。支持单轮和五轮模式，并可查看平均成绩、个人最佳和近期记录。">
     <meta name="twitter:image" content="https://picktests.com/assets/images/og/og-image.png">
 
-    <link rel="stylesheet" href="../assets/css/global.min.css?v=20260830">
-    <link rel="stylesheet" href="../assets/css/style.min.css?v=20260830">
+<!-- theme bootstrap: applied before first paint so there is no flash -->
+    <script>try{var t=localStorage.getItem('mt-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
 
-    <link rel="stylesheet" href="../assets/css/reaction-time-test.min.css?v=20260830">
-    <script src="/assets/js/mt-nav.js?v=20260864" defer></script>
-    <style>
-        /* 模式选择器可点击反馈：未选中项 hover 明显可点（避免灰色误认为禁用） */
-        [class*="mode-picker"] span { transition: color 180ms ease-out, background 180ms ease-out, box-shadow 180ms ease-out; }
-        [class*="mode-picker"]:not(:disabled) label:hover span {
-            background: rgba(35, 122, 94, .09);
-            box-shadow: inset 0 0 0 1.5px rgba(35, 122, 94, .35);
-        }
-        [class*="mode-picker"] input:checked+span { font-weight: 750; }
-    </style>
-<style>
-  /* 测试区域加宽：充分利用宽屏版面 */
-  .common-container { max-width: min(100%, 1650px); }
-  .number-page, .aim-page, .sequence-page, .tracking-page, .stroop-page, .reaction-page { width: min(1650px, 100%); max-width: min(1650px, 100%); }
-</style>
-    <link rel="stylesheet" href="../assets/css/theme.css?v=20260860">
+    <link rel="stylesheet" href="/assets/css/mt.css?v=20270101">
+    <link rel="stylesheet" href="/assets/css/reaction-time-test.min.css?v=20260830">
+    <link rel="stylesheet" href="/assets/css/mt-stage.css?v=20270101">
+    <script src="/assets/js/mt-nav.js?v=20270101" defer></script>
+    <script src="/assets/js/mt-app.js?v=20270101" defer></script>
 </head>
 <body class="test-page">
 <header id="mt-header"></header>
 
 <main>
-    <section class="hero">
-        <div class="common-container">
-            <div class="hero-content">
-                <h1><span class="hero-title-text">反应测试</span></h1>
-                <p class="hero-subtitle">等待屏幕<span class="hero-underline">变绿</span>，立即作出反应，再<span class="hero-underline">比较你的成绩</span>。</p>
-
-                <nav class="hero-test-links" aria-label="更多测试">
-                    <div class="hero-test-links-viewport">
-                        <div class="hero-test-links-marquee">
-                            <div class="hero-test-links-track">
-                                <a class="hero-test-link--aim" href="/aim-trainer/" target="_blank" rel="noopener">瞄准训练</a>
-                                <a class="hero-test-link--stroop" href="/stroop-test/" target="_blank" rel="noopener">斯特鲁普</a>
-                                <a class="hero-test-link--sequence" href="/sequence-memory-test/" target="_blank" rel="noopener">序列记忆</a>
-                                <a class="hero-test-link--number" href="/number-memory-test/" target="_blank" rel="noopener">数字记忆</a>
-                                <a class="hero-test-link--tracking" href="/multiple-object-tracking-test/" target="_blank" rel="noopener">多目标追踪</a>
-                            </div>
-                            <div class="hero-test-links-track" aria-hidden="true">
-                                <a class="hero-test-link--aim" href="/aim-trainer/" target="_blank" rel="noopener" tabindex="-1">瞄准训练</a>
-                                <a class="hero-test-link--stroop" href="/stroop-test/" target="_blank" rel="noopener" tabindex="-1">斯特鲁普</a>
-                                <a class="hero-test-link--sequence" href="/sequence-memory-test/" target="_blank" rel="noopener" tabindex="-1">序列记忆</a>
-                                <a class="hero-test-link--number" href="/number-memory-test/" target="_blank" rel="noopener" tabindex="-1">数字记忆</a>
-                                <a class="hero-test-link--tracking" href="/multiple-object-tracking-test/" target="_blank" rel="noopener" tabindex="-1">多目标追踪</a>
-                            </div>
-                            <div class="hero-test-links-track" aria-hidden="true">
-                                <a class="hero-test-link--aim" href="/aim-trainer/" target="_blank" rel="noopener" tabindex="-1">瞄准训练</a>
-                                <a class="hero-test-link--stroop" href="/stroop-test/" target="_blank" rel="noopener" tabindex="-1">斯特鲁普</a>
-                                <a class="hero-test-link--sequence" href="/sequence-memory-test/" target="_blank" rel="noopener" tabindex="-1">序列记忆</a>
-                                <a class="hero-test-link--number" href="/number-memory-test/" target="_blank" rel="noopener" tabindex="-1">数字记忆</a>
-                                <a class="hero-test-link--tracking" href="/multiple-object-tracking-test/" target="_blank" rel="noopener" tabindex="-1">多目标追踪</a>
-                            </div>
-                        </div>
-                    </div>
-                </nav>
-            </div>
+    <section class="mt-test-head">
+        <div class="mt-wrap-wide">
+            <h1>反应时间测试</h1>
+            <p>等屏幕变绿，然后尽快点下去。单轮测一次，五轮取平均更稳。</p>
         </div>
     </section>
 
@@ -201,113 +159,105 @@
         </div>
     </section>
 
-    <section id="features" class="features">
-        <div class="common-container">
-            <h2>测试简单，结果有用</h2>
-            <p class="features-subtitle">
-                只保留信号、你的反应，以及真正有助于比较成绩的数据。
-            </p>
-
-            <div class="features-grid">
-                <div class="feature-card">
-                    <span class="feature-kicker">模式</span>
+    <section class="mt-section">
+        <div class="mt-wrap-wide">
+            <div class="mt-section-head">
+                <h2>关于这个测试</h2>
+            </div>
+            <div class="mt-notes">
+                <div class="mt-note">
                     <h3>单轮或五轮</h3>
-                    <p>快速测出一次成绩，或完成五轮，用平均值获得更稳定的参考。</p>
+                    <p>单轮适合快速看一眼。五轮会给出平均值和每轮的差异，更适合用来和自己以前的成绩比。</p>
                 </div>
-
-                <div class="feature-card">
-                    <span class="feature-kicker">计时</span>
-                    <h3>专注测量</h3>
-                    <p>计时从绿色信号出现开始，在第一次有效操作时结束。</p>
+                <div class="mt-note">
+                    <h3>计时从变绿开始</h3>
+                    <p>绿色出现的那一刻开始计时，你第一次有效操作时结束。中间的等待时间是随机的，防止靠节奏预判。</p>
                 </div>
-
-                <div class="feature-card">
-                    <span class="feature-kicker">操作</span>
-                    <h3>各种设备都顺手</h3>
-                    <p>鼠标、触屏、空格键和回车键都能作出反应，选择最自然的方式即可。</p>
+                <div class="mt-note">
+                    <h3>鼠标、触屏、键盘都行</h3>
+                    <p>点击、轻触、空格键或回车键都能作出反应，用最顺手的方式即可。</p>
                 </div>
-
-                <div class="feature-card">
-                    <span class="feature-kicker">结果</span>
-                    <h3>比较清楚</h3>
-                    <p>查看最近、最快和平均时间，完成五轮后还能看到一张简洁图表。</p>
+                <div class="mt-note">
+                    <h3>点早了不算成绩</h3>
+                    <p>绿色出现前点下去会提示“点早了”，这一轮不计入，可以立刻重来。</p>
                 </div>
-
-                <div class="feature-card">
-                    <span class="feature-kicker">记录</span>
-                    <h3>近期成绩</h3>
-                    <p>最多保留 20 次完整测试，方便快速比较最近几次表现。</p>
+                <div class="mt-note">
+                    <h3>最近 20 次</h3>
+                    <p>本机最多保留最近 20 次完整测试，方便快速回看最近几次的状态。</p>
                 </div>
-
-                <div class="feature-card">
-                    <span class="feature-kicker">隐私</span>
-                    <h3>保存在当前设备</h3>
-                    <p>反应时间记录只保存在当前浏览器的本地存储中，无需账号。</p>
+                <div class="mt-note">
+                    <h3>数据不出这台设备</h3>
+                    <p>成绩只写进当前浏览器的本地存储，不需要账号，也不会上传。你可以随时清空。</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <section id="faq" class="faq">
-        <div class="common-container">
-            <h2>常见问题</h2>
-
-            <div class="faq-grid">
-                <div class="faq-item">
-                    <h3>如何进行测试？</h3>
-                    <p>选择模式并开始测试。橙色画面出现时先等待，变成绿色后立即作出反应。</p>
+    <section id="faq" class="mt-section">
+        <div class="mt-wrap-wide">
+            <div class="mt-section-head">
+                <h2>常见问题</h2>
+            </div>
+            <div class="mt-faq">
+                <div class="mt-faq-item">
+                    <button class="mt-faq-q" type="button">怎么测？
+                        <span class="mt-chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+                    </button>
+                    <div class="mt-faq-a"><div class="mt-faq-a-inner">选好模式后点一下开始。画面先变成橙色，这时候等着别动；变绿之后立刻点。</div></div>
                 </div>
-
-                <div class="faq-item">
-                    <h3>如果点早了会怎样？</h3>
-                    <p>本轮会显示“点早了”，不会记录成绩，你可以立即重试同一轮。</p>
+                <div class="mt-faq-item">
+                    <button class="mt-faq-q" type="button">点早了会怎样？
+                        <span class="mt-chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+                    </button>
+                    <div class="mt-faq-a"><div class="mt-faq-a-inner">这一轮会显示“点早了”，成绩不计入，你可以马上重试同一轮。</div></div>
                 </div>
-
-                <div class="faq-item">
-                    <h3>应该选择哪种模式？</h3>
-                    <p>单轮适合快速测试；如果想查看平均值和每轮差异，可以选择五轮。</p>
+                <div class="mt-faq-item">
+                    <button class="mt-faq-q" type="button">该选单轮还是五轮？
+                        <span class="mt-chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+                    </button>
+                    <div class="mt-faq-a"><div class="mt-faq-a-inner">想快速试一下就单轮。想要一个能拿来对比的数字就五轮，单次发挥的运气成分会被平均掉一部分。</div></div>
                 </div>
-
-                <div class="faq-item">
-                    <h3>反应时间多少算快？</h3>
-                    <p>没有一个适合所有人的统一标准。最有意义的方式，是在同一设备上和自己的其他成绩比较。</p>
+                <div class="mt-faq-item">
+                    <button class="mt-faq-q" type="button">多少毫秒算快？
+                        <span class="mt-chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+                    </button>
+                    <div class="mt-faq-a"><div class="mt-faq-a-inner">没有一个适用于所有人的标准。比较有意义的做法，是在同一台设备、同样的输入方式下，和自己以前的成绩比。</div></div>
                 </div>
-
-                <div class="faq-item">
-                    <h3>为什么不同设备上的成绩会变化？</h3>
-                    <p>屏幕刷新率、浏览器性能和输入延迟都会影响记录到的时间。</p>
+                <div class="mt-faq-item">
+                    <button class="mt-faq-q" type="button">为什么换设备成绩就变了？
+                        <span class="mt-chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+                    </button>
+                    <div class="mt-faq-a"><div class="mt-faq-a-inner">屏幕刷新率、浏览器性能和输入延迟都会算进这个数字里。这些差异有时候能有几十毫秒。</div></div>
                 </div>
-
-                <div class="faq-item">
-                    <h3>成绩保存在哪里？</h3>
-                    <p>成绩只保存在当前浏览器的本地存储中，你可以在本页面清除近期测试记录。</p>
+                <div class="mt-faq-item">
+                    <button class="mt-faq-q" type="button">成绩存在哪？
+                        <span class="mt-chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+                    </button>
+                    <div class="mt-faq-a"><div class="mt-faq-a-inner">只在当前浏览器的本地存储里，随时可以在本页清除近期记录。</div></div>
                 </div>
             </div>
+        </div>
+    </section>
+
+    <section class="mt-section">
+        <div class="mt-wrap-wide">
+            <div class="mt-section-head">
+                <h2>换一个测试</h2>
+            </div>
+            <nav class="mt-more" aria-label="其他测试">
+                <a href="/aim-trainer/">瞄准训练<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left:auto"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                <a href="/sequence-memory-test/">序列记忆<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left:auto"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                <a href="/number-memory-test/">数字记忆<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left:auto"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                <a href="/multiple-object-tracking-test/">多目标追踪<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left:auto"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                <a href="/stroop-test/">斯特鲁普<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left:auto"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+            </nav>
         </div>
     </section>
 </main>
 
-<footer>
-    <div class="footer-center-box">
-        <div class="footer-center-content-box">
-            <p>
-                <span class="footer-brand-line">&copy;&nbsp;<span id="currentYear"></span>&nbsp;PickTests</span>
-                <span class="footer-link-line">
-                    <a href="/privacy-policy/">隐私</a>
-                    <a href="/terms-of-use/">条款</a>
-                    <a href="/about/">关于</a>
-                    <a href="mailto:hello@picktests.com">联系</a>
-                </span>
-            </p>
-        </div>
-    </div>
-</footer>
+<footer></footer>
 
-<script src="../assets/js/global.min.js?v=20260830" defer></script>
-
-<script src="../assets/js/reaction-time-test.min.js?v=20260830" defer></script>
-
-
-    <script src="../assets/js/feedback-marker.js?v=20260849" defer></script>
+<script src="/assets/js/reaction-time-test.min.js?v=20260830" defer></script>
+<script src="/assets/js/feedback-marker.js?v=20270101" defer></script>
 </body>
 </html>

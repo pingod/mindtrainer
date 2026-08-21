@@ -1,22 +1,26 @@
-/* ============================================================
- * MindTrainer 全局导航栏 v2（高级设计）
- * 毛玻璃 header · 渐变品牌 · pill 菜单 · 动效下拉 · 渐变 CTA
- * 所有页面共用：<header id="mt-header"></header> + 本脚本
- * ============================================================ */
+/* ==========================================================================
+   MindTrainer — site shell
+   Renders the header and footer on every page so the chrome is defined once.
+   All styling lives in mt.css; this file only builds markup and wires
+   behaviour. Requires <header id="mt-header"></header> in the page.
+   ========================================================================== */
 (function () {
   'use strict';
-  var current = document.getElementById('mt-header');
-  if (!current) return;
 
+  var header = document.getElementById('mt-header');
+  if (!header) return;
+
+  /* Information architecture is unchanged from the previous site:
+     same labels, same URLs, same grouping. Only the presentation is new. */
   var NAV = [
     { label: '首页', href: '/' },
     { label: '认知测试', children: [
-      { label: '反应时间', href: '/reaction-time-test/' },
-      { label: '瞄准训练', href: '/aim-trainer/' },
-      { label: '序列记忆', href: '/sequence-memory-test/' },
-      { label: '数字记忆', href: '/number-memory-test/' },
+      { label: '反应时间',   href: '/reaction-time-test/' },
+      { label: '瞄准训练',   href: '/aim-trainer/' },
+      { label: '序列记忆',   href: '/sequence-memory-test/' },
+      { label: '数字记忆',   href: '/number-memory-test/' },
       { label: '多目标追踪', href: '/multiple-object-tracking-test/' },
-      { label: '斯特鲁普', href: '/stroop-test/' }
+      { label: '斯特鲁普',   href: '/stroop-test/' }
     ]},
     { label: '飞克视读', children: [
       { label: '基础训练', href: '/speed-read/basic.html' },
@@ -29,125 +33,149 @@
   ];
 
   var path = location.pathname;
+
   function isActive(item) {
     if (item.href === '/') return path === '/' || path === '/index.html';
-    if (item.href === '/speed-read/') return /^\/speed-read\/?$/.test(path);
-    if (item.href.indexOf('/speed-read/') === 0) return path.indexOf(item.href) === 0;
     return path.indexOf(item.href) === 0;
   }
-  function isGroupActive(group) { return group.children.some(isActive); }
   function esc(s) {
-    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
-  var itemsHtml = NAV.map(function (item) {
-    if (item.children) {
-      var active = isGroupActive(item);
-      var sub = item.children.map(function (c) {
-        var a = isActive(c);
-        return '<a class="mt-sub' + (a ? ' mt-sub-active' : '') + '" href="' + esc(c.href) + '">' +
-          '<span class="mt-sub-dot"></span>' + esc(c.label) + '</a>';
-      }).join('');
-      return '<div class="mt-menu-item mt-dropdown' + (active ? ' mt-active' : '') + '">' +
-        '<button type="button" class="mt-menu-btn">' + esc(item.label) +
-        '<svg class="mt-caret" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></button>' +
-        '<div class="mt-dropdown-panel">' + sub + '</div></div>';
+  var CARET = '<svg class="mt-caret" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
+
+  /* ------------------------------------------------------------- header -- */
+  var items = NAV.map(function (item, i) {
+    if (!item.children) {
+      return '<a class="mt-nav-item mt-nav-link' + (isActive(item) ? ' is-active' : '') +
+             '" href="' + esc(item.href) + '">' + esc(item.label) + '</a>';
     }
-    return '<a class="mt-menu-item mt-menu-link' + (isActive(item) ? ' mt-active' : '') + '" href="' + esc(item.href) + '">' + esc(item.label) + '</a>';
+    var open = item.children.some(isActive);
+    var subs = item.children.map(function (c) {
+      return '<a href="' + esc(c.href) + '"' + (isActive(c) ? ' class="is-active"' : '') + '>' +
+             esc(c.label) + '</a>';
+    }).join('');
+    return '<div class="mt-nav-item mt-has-pop' + (open ? ' is-active' : '') + '">' +
+             '<button type="button" class="mt-nav-btn" aria-expanded="false" aria-controls="mt-pop-' + i + '">' +
+               esc(item.label) + CARET +
+             '</button>' +
+             '<div class="mt-pop" id="mt-pop-' + i + '">' + subs + '</div>' +
+           '</div>';
   }).join('');
 
-  /* ---- 高级导航样式（覆盖原站 header 视觉）---- */
-  var style = document.createElement('style');
-  style.textContent = [
-    /* header 容器：毛玻璃 */
-    '#mt-header{position:fixed;top:0;left:0;right:0;z-index:10240;height:72px;padding:0 28px;',
-    '  display:flex;align-items:center;justify-content:space-between;',
-    '  background:rgba(255,255,255,.68);',
-    '  -webkit-backdrop-filter:blur(22px) saturate(1.5);backdrop-filter:blur(22px) saturate(1.5);',
-    '  border-bottom:1px solid rgba(226,232,240,.7);',
-    '  box-shadow:0 1px 2px rgba(15,23,42,.03),0 12px 32px -16px rgba(15,23,42,.12);}',
-    /* main 让位同步（原站 128px → 72px）；首页 hero 自带 padding-top，通过 body>main 覆盖 */
-    'main{margin-top:72px !important;}',
-    /* 品牌 */
-    '.mt-brand{display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0}',
-    '.mt-brand-icon{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;',
-    '  background:linear-gradient(135deg,#2563eb,#3b82f6 55%,#60a5fa);color:#fff;font-size:19px;',
-    '  box-shadow:0 6px 16px -6px rgba(37,99,235,.55);}',
-    '.mt-brand-text{font-size:18px;font-weight:800;letter-spacing:-.02em;',
-    '  background:linear-gradient(120deg,#0f172a,#1d4ed8);-webkit-background-clip:text;background-clip:text;color:transparent;}',
-    /* 菜单 */
-    '.mt-menu{display:flex;align-items:center;gap:4px;margin-left:auto;margin-right:16px}',
-    '.mt-menu-item{position:relative;display:flex;align-items:center}',
-    '.mt-menu-link,.mt-menu-btn{font:inherit;font-size:14.5px;font-weight:500;color:#475569;text-decoration:none;',
-    '  background:none;border:0;padding:9px 15px;border-radius:999px;cursor:pointer;',
-    '  display:flex;align-items:center;gap:5px;transition:background .15s ease,color .15s ease,transform .1s ease;}',
-    '.mt-menu-link:hover,.mt-menu-btn:hover{background:rgba(241,245,249,.95);color:#0f172a}',
-    '.mt-menu-link:active,.mt-menu-btn:active{transform:scale(.97)}',
-    '.mt-menu-item.mt-active>.mt-menu-link,.mt-menu-item.mt-active>.mt-menu-btn{',
-    '  background:linear-gradient(120deg,rgba(37,99,235,.12),rgba(139,92,246,.12));color:#1d4ed8;font-weight:700}',
-    '.mt-caret{transition:transform .18s ease;opacity:.65}',
-    '.mt-dropdown:hover .mt-caret{transform:rotate(180deg)}',
-    /* 下拉面板：毛玻璃卡片 */
-    '.mt-dropdown-panel{display:none;position:absolute;top:calc(100% + 10px);left:50%;transform:translateX(-50%) translateY(-4px);',
-    '  min-width:196px;padding:8px;border-radius:16px;',
-    '  background:rgba(255,255,255,.9);-webkit-backdrop-filter:blur(18px) saturate(1.3);backdrop-filter:blur(18px) saturate(1.3);',
-    '  border:1px solid rgba(226,232,240,.85);box-shadow:0 18px 48px -12px rgba(15,23,42,.18);',
-    '  opacity:0;visibility:hidden;transition:opacity .16s ease,transform .16s ease,visibility .16s;z-index:20480;flex-direction:column;}',
-    '.mt-dropdown-panel::before{content:"";position:absolute;top:-5px;left:50%;transform:translateX(-50%) rotate(45deg);',
-    '  width:10px;height:10px;background:rgba(255,255,255,.95);border-left:1px solid rgba(226,232,240,.85);border-top:1px solid rgba(226,232,240,.85);}',
-    /* hover 桥：覆盖按钮与面板之间的 10px 缝隙，鼠标移过缝隙时 hover 不中断 */
-    '.mt-dropdown-panel::after{content:"";position:absolute;top:-10px;left:0;right:0;height:10px}',
-    '.mt-dropdown:hover .mt-dropdown-panel,.mt-dropdown.open .mt-dropdown-panel{display:flex;opacity:1;visibility:visible;transform:translateX(-50%) translateY(0)}',
-    '.mt-sub{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;font-size:14px;color:#334155;',
-    '  text-decoration:none;white-space:nowrap;transition:background .12s ease,color .12s ease;font-weight:500}',
-    '.mt-sub:hover{background:rgba(37,99,235,.08);color:#1d4ed8}',
-    '.mt-sub-dot{width:6px;height:6px;border-radius:50%;background:#cbd5e1;transition:background .15s ease,transform .15s ease;flex-shrink:0}',
-    '.mt-sub:hover .mt-sub-dot{background:#3b82f6;transform:scale(1.3)}',
-    '.mt-sub-active{background:rgba(37,99,235,.1);color:#1d4ed8;font-weight:700}',
-    '.mt-sub-active .mt-sub-dot{background:#2563eb}',
-    /* CTA 按钮 */
-    '  font-size:14px;font-weight:700;color:#fff;text-decoration:none;',
-    '  background:linear-gradient(120deg,#172554,#1e3a8a);',
-    '  box-shadow:0 8px 20px -8px rgba(15,23,42,.5);transition:transform .12s ease,box-shadow .2s ease;}',
-    /* 响应式 */
-    '@media (max-width:900px){#mt-header{padding:0 16px}.mt-menu{gap:2px}.mt-menu-link,.mt-menu-btn{padding:8px 10px;font-size:13.5px}.mt-brand-text{font-size:16px}}',
-  ].join('\n');
-  document.head.appendChild(style);
-
-  /* ---- 组装 header ---- */
-  current.innerHTML =
-    '<a class="mt-brand" href="/">' +
-    '<span class="mt-brand-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l14 9-6 1 3 8-14-9 6-1-3-8z"/></svg></span>' +
-    '<span class="mt-brand-text">MindTrainer</span>' +
+  header.innerHTML =
+    '<a class="mt-brand" href="/" aria-label="MindTrainer 首页">' +
+      '<span class="mt-brand-mark">' +
+        '<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+          '<path d="M12 4a4 4 0 0 0-4 4 3.5 3.5 0 0 0-1 6.8V17a3 3 0 0 0 5 2.2A3 3 0 0 0 17 17v-2.2A3.5 3.5 0 0 0 16 8a4 4 0 0 0-4-4Z"/>' +
+          '<path d="M12 4v16"/>' +
+        '</svg>' +
+      '</span>' +
+      '<span class="mt-brand-name">MindTrainer</span>' +
     '</a>' +
-    '<nav class="mt-menu" aria-label="主导航">' + itemsHtml + '</nav>';
+    '<nav class="mt-nav" aria-label="主导航">' + items + '</nav>' +
+    '<button type="button" class="mt-theme" aria-label="切换深色模式" title="切换深色模式">' +
+      '<svg class="mt-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>' +
+      '<svg class="mt-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>' +
+    '</button>' +
+    '<button type="button" class="mt-burger" aria-label="打开菜单" aria-expanded="false">' +
+      '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>' +
+    '</button>';
 
-  /* 下拉菜单防抖关闭：mouseenter 打开、mouseleave 延迟 250ms 关闭，
-   * 快速或斜向移动鼠标时有缓冲，不会中途自动关闭（配合 CSS hover 桥） */
-  document.querySelectorAll('.mt-dropdown').forEach(function (dd) {
+  /* ------------------------------------------------------------- footer -- */
+  var footer = document.querySelector('footer');
+  if (footer) {
+    footer.className = 'mt-footer';
+    footer.innerHTML =
+      '<div class="mt-wrap mt-footer-inner">' +
+        '<span class="mt-footer-brand">© ' + new Date().getFullYear() + ' MindTrainer</span>' +
+        '<span class="mt-footer-links">' +
+          '<a href="/about/">关于</a>' +
+          '<a href="/privacy-policy/">隐私政策</a>' +
+          '<a href="/terms-of-use/">使用条款</a>' +
+          '<a href="mailto:hello@picktests.com">联系</a>' +
+        '</span>' +
+      '</div>';
+  }
+
+  /* ---------------------------------------------------------- behaviour -- */
+  var pops = Array.prototype.slice.call(header.querySelectorAll('.mt-has-pop'));
+  var desktop = window.matchMedia('(min-width: 901px)');
+
+  function closeAll(except) {
+    pops.forEach(function (p) {
+      if (p === except) return;
+      p.classList.remove('is-open');
+      var b = p.querySelector('.mt-nav-btn');
+      if (b) b.setAttribute('aria-expanded', 'false');
+    });
+  }
+  function setOpen(item, open) {
+    item.classList.toggle('is-open', open);
+    var b = item.querySelector('.mt-nav-btn');
+    if (b) b.setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+
+  pops.forEach(function (item) {
     var timer = null;
-    function open() { if (timer) clearTimeout(timer); dd.classList.add('open'); }
-    function close() { if (timer) clearTimeout(timer); timer = setTimeout(function () { dd.classList.remove('open'); }, 250); }
-    dd.addEventListener('mouseenter', open);
-    dd.addEventListener('mouseleave', close);
-    var panel = dd.querySelector('.mt-dropdown-panel');
-    if (panel) {
-      panel.addEventListener('mouseenter', open);
-      panel.addEventListener('mouseleave', close);
-    }
+    var btn = item.querySelector('.mt-nav-btn');
+
+    // Desktop: hover with a close delay so a diagonal cursor path is forgiving.
+    item.addEventListener('mouseenter', function () {
+      if (!desktop.matches) return;
+      clearTimeout(timer);
+      closeAll(item);
+      setOpen(item, true);
+    });
+    item.addEventListener('mouseleave', function () {
+      if (!desktop.matches) return;
+      clearTimeout(timer);
+      timer = setTimeout(function () { setOpen(item, false); }, 220);
+    });
+
+    // Click works in both modes, and is the only path on touch.
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      var willOpen = !item.classList.contains('is-open');
+      closeAll(item);
+      setOpen(item, willOpen);
+    });
   });
 
-  /* 移动端：点击展开下拉 */
   document.addEventListener('click', function (e) {
-    var dd = e.target.closest ? e.target.closest('.mt-dropdown') : null;
-    var menu = dd && dd.querySelector('.mt-dropdown-panel');
-    document.querySelectorAll('.mt-dropdown.open').forEach(function (el) {
-      if (el !== dd) el.classList.remove('open');
-    });
-    if (dd) {
-      if (!menu || !menu.contains(e.target)) {
-        dd.classList.toggle('open');
-      }
+    if (!header.contains(e.target)) {
+      closeAll(null);
+      setMenu(false);
     }
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') { closeAll(null); setMenu(false); }
+  });
+
+  /* mobile drawer */
+  var burger = header.querySelector('.mt-burger');
+  function setMenu(open) {
+    header.classList.toggle('is-menu-open', open);
+    burger.setAttribute('aria-expanded', open ? 'true' : 'false');
+    burger.setAttribute('aria-label', open ? '关闭菜单' : '打开菜单');
+    if (!open) closeAll(null);
+  }
+  burger.addEventListener('click', function (e) {
+    e.stopPropagation();
+    setMenu(!header.classList.contains('is-menu-open'));
+  });
+  desktop.addEventListener('change', function () { setMenu(false); closeAll(null); });
+
+  /* theme toggle — falls back to the OS preference until the user chooses */
+  var root = document.documentElement;
+  header.querySelector('.mt-theme').addEventListener('click', function () {
+    var isDark = root.getAttribute('data-theme') === 'dark' ||
+      (!root.getAttribute('data-theme') &&
+        window.matchMedia('(prefers-color-scheme: dark)').matches);
+    var next = isDark ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('mt-theme', next); } catch (err) {}
   });
 })();

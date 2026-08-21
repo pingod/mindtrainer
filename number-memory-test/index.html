@@ -32,56 +32,23 @@
     <meta name="twitter:description" content="免费在线数字记忆测试。记住屏幕上的数字，在它消失后完整输入，答对后下一轮会增加一位。支持经典、倒序和逐位显示三种模式。">
     <meta name="twitter:image" content="https://picktests.com/assets/images/og/og-image.png">
 
-    <link rel="stylesheet" href="../assets/css/global.min.css?v=20260830">
-    <link rel="stylesheet" href="../assets/css/style.min.css?v=20260830">
+<!-- theme bootstrap: applied before first paint so there is no flash -->
+    <script>try{var t=localStorage.getItem('mt-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
 
-    <link rel="stylesheet" href="../assets/css/number-memory-test.min.css?v=20260830">
-    <script src="/assets/js/mt-nav.js?v=20260864" defer></script>
-<style>
-  /* 测试区域加宽：充分利用宽屏版面 */
-  .common-container { max-width: min(100%, 1650px); }
-  .number-page, .aim-page, .sequence-page, .tracking-page, .stroop-page, .reaction-page { width: min(1650px, 100%); max-width: min(1650px, 100%); }
-</style>
-    <link rel="stylesheet" href="../assets/css/theme.css?v=20260860">
+    <link rel="stylesheet" href="/assets/css/mt.css?v=20270101">
+    <link rel="stylesheet" href="/assets/css/number-memory-test.min.css?v=20260830">
+    <link rel="stylesheet" href="/assets/css/mt-stage.css?v=20270101">
+    <script src="/assets/js/mt-nav.js?v=20270101" defer></script>
+    <script src="/assets/js/mt-app.js?v=20270101" defer></script>
 </head>
 <body class="test-page">
 <header id="mt-header"></header>
 
 <main>
-    <section class="hero">
-        <div class="common-container">
-            <div class="hero-content">
-                <h1><span class="hero-title-text">数字记忆</span></h1>
-                <p class="hero-subtitle">把数字记在心里，<span class="hero-underline">再完整输入出来</span>。</p>
-
-                <nav class="hero-test-links" aria-label="更多测试">
-                    <div class="hero-test-links-viewport">
-                        <div class="hero-test-links-marquee">
-                            <div class="hero-test-links-track">
-                                <a class="hero-test-link--reaction" href="/reaction-time-test/" target="_blank" rel="noopener">反应时间</a>
-                                <a class="hero-test-link--aim" href="/aim-trainer/" target="_blank" rel="noopener">瞄准训练</a>
-                                <a class="hero-test-link--stroop" href="/stroop-test/" target="_blank" rel="noopener">斯特鲁普</a>
-                                <a class="hero-test-link--sequence" href="/sequence-memory-test/" target="_blank" rel="noopener">序列记忆</a>
-                                <a class="hero-test-link--tracking" href="/multiple-object-tracking-test/" target="_blank" rel="noopener">多目标追踪</a>
-                            </div>
-                            <div class="hero-test-links-track" aria-hidden="true">
-                                <a class="hero-test-link--reaction" href="/reaction-time-test/" target="_blank" rel="noopener" tabindex="-1">反应时间</a>
-                                <a class="hero-test-link--aim" href="/aim-trainer/" target="_blank" rel="noopener" tabindex="-1">瞄准训练</a>
-                                <a class="hero-test-link--stroop" href="/stroop-test/" target="_blank" rel="noopener" tabindex="-1">斯特鲁普</a>
-                                <a class="hero-test-link--sequence" href="/sequence-memory-test/" target="_blank" rel="noopener" tabindex="-1">序列记忆</a>
-                                <a class="hero-test-link--tracking" href="/multiple-object-tracking-test/" target="_blank" rel="noopener" tabindex="-1">多目标追踪</a>
-                            </div>
-                            <div class="hero-test-links-track" aria-hidden="true">
-                                <a class="hero-test-link--reaction" href="/reaction-time-test/" target="_blank" rel="noopener" tabindex="-1">反应时间</a>
-                                <a class="hero-test-link--aim" href="/aim-trainer/" target="_blank" rel="noopener" tabindex="-1">瞄准训练</a>
-                                <a class="hero-test-link--stroop" href="/stroop-test/" target="_blank" rel="noopener" tabindex="-1">斯特鲁普</a>
-                                <a class="hero-test-link--sequence" href="/sequence-memory-test/" target="_blank" rel="noopener" tabindex="-1">序列记忆</a>
-                                <a class="hero-test-link--tracking" href="/multiple-object-tracking-test/" target="_blank" rel="noopener" tabindex="-1">多目标追踪</a>
-                            </div>
-                        </div>
-                    </div>
-                </nav>
-            </div>
+    <section class="mt-test-head">
+        <div class="mt-wrap-wide">
+            <h1>数字记忆测试</h1>
+            <p>数字出现几秒后消失，把它原样打出来。答对一次，下一轮就多一位。</p>
         </div>
     </section>
 
@@ -109,16 +76,6 @@
                 </label>
             </fieldset>
             <p class="number-mode-help" id="numberModeHelp">查看完整数字，再按原样输入。</p>
-            <style>
-                /* 增强模式选项的可点击视觉反馈（未选中项 hover 明显可点） */
-                .number-mode-picker span { transition: color 180ms ease-out, background 180ms ease-out, box-shadow 180ms ease-out; }
-                .number-mode-picker:not(:disabled) label:hover span {
-                    background: rgba(35, 122, 94, .09);
-                    box-shadow: inset 0 0 0 1.5px rgba(35, 122, 94, .35);
-                    color: var(--number-green-dark);
-                }
-                .number-mode-picker input:checked+span { font-weight: 750; }
-            </style>
 
             <div class="number-stage-shell" id="numberStageShell" data-fullscreen="false">
                 <div class="number-stage-tools">
@@ -231,101 +188,105 @@
         </div>
     </section>
 
-    <section id="features" class="features number-features">
-        <div class="common-container">
-            <h2>一个数字，一次清楚的挑战</h2>
-            <p class="features-subtitle">平静的节奏、清楚的反馈，以及一份有用的个人记录。</p>
-
-            <div class="features-grid">
-                <div class="feature-card">
-                    <span class="feature-kicker">增长</span>
-                    <h3>下一步始终清楚</h3>
-                    <p>每答对一次就增加一位数字，下一轮为什么更难，一目了然。</p>
+    <section class="mt-section">
+        <div class="mt-wrap-wide">
+            <div class="mt-section-head">
+                <h2>关于这个测试</h2>
+            </div>
+            <div class="mt-notes">
+                <div class="mt-note">
+                    <h3>每答对一次就多一位</h3>
+                    <p>难度是线性上升的，所以你很清楚下一轮为什么更难，也知道自己卡在第几位。</p>
                 </div>
-                <div class="feature-card">
-                    <span class="feature-kicker">节奏</span>
-                    <h3>留出记忆时间</h3>
-                    <p>数字越长，完整显示的时间也会稍微增加；逐位模式则保持稳定节奏。</p>
+                <div class="mt-note">
+                    <h3>显示时间会跟着变长</h3>
+                    <p>经典和倒序模式里，一位数显示 1.2 秒，之后每多一位多给 0.4 秒。逐位模式保持固定节奏。</p>
                 </div>
-                <div class="feature-card">
-                    <span class="feature-kicker">模式</span>
-                    <h3>三种专注方式</h3>
-                    <p>按原样输入、倒序输入，或者逐位观察后再输入完整数字。</p>
+                <div class="mt-note">
+                    <h3>三种模式</h3>
+                    <p>经典是原样输入，倒序是反着输入，逐位显示则是一位一位地给你看，最后一次性输入。</p>
                 </div>
-                <div class="feature-card">
-                    <span class="feature-kicker">反馈</span>
-                    <h3>看清差在哪里</h3>
-                    <p>答错后逐位比较正确答案与你的输入，不让结果含糊不清。</p>
+                <div class="mt-note">
+                    <h3>答错会告诉你差在哪</h3>
+                    <p>错了以后会把正确答案和你的输入并排列出来，可以直接看出是哪一位记岔了。</p>
                 </div>
-                <div class="feature-card">
-                    <span class="feature-kicker">进度</span>
-                    <h3>只比较重要的</h3>
-                    <p>查看上一次、个人最佳，以及这次是否比上次记得更长。</p>
+                <div class="mt-note">
+                    <h3>分段记是有用的</h3>
+                    <p>把长数字切成几组短的再记，是很常见也确实有效的办法，这里不限制你怎么记。</p>
                 </div>
-                <div class="feature-card">
-                    <span class="feature-kicker">隐私</span>
-                    <h3>只保存在当前浏览器</h3>
-                    <p>每种模式最近 20 次完整测试只保存在这台设备，不会上传。</p>
+                <div class="mt-note">
+                    <h3>数据不出这台设备</h3>
+                    <p>每种模式各保留最近 20 次完整测试，只写进当前浏览器，不会上传。</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <section id="faq" class="faq">
-        <div class="common-container">
-            <h2>常见问题</h2>
-
-            <div class="faq-grid">
-                <div class="faq-item">
-                    <h3>测试如何进行？</h3>
-                    <p>经典模式显示完整数字；倒序模式显示方式相同，但需要反向输入；逐位模式一次显示一位。每答对一次，下一轮就增加一位。</p>
+    <section id="faq" class="mt-section">
+        <div class="mt-wrap-wide">
+            <div class="mt-section-head">
+                <h2>常见问题</h2>
+            </div>
+            <div class="mt-faq">
+                <div class="mt-faq-item">
+                    <button class="mt-faq-q" type="button">怎么测？
+                        <span class="mt-chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+                    </button>
+                    <div class="mt-faq-a"><div class="mt-faq-a-inner">经典模式给你看完整数字；倒序模式一样显示，但要反着输入；逐位模式一次只给一位。答对就进入下一轮，位数加一。</div></div>
                 </div>
-                <div class="faq-item">
-                    <h3>成绩如何计算？</h3>
-                    <p>成绩是你正确记住的最长数字位数。8 位表示你完成了八位数那一轮，每种模式会分别保存记录。</p>
+                <div class="mt-faq-item">
+                    <button class="mt-faq-q" type="button">成绩怎么算？
+                        <span class="mt-chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+                    </button>
+                    <div class="mt-faq-a"><div class="mt-faq-a-inner">成绩就是你答对的最长位数。8 位表示你完整通过了八位数那一轮。三种模式的记录分开存。</div></div>
                 </div>
-                <div class="faq-item">
-                    <h3>数字会显示多久？</h3>
-                    <p>经典和倒序模式中，一位数字显示 1.2 秒，每增加一位会多显示 0.4 秒。逐位模式中，每位显示约半秒，随后有短暂停顿。</p>
+                <div class="mt-faq-item">
+                    <button class="mt-faq-q" type="button">数字显示多久？
+                        <span class="mt-chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+                    </button>
+                    <div class="mt-faq-a"><div class="mt-faq-a-inner">经典和倒序：一位数 1.2 秒，之后每多一位加 0.4 秒。逐位显示：每位约半秒，中间有短暂停顿。</div></div>
                 </div>
-                <div class="faq-item">
-                    <h3>答错后会怎样？</h3>
-                    <p>一次错误就会结束本次测试。你可以比较正确答案和自己的输入，然后立即重新开始。</p>
+                <div class="mt-faq-item">
+                    <button class="mt-faq-q" type="button">答错了会怎样？
+                        <span class="mt-chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+                    </button>
+                    <div class="mt-faq-a"><div class="mt-faq-a-inner">一次错就结束本轮测试。你可以对照一下正确答案和自己的输入，然后马上重来。</div></div>
                 </div>
-                <div class="faq-item">
-                    <h3>可以使用记忆技巧吗？</h3>
-                    <p>可以。把长数字分成几个更小的片段，是一种常见而有效的记忆方式。</p>
+                <div class="mt-faq-item">
+                    <button class="mt-faq-q" type="button">可以用记忆技巧吗？
+                        <span class="mt-chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+                    </button>
+                    <div class="mt-faq-a"><div class="mt-faq-a-inner">可以，随便用。分段、编故事、联想都行，这本来就是记忆训练的一部分。</div></div>
                 </div>
-                <div class="faq-item">
-                    <h3>成绩保存在哪里？</h3>
-                    <p>完整成绩只保存在当前浏览器。中断的测试不会保存，你也可以随时清除记录。</p>
+                <div class="mt-faq-item">
+                    <button class="mt-faq-q" type="button">成绩存在哪？
+                        <span class="mt-chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+                    </button>
+                    <div class="mt-faq-a"><div class="mt-faq-a-inner">只在当前浏览器的本地存储里。中途退出的不保存，已有记录可以随时清除。</div></div>
                 </div>
             </div>
+        </div>
+    </section>
+
+    <section class="mt-section">
+        <div class="mt-wrap-wide">
+            <div class="mt-section-head">
+                <h2>换一个测试</h2>
+            </div>
+            <nav class="mt-more" aria-label="其他测试">
+                <a href="/reaction-time-test/">反应时间<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left:auto"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                <a href="/aim-trainer/">瞄准训练<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left:auto"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                <a href="/sequence-memory-test/">序列记忆<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left:auto"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                <a href="/multiple-object-tracking-test/">多目标追踪<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left:auto"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                <a href="/stroop-test/">斯特鲁普<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left:auto"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+            </nav>
         </div>
     </section>
 </main>
 
-<footer>
-    <div class="footer-center-box">
-        <div class="footer-center-content-box">
-            <p>
-                <span class="footer-brand-line">&copy;&nbsp;<span id="currentYear"></span>&nbsp;PickTests</span>
-                <span class="footer-link-line">
-                    <a href="/privacy-policy/">隐私</a>
-                    <a href="/terms-of-use/">条款</a>
-                    <a href="/about/">关于</a>
-                    <a href="mailto:hello@picktests.com">联系</a>
-                </span>
-            </p>
-        </div>
-    </div>
-</footer>
+<footer></footer>
 
-<script src="../assets/js/global.min.js?v=20260830" defer></script>
-
-<script src="../assets/js/number-memory-test.min.js?v=20260830" defer></script>
-
-
-    <script src="../assets/js/feedback-marker.js?v=20260849" defer></script>
+<script src="/assets/js/number-memory-test.min.js?v=20260830" defer></script>
+<script src="/assets/js/feedback-marker.js?v=20270101" defer></script>
 </body>
 </html>

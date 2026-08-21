@@ -1,264 +1,200 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>关于 MindTrainer – 认知测试与速读训练</title>
+    <meta name="description" content="MindTrainer：6 项认知测试 + 飞克视读 Web 重写版（50+ 项速读训练）。纯前端本地运行，无账号，数据只留在你的浏览器里。">
 
-    <meta name="description" content="MindTrainer 脑力训练场：认知测试（反应、瞄准、记忆、专注）+ 飞克视读 Web 重写版（速读训练 50+ 项）。纯前端本地运行，数据只保存在浏览器。">
-
-    <link rel="apple-touch-icon" sizes="180x180" href="../assets/images/icons/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="../assets/images/icons/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="../assets/images/icons/favicon-16x16.png">
-
-    <link rel="manifest" href="../site.webmanifest">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/icons/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
 
     <meta property="og:title" content="关于 MindTrainer – 认知测试与速读训练">
-    <meta property="og:description" content="MindTrainer 脑力训练场：认知测试 + 飞克视读 Web 重写版。纯前端本地运行。">
-    <meta property="og:image" content="/assets/images/og/og-image.png">
+    <meta property="og:description" content="6 项认知测试 + 飞克视读 Web 重写版。纯前端本地运行。">
     <meta property="og:type" content="website">
 
-    <link rel="stylesheet" href="../assets/css/global.min.css?v=20260830">
-    <link rel="stylesheet" href="../assets/css/style.min.css?v=20260830">
-    <link rel="stylesheet" href="../assets/css/about.min.css?v=20260830">
-    <script src="/assets/js/mt-nav.js?v=20260864" defer></script>
-    <style>
-        /* 飞克视读模块卡 */
-        .about-feature-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; margin-top: 28px; }
-        .about-feature-card {
-            display: block; text-decoration: none; color: inherit;
-            background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px;
-            padding: 18px; transition: transform .14s ease, box-shadow .14s ease, border-color .14s ease;
-        }
-        .about-feature-card:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgb(15 23 42 / 8%); border-color: #c7d2fe; }
-        .about-feature-card .af-icon { font-size: 24px; display: block; margin-bottom: 8px; }
-        .about-feature-card h3 { font-size: 15px; margin: 0 0 6px; color: #0f172a; }
-        .about-feature-card p { font-size: 13px; line-height: 1.6; color: #64748b; margin: 0; }
-        .about-feature-card .af-count { display: inline-block; margin-top: 10px; font-size: 11px; color: #4f46e5; background: rgba(99,102,241,.1); border-radius: 999px; padding: 2px 9px; font-weight: 600; }
-        .about-cta-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 22px; }
-        .about-cta {
-            display: inline-flex; align-items: center; gap: 6px; text-decoration: none;
-            padding: 11px 22px; border-radius: 999px; font-size: 14px; font-weight: 700;
-            background: linear-gradient(120deg, #0f172a, #1e293b); color: #fff;
-            box-shadow: 0 8px 20px -8px rgb(15 23 42 / .5); transition: transform .12s ease, box-shadow .2s ease;
-        }
-        .about-cta:hover { transform: translateY(-1px); }
-        .about-cta.about-cta-ghost { background: #fff; color: #0f172a; border: 1px solid #e2e8f0; box-shadow: none; }
-        .about-cta.about-cta-ghost:hover { background: #f8fafc; }
-    </style>
-    <link rel="stylesheet" href="../assets/css/theme.css?v=20260860">
+    <script>try{var t=localStorage.getItem('mt-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+    <link rel="stylesheet" href="/assets/css/mt.css?v=20270101">
+    <script src="/assets/js/mt-nav.js?v=20270101" defer></script>
+    <script src="/assets/js/mt-app.js?v=20270101" defer></script>
 </head>
-<body class="about-page">
+<body>
 <header id="mt-header"></header>
 
 <main>
-    <article class="about-content">
-        <div class="about-shell">
-            <section class="about-hero" aria-labelledby="about-title">
-                <p class="about-label">脑力训练场</p>
-                <h1 id="about-title">关于 MindTrainer</h1>
-                <p class="about-intro">MindTrainer 是一个本地运行的脑力训练平台，包含<b>认知测试</b>与<b>速读训练</b>两大部分。认知测试用于测量反应、瞄准、记忆与专注；速读训练完整重写了经典软件「飞克视读」的七大训练模块。</p>
-                <p class="about-hero-note">全部纯前端运行，无需账号、无需下载，数据只保存在你自己的浏览器里。</p>
-
-                <div class="about-summary">
-                    <div>
-                        <h2>它是什么</h2>
-                        <p>六项认知测试 + 飞克视读 Web 重写版（七大模块、50+ 项训练）的一体化平台。</p>
-                    </div>
-                    <div>
-                        <h2>怎么使用</h2>
-                        <p>测试即点即用；训练按原版方法说明逐步进行，还能制定自己的训练计划一键执行。</p>
-                    </div>
-                    <div>
-                        <h2>我们在意什么</h2>
-                        <p>结果清楚、方法忠实还原、界面不打扰、数据完全本地。</p>
-                    </div>
-                </div>
-
-                <nav class="about-jump-links" aria-label="关于页面章节">
-                    <a href="#about-tests">认知测试</a>
-                    <a href="#about-speedread">飞克视读</a>
-                    <a href="#about-approach">设计原则</a>
-                    <a href="#about-results">结果记录</a>
-                </nav>
-            </section>
-
-            <section id="about-tests" class="about-tests" aria-labelledby="about-tests-title">
-                <div class="about-section-heading">
-                    <p class="about-label">认知测试</p>
-                    <h2 id="about-tests-title">六项测试，测量反应、瞄准、记忆与专注。</h2>
-                    <p>有些测量速度，有些需要你记住、追踪、保持专注，或在难度提高时继续保持准确。</p>
-                </div>
-
-                <div class="about-test-list">
-                    <a href="/reaction-time-test/">
-                        <span>反应</span>
-                        <h3>反应时间</h3>
-                        <p>在屏幕变化时作出反应，看看这次用了多少毫秒。</p>
-                    </a>
-                    <a href="/aim-trainer/">
-                        <span>瞄准</span>
-                        <h3>瞄准训练</h3>
-                        <p>快速击中目标，同时兼顾速度、准确率和失误次数。</p>
-                    </a>
-                    <a href="/sequence-memory-test/">
-                        <span>记忆</span>
-                        <h3>序列记忆</h3>
-                        <p>观察不断变长的方块序列，再按正确顺序重复。</p>
-                    </a>
-                    <a href="/number-memory-test/">
-                        <span>记忆</span>
-                        <h3>数字记忆</h3>
-                        <p>记住消失前的数字，随着进度逐渐挑战更多位数。</p>
-                    </a>
-                    <a href="/multiple-object-tracking-test/">
-                        <span>注意力</span>
-                        <h3>多目标追踪</h3>
-                        <p>在相同的干扰物之间，持续追踪被标记的目标。</p>
-                    </a>
-                    <a href="/stroop-test/">
-                        <span>专注</span>
-                        <h3>斯特鲁普</h3>
-                        <p>在文字、文字颜色或背景造成干扰时，选出正确颜色。</p>
-                    </a>
-                </div>
-            </section>
-
-            <section id="about-speedread" class="about-tests" aria-labelledby="about-speedread-title">
-                <div class="about-section-heading">
-                    <p class="about-label">速读训练 · 经典重写</p>
-                    <h2 id="about-speedread-title">从「飞克视读」到 Web 版，经典功能完整保留。</h2>
-                    <p>「飞克视读」是上海 fiercelc 团队 2009 年起发布的速读与右脑开发训练软件，融合了闪视、速读、照相记忆等数十种训练方法。MindTrainer 用现代 Web 技术（Canvas 动画、Web Audio 双耳节拍）将其全量重写，每个训练都附原版训练方法说明。</p>
-                </div>
-
-                <div class="about-feature-list">
-                    <a class="about-feature-card" href="/speed-read/basic.html">
-                        <span class="af-icon">👁️</span>
-                        <h3>基础训练</h3>
-                        <p>视野扩展与眼球运动：发散箭头、拓宽、移动路线、凝视、舒尔特视读表。</p>
-                        <span class="af-count">26 项训练</span>
-                    </a>
-                    <a class="about-feature-card" href="/speed-read/flash.html">
-                        <span class="af-icon">⚡</span>
-                        <h3>闪视训练</h3>
-                        <p>数字/字母/汉字/文章/图片快速闪现，附测试题与回放，抑制音读。</p>
-                        <span class="af-count">6 项训练</span>
-                    </a>
-                    <a class="about-feature-card" href="/speed-read/speed.html">
-                        <span class="af-icon">📖</span>
-                        <h3>速读训练</h3>
-                        <p>字块移动、视野扩展、阅读训练、实战训练（模拟书刊排版）。</p>
-                        <span class="af-count">4 大模块</span>
-                    </a>
-                    <a class="about-feature-card" href="/speed-read/photo.html">
-                        <span class="af-icon">🧠</span>
-                        <h3>照相记忆</h3>
-                        <p>黄卡残像、三色卡、曼陀罗、3D 卡、图片位置记忆、瞬间计算。</p>
-                        <span class="af-count">8 项训练</span>
-                    </a>
-                    <a class="about-feature-card" href="/speed-read/meditation.html">
-                        <span class="af-icon">🌙</span>
-                        <h3>冥想训练</h3>
-                        <p>双脑同步声频（双耳节拍 δ/θ/α/β/γ 五档）+ 呼吸引导 + 曼陀罗动画。</p>
-                        <span class="af-count">3.0 新增</span>
-                    </a>
-                    <a class="about-feature-card" href="/speed-read/plan.html">
-                        <span class="af-icon">🗓️</span>
-                        <h3>训练计划</h3>
-                        <p>自定义训练步骤与时长，保存/导入/导出，一键按序执行。</p>
-                        <span class="af-count">自定义</span>
-                    </a>
-                </div>
-
-                <div class="about-cta-row">
-                    <a class="about-cta" href="/speed-read/">进入飞克视读 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"></path></svg></a>
-                </div>
-            </section>
-
-            <section id="about-approach" class="about-approach" aria-labelledby="about-approach-title">
-                <div class="about-section-heading">
-                    <p class="about-label">设计原则</p>
-                    <h2 id="about-approach-title">本地优先，简单直接。</h2>
-                    <p>测试与训练都只需要很短的时间，因此每一个细节都值得认真对待。</p>
-                </div>
-
-                <div class="about-principles">
-                    <div>
-                        <h3>本地运行</h3>
-                        <p>纯静态页面，无后端、无账号、无追踪，打开即用。</p>
-                    </div>
-                    <div>
-                        <h3>数据私有</h3>
-                        <p>测试成绩与训练设置只保存在当前浏览器，可随时清除。</p>
-                    </div>
-                    <div>
-                        <h3>方法还原</h3>
-                        <p>每个训练都附原版训练方法说明，不凭空发挥，忠实于经典。</p>
-                    </div>
-                    <div>
-                        <h3>各种设备都舒服</h3>
-                        <p>键盘、鼠标、触屏都可用；训练支持全屏与快捷键调速。</p>
-                    </div>
-                </div>
-
-                <blockquote>功能应该有留下来的理由，视觉细节应该知道何时收住。</blockquote>
-            </section>
-
-            <section id="about-results" class="about-results" aria-labelledby="about-results-title">
-                <div class="about-results-heading">
-                    <p class="about-label">结果如何呈现</p>
-                    <h2 id="about-results-title">一份安静而有用的个人记录。</h2>
-
-                    <div class="about-results-illustration" aria-hidden="true">
-                        <img src="../assets/images/other/about-progress.png" alt="" width="960" height="346" loading="lazy" decoding="async">
-                    </div>
-                </div>
-
-                <div class="about-result-copy">
-                    <p>记录不是为了证明网站保存了很多数据，而是为了回答三个有用的问题：</p>
-                    <ul>
-                        <li>我这次表现怎么样？</li>
-                        <li>我最好的一次是多少？</li>
-                        <li>我最近有没有变得更好？</li>
-                    </ul>
-                    <p>无需账号。成绩与训练设置只存放在当前浏览器的本地存储中，最适合用来比较自己在相近条件下的不同尝试。</p>
-                </div>
-            </section>
-
-            <section class="about-closing" aria-labelledby="about-closing-title">
-                <div>
-                    <p class="about-label">最后想说</p>
-                    <h2 id="about-closing-title">经典值得被重新做成 Web 的样子。</h2>
-                    <p>「飞克视读」的开发者曾把速读训练做成了 Windows 上的经典。我们用 Web 技术让它跨设备可用、随时打开；认知测试则提供即点即用的能力测量。如果哪里让你觉得不清楚、太吵或没有必要，欢迎反馈。</p>
-                </div>
-
-                <div class="about-cta-row">
-                    <a class="about-cta" href="/speed-read/">进入飞克视读</a>
-                    <a class="about-cta about-cta-ghost" href="/#tests">去认知测试</a>
-                </div>
-            </section>
+    <section class="mt-page-head">
+        <div class="mt-wrap">
+            <h1>关于 MindTrainer</h1>
+            <p class="mt-lead">一个本地运行的脑力训练站，两部分组成：测量能力的认知测试，和完整重写自「飞克视读」的速读训练。没有账号，没有后端，数据只留在你的浏览器里。</p>
         </div>
-    </article>
+    </section>
+
+    <section class="mt-section" style="padding-top:0">
+        <div class="mt-wrap">
+            <dl class="mt-facts">
+                <div class="mt-fact"><dd>6</dd><dt>项认知测试</dt></div>
+                <div class="mt-fact"><dd>50+</dd><dt>项速读与右脑训练</dt></div>
+                <div class="mt-fact"><dd>0</dd><dt>账号、后端、追踪</dt></div>
+            </dl>
+        </div>
+    </section>
+
+    <section class="mt-section" id="about-tests">
+        <div class="mt-wrap">
+            <div class="mt-section-head">
+                <h2>认知测试</h2>
+                <p>六项测试，分别测反应、瞄准、记忆和专注。每项只测一种能力，所以结果好读也好比。</p>
+            </div>
+            <div class="mt-cardgrid">
+                <a class="mt-linkcard" href="/reaction-time-test/">
+                    <span class="mt-linkcard-ico"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l14 9-6 1 3 8-14-9 6-1-3-8z"/></svg></span>
+                    <h3>反应时间</h3>
+                    <p>屏幕变绿就点，看这次用了多少毫秒。</p>
+                    <span class="mt-linkcard-tag">反应</span>
+                </a>
+                <a class="mt-linkcard" href="/aim-trainer/">
+                    <span class="mt-linkcard-ico"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg></span>
+                    <h3>瞄准训练</h3>
+                    <p>快速命中目标，速度和准确率一起算。</p>
+                    <span class="mt-linkcard-tag">瞄准</span>
+                </a>
+                <a class="mt-linkcard" href="/sequence-memory-test/">
+                    <span class="mt-linkcard-ico"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></span>
+                    <h3>序列记忆</h3>
+                    <p>记住越来越长的方块顺序，再重复出来。</p>
+                    <span class="mt-linkcard-tag">记忆</span>
+                </a>
+                <a class="mt-linkcard" href="/number-memory-test/">
+                    <span class="mt-linkcard-ico"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg></span>
+                    <h3>数字记忆</h3>
+                    <p>数字消失后原样打出来，位数逐轮增加。</p>
+                    <span class="mt-linkcard-tag">记忆</span>
+                </a>
+                <a class="mt-linkcard" href="/multiple-object-tracking-test/">
+                    <span class="mt-linkcard-ico"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.5 6h7M8.5 18h7M6 8.5v7M18 8.5v7"/></svg></span>
+                    <h3>多目标追踪</h3>
+                    <p>在一堆一模一样的干扰物里盯住目标。</p>
+                    <span class="mt-linkcard-tag">注意力</span>
+                </a>
+                <a class="mt-linkcard" href="/stroop-test/">
+                    <span class="mt-linkcard-ico"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18 3 3 0 0 0 0-6 3 3 0 0 1 0-6 3 3 0 0 0 0-6Z"/><circle cx="9" cy="9" r="1"/><circle cx="15" cy="9" r="1"/></svg></span>
+                    <h3>斯特鲁普</h3>
+                    <p>选颜色，别被字义带偏。</p>
+                    <span class="mt-linkcard-tag">专注</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="mt-section mt-section-sunk" id="about-speedread">
+        <div class="mt-wrap">
+            <div class="mt-section-head">
+                <h2>从飞克视读到 Web 版</h2>
+                <p>「飞克视读」是上海 fiercelc 团队从 2009 年起发布的 Delphi 速读训练软件，覆盖闪视、速读、照相记忆等数十种方法。这里用 Canvas 动画和 Web Audio 把它全量重写成网页，每项训练都保留了原版的训练方法说明。</p>
+                <p>原版的宣传语（「右脑开发」「过目不忘」「一目十行」）我们没有保留，因为这些说法和现有研究对不上。训练项目本身作为练习和放松是成立的，但它不会改造你的大脑。<a href="/speed-read/#modules">具体依据写在训练中心页面</a>。</p>
+            </div>
+
+            <div class="mt-cardgrid">
+                <a class="mt-linkcard" href="/speed-read/basic.html">
+                    <span class="mt-linkcard-ico"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg></span>
+                    <h3>基础训练</h3>
+                    <p>视野扩展与眼球运动：发散箭头、拓宽、移动路线、凝视、舒尔特表。</p>
+                    <span class="mt-linkcard-tag">26 项</span>
+                </a>
+                <a class="mt-linkcard" href="/speed-read/flash.html">
+                    <span class="mt-linkcard-ico"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4.5 13.5H11L9.5 22 19 10.5h-6.5L13 2Z"/></svg></span>
+                    <h3>闪视训练</h3>
+                    <p>数字、汉字、文章、图片快速闪现，附测试题与回放，抑制音读。</p>
+                    <span class="mt-linkcard-tag">7 项</span>
+                </a>
+                <a class="mt-linkcard" href="/speed-read/speed.html">
+                    <span class="mt-linkcard-ico"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V4a2 2 0 0 0-2-2H6.5A2.5 2.5 0 0 0 4 4.5v15Z"/></svg></span>
+                    <h3>速读训练</h3>
+                    <p>字块移动、视野扩展、阅读训练、实战训练（模拟书刊排版）。</p>
+                    <span class="mt-linkcard-tag">4 模块</span>
+                </a>
+                <a class="mt-linkcard" href="/speed-read/photo.html">
+                    <span class="mt-linkcard-ico"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="14" rx="2"/><circle cx="12" cy="13" r="3.5"/><path d="M8 6l1.5-2h5L16 6"/></svg></span>
+                    <h3>照相记忆</h3>
+                    <p>黄卡残像、三色卡、曼陀罗、3D 卡、位置记忆、瞬间计算。</p>
+                    <span class="mt-linkcard-tag">8 项</span>
+                </a>
+                <a class="mt-linkcard" href="/speed-read/meditation.html">
+                    <span class="mt-linkcard-ico"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></span>
+                    <h3>冥想训练</h3>
+                    <p>双耳节拍 δ/θ/α/β/γ 五档，配呼吸引导与曼陀罗动画。</p>
+                    <span class="mt-linkcard-tag">5 档</span>
+                </a>
+                <a class="mt-linkcard" href="/speed-read/plan.html">
+                    <span class="mt-linkcard-ico"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span>
+                    <h3>训练计划</h3>
+                    <p>自定义步骤与时长，保存导入导出，一键按序执行。</p>
+                    <span class="mt-linkcard-tag">自定义</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="mt-section" id="about-approach">
+        <div class="mt-wrap">
+            <div class="mt-section-head">
+                <h2>几条原则</h2>
+                <p>一次测试只要一分钟，一次训练也不长。正因为短，每个细节才值得较真。</p>
+            </div>
+            <div class="mt-notes">
+                <div class="mt-note">
+                    <h3>本地运行</h3>
+                    <p>纯静态页面，没有后端、没有账号、没有追踪脚本。打开就能用，断网也能用。</p>
+                </div>
+                <div class="mt-note">
+                    <h3>数据是你的</h3>
+                    <p>成绩和训练设置只写进当前浏览器的本地存储，随时可以自己清除。</p>
+                </div>
+                <div class="mt-note">
+                    <h3>方法照着原版做</h3>
+                    <p>每个速读训练都附原版的训练方法说明，参数和节奏尽量还原，不自己发挥。</p>
+                </div>
+                <div class="mt-note">
+                    <h3>测试的时候不打扰</h3>
+                    <p>测试区里没有动画、没有装饰。计时的时候，任何多余的视觉变化都会影响成绩。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="mt-section" id="about-results">
+        <div class="mt-wrap">
+            <div class="mt-section-head">
+                <h2>成绩怎么呈现</h2>
+            </div>
+            <div class="mt-prose">
+                <p>记录不是为了显示我们存了多少数据，而是回答三个问题：这次怎么样、最好的一次是多少、最近有没有变好。</p>
+                <div class="mt-figure">
+                    <img src="/assets/images/other/about-progress.png" alt="成绩记录界面示意：显示最近一次、个人最佳与近期趋势" width="960" height="346" loading="lazy" decoding="async">
+                </div>
+                <p>所以每项测试只保留最近一次、个人最佳，和最近若干次的列表。没有排行榜，也没有和陌生人的对比 —— 跨设备的分数本来就不可比，屏幕刷新率和输入延迟的差距能有几十毫秒。</p>
+                <blockquote class="mt-quote">功能要有留下来的理由，视觉细节要知道什么时候收住。</blockquote>
+            </div>
+        </div>
+    </section>
+
+    <section class="mt-section">
+        <div class="mt-wrap">
+            <div class="mt-cta">
+                <div>
+                    <h2>挑一个，现在就测</h2>
+                    <p>大部分测试一分钟内做完。速读训练可以从基础训练的 26 项开始。</p>
+                </div>
+                <a class="mt-btn mt-btn-primary mt-btn-lg" href="/#tests">开始测试</a>
+            </div>
+        </div>
+    </section>
 </main>
 
-<footer>
-    <div class="footer-center-box">
-        <div class="footer-center-content-box">
-            <p>
-                <span class="footer-brand-line">&copy;&nbsp;<span id="currentYear"></span>&nbsp;MindTrainer</span>
-                <span class="footer-link-line">
-                    <a href="/privacy-policy/">隐私</a>
-                    <a href="/terms-of-use/">条款</a>
-                    <a href="/about/" aria-current="page">关于</a>
-                </span>
-            </p>
-        </div>
-    </div>
-</footer>
-
-<script src="../assets/js/global.min.js?v=20260830" defer></script>
-
-    <script src="../assets/js/feedback-marker.js?v=20260849" defer></script>
+<footer></footer>
+<script src="/assets/js/feedback-marker.js?v=20270101" defer></script>
 </body>
 </html>

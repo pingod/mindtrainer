@@ -32,58 +32,23 @@
     <meta name="twitter:description" content="免费在线瞄准练习，点击固定或移动目标，测试你的点击速度、准确率和目标追踪能力。提供 30 个目标、30 秒和移动目标三种模式。">
     <meta name="twitter:image" content="https://picktests.com/assets/images/og/og-image.png">
 
-    <link rel="stylesheet" href="../assets/css/global.min.css?v=20260830">
-    <link rel="stylesheet" href="../assets/css/style.min.css?v=20260830">
+<!-- theme bootstrap: applied before first paint so there is no flash -->
+    <script>try{var t=localStorage.getItem('mt-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
 
-    <link rel="stylesheet" href="../assets/css/aim-trainer.min.css?v=20260830">
-    <script src="/assets/js/mt-nav.js?v=20260864" defer></script>
-<style>
-  /* 测试区域加宽：充分利用宽屏版面 */
-  .common-container { max-width: min(100%, 1650px); }
-  .number-page, .aim-page, .sequence-page, .tracking-page, .stroop-page, .reaction-page { width: min(1650px, 100%); max-width: min(1650px, 100%); }
-</style>
-    <link rel="stylesheet" href="../assets/css/theme.css?v=20260860">
+    <link rel="stylesheet" href="/assets/css/mt.css?v=20270101">
+    <link rel="stylesheet" href="/assets/css/aim-trainer.min.css?v=20260830">
+    <link rel="stylesheet" href="/assets/css/mt-stage.css?v=20270101">
+    <script src="/assets/js/mt-nav.js?v=20270101" defer></script>
+    <script src="/assets/js/mt-app.js?v=20270101" defer></script>
 </head>
 <body class="test-page">
 <header id="mt-header"></header>
 
 <main>
-    <section class="hero">
-        <div class="common-container">
-            <div class="hero-content">
-                <h1><span class="hero-title-text">瞄准训练</span></h1>
-                <p class="hero-subtitle">
-                    尽可能快速、准确地<span class="hero-underline">命中每一个目标</span>。
-                </p>
-
-                <nav class="hero-test-links" aria-label="更多测试">
-                    <div class="hero-test-links-viewport">
-                        <div class="hero-test-links-marquee">
-                            <div class="hero-test-links-track">
-                                <a class="hero-test-link--reaction" href="/reaction-time-test/" target="_blank" rel="noopener">反应时间</a>
-                                <a class="hero-test-link--stroop" href="/stroop-test/" target="_blank" rel="noopener">斯特鲁普</a>
-                                <a class="hero-test-link--sequence" href="/sequence-memory-test/" target="_blank" rel="noopener">序列记忆</a>
-                                <a class="hero-test-link--number" href="/number-memory-test/" target="_blank" rel="noopener">数字记忆</a>
-                                <a class="hero-test-link--tracking" href="/multiple-object-tracking-test/" target="_blank" rel="noopener">多目标追踪</a>
-                            </div>
-                            <div class="hero-test-links-track" aria-hidden="true">
-                                <a class="hero-test-link--reaction" href="/reaction-time-test/" target="_blank" rel="noopener" tabindex="-1">反应时间</a>
-                                <a class="hero-test-link--stroop" href="/stroop-test/" target="_blank" rel="noopener" tabindex="-1">斯特鲁普</a>
-                                <a class="hero-test-link--sequence" href="/sequence-memory-test/" target="_blank" rel="noopener" tabindex="-1">序列记忆</a>
-                                <a class="hero-test-link--number" href="/number-memory-test/" target="_blank" rel="noopener" tabindex="-1">数字记忆</a>
-                                <a class="hero-test-link--tracking" href="/multiple-object-tracking-test/" target="_blank" rel="noopener" tabindex="-1">多目标追踪</a>
-                            </div>
-                            <div class="hero-test-links-track" aria-hidden="true">
-                                <a class="hero-test-link--reaction" href="/reaction-time-test/" target="_blank" rel="noopener" tabindex="-1">反应时间</a>
-                                <a class="hero-test-link--stroop" href="/stroop-test/" target="_blank" rel="noopener" tabindex="-1">斯特鲁普</a>
-                                <a class="hero-test-link--sequence" href="/sequence-memory-test/" target="_blank" rel="noopener" tabindex="-1">序列记忆</a>
-                                <a class="hero-test-link--number" href="/number-memory-test/" target="_blank" rel="noopener" tabindex="-1">数字记忆</a>
-                                <a class="hero-test-link--tracking" href="/multiple-object-tracking-test/" target="_blank" rel="noopener" tabindex="-1">多目标追踪</a>
-                            </div>
-                        </div>
-                    </div>
-                </nav>
-            </div>
+    <section class="mt-test-head">
+        <div class="mt-wrap-wide">
+            <h1>瞄准训练</h1>
+            <p>尽快、尽准地打掉每一个目标。三种模式分别练平均速度、爆发和追踪。</p>
         </div>
     </section>
 
@@ -238,101 +203,105 @@
         </div>
     </section>
 
-    <section id="features" class="features aim-features">
-        <div class="common-container">
-            <h2>把注意力留给测试本身</h2>
-            <p class="features-subtitle">规则清楚、反馈及时，只保留对下一次测试真正有用的结果。</p>
-
-            <div class="features-grid">
-                <div class="feature-card">
-                    <span class="feature-kicker">目标</span>
-                    <h3>位置分布均衡</h3>
-                    <p>目标会留在舒适的操作范围内，并尽量避免连续出现在相同位置。</p>
+    <section class="mt-section">
+        <div class="mt-wrap-wide">
+            <div class="mt-section-head">
+                <h2>关于这个测试</h2>
+            </div>
+            <div class="mt-notes">
+                <div class="mt-note">
+                    <h3>三种模式测三件事</h3>
+                    <p>30 个目标测每次命中的平均用时，30 秒测固定时间内的命中数，移动 30 秒测的是追踪。</p>
                 </div>
-                <div class="feature-card">
-                    <span class="feature-kicker">模式</span>
-                    <h3>三种专注玩法</h3>
-                    <p>用 30 个目标测试平均速度，用 30 秒挑战固定目标，或在移动模式中练习追踪。</p>
+                <div class="mt-note">
+                    <h3>目标位置是分散的</h3>
+                    <p>目标会落在舒适的操作范围内，并尽量避免连着出现在同一个位置。</p>
                 </div>
-                <div class="feature-card">
-                    <span class="feature-kicker">规则</span>
-                    <h3>失误同样重要</h3>
-                    <p>每种模式都有清楚的失误规则，让速度不会掩盖准确率。</p>
+                <div class="mt-note">
+                    <h3>失误有代价</h3>
+                    <p>30 个目标模式下点空不计数但计时继续。30 秒模式点空或超时会扣掉一次机会，目标会依次在 3 秒、2.2 秒、1.5 秒后超时。移动模式只有点空才扣。</p>
                 </div>
-                <div class="feature-card">
-                    <span class="feature-kicker">反馈</span>
-                    <h3>鼠标与触屏都顺手</h3>
-                    <p>每次命中或失误都会立即得到反馈，同时不打断测试节奏。</p>
+                <div class="mt-note">
+                    <h3>声音不影响计时</h3>
+                    <p>成绩先记录，之后才播放可选的音效和视觉反馈，所以开不开声音都一样。</p>
                 </div>
-                <div class="feature-card">
-                    <span class="feature-kicker">结果</span>
-                    <h3>看清这次变化</h3>
-                    <p>结果会显示主要成绩、准确率，以及这次是否比上一次更好。</p>
+                <div class="mt-note">
+                    <h3>会告诉你有没有进步</h3>
+                    <p>结果里除了主成绩和准确率，还会标出这次比上一次快了还是慢了。</p>
                 </div>
-                <div class="feature-card">
-                    <span class="feature-kicker">隐私</span>
-                    <h3>只保存在当前浏览器</h3>
-                    <p>每种模式最多保留近期 20 次测试，无需账号，也不会上传记录。</p>
+                <div class="mt-note">
+                    <h3>数据不出这台设备</h3>
+                    <p>每种模式各保留最近 20 次，只写进当前浏览器，不需要账号，也不会上传。</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <section id="faq" class="faq">
-        <div class="common-container">
-            <h2>常见问题</h2>
-
-            <div class="faq-grid">
-                <div class="faq-item">
-                    <h3>应该选择哪种模式？</h3>
-                    <p>“30 个目标”用于测量每个目标的平均用时；“30 秒”用于统计固定目标命中数；“移动 30 秒”更适合练习追踪。</p>
+    <section id="faq" class="mt-section">
+        <div class="mt-wrap-wide">
+            <div class="mt-section-head">
+                <h2>常见问题</h2>
+            </div>
+            <div class="mt-faq">
+                <div class="mt-faq-item">
+                    <button class="mt-faq-q" type="button">该选哪个模式？
+                        <span class="mt-chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+                    </button>
+                    <div class="mt-faq-a"><div class="mt-faq-a-inner">想要一个能对比的稳定数字，选 30 个目标。想比谁打得多，选 30 秒。想练跟枪，选移动 30 秒。</div></div>
                 </div>
-                <div class="faq-item">
-                    <h3>成绩如何计算？</h3>
-                    <p>“30 个目标”显示每次成功命中的平均用时，数值越低越快。两种 30 秒模式统计成功命中数，数值越高越好。</p>
+                <div class="mt-faq-item">
+                    <button class="mt-faq-q" type="button">成绩怎么算？
+                        <span class="mt-chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+                    </button>
+                    <div class="mt-faq-a"><div class="mt-faq-a-inner">30 个目标看的是每次成功命中的平均用时，越低越好。两个 30 秒模式看的是命中数，越高越好。</div></div>
                 </div>
-                <div class="faq-item">
-                    <h3>什么情况算失误？</h3>
-                    <p>在“30 个目标”中，点空不会计数，但计时会继续。在“30 秒”中，点空或目标超时都会失去一次机会；随着时间推进，目标会在 3 秒、2.2 秒或 1.5 秒后超时。在“移动 30 秒”中，只有点空才会失去机会。</p>
+                <div class="mt-faq-item">
+                    <button class="mt-faq-q" type="button">什么算失误？
+                        <span class="mt-chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+                    </button>
+                    <div class="mt-faq-a"><div class="mt-faq-a-inner">30 个目标里点空不计数，但计时不停。30 秒里点空或者让目标超时都会失去一次机会。移动模式只有点空才算。</div></div>
                 </div>
-                <div class="faq-item">
-                    <h3>为什么不同设备上的成绩会变化？</h3>
-                    <p>屏幕尺寸、指针灵敏度、刷新率、浏览器性能和输入延迟都会影响结果。</p>
+                <div class="mt-faq-item">
+                    <button class="mt-faq-q" type="button">为什么换设备成绩差很多？
+                        <span class="mt-chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+                    </button>
+                    <div class="mt-faq-a"><div class="mt-faq-a-inner">屏幕大小、指针灵敏度、刷新率和输入延迟都会影响。触屏和鼠标之间的差距尤其大。</div></div>
                 </div>
-                <div class="faq-item">
-                    <h3>声音会影响成绩吗？</h3>
-                    <p>不会。计时会先完成记录，之后才播放可选的声音和视觉反馈。</p>
+                <div class="mt-faq-item">
+                    <button class="mt-faq-q" type="button">中途退出的成绩算吗？
+                        <span class="mt-chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+                    </button>
+                    <div class="mt-faq-a"><div class="mt-faq-a-inner">机会用完而提前结束的会记进历史。但计时模式里，只有完整跑满 30 秒的成绩才能成为个人最佳，被打断的不保存。</div></div>
                 </div>
-                <div class="faq-item">
-                    <h3>成绩保存在哪里？</h3>
-                    <p>每种模式最多在当前浏览器中保留 20 次近期结果，包括机会全部用完而提前结束的测试。计时模式只有完整完成 30 秒的成绩可以成为个人最佳；被中断的测试不会保存。</p>
+                <div class="mt-faq-item">
+                    <button class="mt-faq-q" type="button">成绩存在哪？
+                        <span class="mt-chev"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></span>
+                    </button>
+                    <div class="mt-faq-a"><div class="mt-faq-a-inner">只在当前浏览器的本地存储里，每种模式各留最近 20 次，可以随时清除。</div></div>
                 </div>
             </div>
+        </div>
+    </section>
+
+    <section class="mt-section">
+        <div class="mt-wrap-wide">
+            <div class="mt-section-head">
+                <h2>换一个测试</h2>
+            </div>
+            <nav class="mt-more" aria-label="其他测试">
+                <a href="/reaction-time-test/">反应时间<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left:auto"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                <a href="/sequence-memory-test/">序列记忆<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left:auto"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                <a href="/number-memory-test/">数字记忆<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left:auto"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                <a href="/multiple-object-tracking-test/">多目标追踪<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left:auto"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+                <a href="/stroop-test/">斯特鲁普<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left:auto"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+            </nav>
         </div>
     </section>
 </main>
 
-<footer>
-    <div class="footer-center-box">
-        <div class="footer-center-content-box">
-            <p>
-                <span class="footer-brand-line">&copy;&nbsp;<span id="currentYear"></span>&nbsp;PickTests</span>
-                <span class="footer-link-line">
-                    <a href="/privacy-policy/">隐私</a>
-                    <a href="/terms-of-use/">条款</a>
-                    <a href="/about/">关于</a>
-                    <a href="mailto:hello@picktests.com">联系</a>
-                </span>
-            </p>
-        </div>
-    </div>
-</footer>
+<footer></footer>
 
-<script src="../assets/js/global.min.js?v=20260830" defer></script>
-
-<script src="../assets/js/aim-trainer.min.js?v=20260830" defer></script>
-
-
-    <script src="../assets/js/feedback-marker.js?v=20260849" defer></script>
+<script src="/assets/js/aim-trainer.min.js?v=20260830" defer></script>
+<script src="/assets/js/feedback-marker.js?v=20270101" defer></script>
 </body>
 </html>
