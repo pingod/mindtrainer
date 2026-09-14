@@ -73,69 +73,86 @@
   --nav-h: 64px;
   --section-y: clamp(56px, 8vw, 104px);
   --ease: cubic-bezier(.16, 1, .3, 1);
+
+  /* ---------------------------------------------------------------------
+     深色值只在这里写一次。
+     此前 @media(prefers-color-scheme:dark) 与 [data-theme="dark"] 两块各
+     抄了一份完整的深色色值，改配色要同时改两处，迟早漂移。现在两块只做
+     一次「指过去」的赋值。
+     --------------------------------------------------------------------- */
+  --d-bg:        #0c0a09;
+  --d-bg-sunk:   #000000;
+  --d-surface:   #1c1917;
+  --d-surface-2: #262220;
+  --d-ink:       #fafaf9;
+  --d-ink-2:     #b3aca5;
+  --d-ink-3:     #7d7772;
+  --d-line:      #2a2624;
+  --d-line-2:    #3d3835;
+
+  --d-accent:      #93b4ff;
+  --d-accent-hi:   #b9cfff;
+  --d-accent-soft: rgba(147, 180, 255, .13);
+  --d-accent-line: rgba(147, 180, 255, .34);
+  --d-on-accent:   #0c0a09;
+
+  --d-btn-bg:   #fafaf9;
+  --d-btn-fg:   #1c1917;
+  --d-btn-bg-h: #ffffff;
+
+  --d-sig-go:    #4ade80;
+  --d-sig-wait:  #fbbf24;
+  --d-sig-error: #f87171;
+
+  --d-sh-1: 0 1px 2px rgba(0, 0, 0, .5);
+  --d-sh-2: 0 1px 2px rgba(0, 0, 0, .5), 0 8px 24px -12px rgba(0, 0, 0, .7);
+  --d-sh-3: 0 2px 4px rgba(0, 0, 0, .5), 0 20px 48px -20px rgba(0, 0, 0, .8);
 }
 
+/* 切到深色：系统偏好（未手动指定浅色时） */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg:        #0c0a09;
-    --bg-sunk:   #000000;
-    --surface:   #1c1917;
-    --surface-2: #262220;
-    --ink:       #fafaf9;
-    --ink-2:     #b3aca5;
-    --ink-3:     #7d7772;
-    --line:      #2a2624;
-    --line-2:    #3d3835;
+    --bg: var(--d-bg);           --bg-sunk: var(--d-bg-sunk);
+    --surface: var(--d-surface); --surface-2: var(--d-surface-2);
+    --ink: var(--d-ink);         --ink-2: var(--d-ink-2);
+    --ink-3: var(--d-ink-3);
+    --line: var(--d-line);       --line-2: var(--d-line-2);
 
-    --accent:      #93b4ff;
-    --accent-hi:   #b9cfff;
-    --accent-soft: rgba(147, 180, 255, .13);
-    --accent-line: rgba(147, 180, 255, .34);
-    --on-accent:   #0c0a09;
+    --accent: var(--d-accent);       --accent-hi: var(--d-accent-hi);
+    --accent-soft: var(--d-accent-soft);
+    --accent-line: var(--d-accent-line);
+    --on-accent: var(--d-on-accent);
 
-    --btn-bg:   #fafaf9;
-    --btn-fg:   #1c1917;
-    --btn-bg-h: #ffffff;
+    --btn-bg: var(--d-btn-bg); --btn-fg: var(--d-btn-fg);
+    --btn-bg-h: var(--d-btn-bg-h);
 
-    --sig-go:    #4ade80;
-    --sig-wait:  #fbbf24;
-    --sig-error: #f87171;
+    --sig-go: var(--d-sig-go); --sig-wait: var(--d-sig-wait);
+    --sig-error: var(--d-sig-error);
 
-    --sh-1: 0 1px 2px rgba(0, 0, 0, .5);
-    --sh-2: 0 1px 2px rgba(0, 0, 0, .5), 0 8px 24px -12px rgba(0, 0, 0, .7);
-    --sh-3: 0 2px 4px rgba(0, 0, 0, .5), 0 20px 48px -20px rgba(0, 0, 0, .8);
+    --sh-1: var(--d-sh-1); --sh-2: var(--d-sh-2); --sh-3: var(--d-sh-3);
   }
 }
 
-/* manual toggle wins in both directions */
+/* 手动切换为深色：覆盖系统偏好，两个方向都生效 */
 [data-theme="dark"] {
-  --bg:        #0c0a09;
-  --bg-sunk:   #000000;
-  --surface:   #1c1917;
-  --surface-2: #262220;
-  --ink:       #fafaf9;
-  --ink-2:     #b3aca5;
-  --ink-3:     #7d7772;
-  --line:      #2a2624;
-  --line-2:    #3d3835;
+  --bg: var(--d-bg);           --bg-sunk: var(--d-bg-sunk);
+  --surface: var(--d-surface); --surface-2: var(--d-surface-2);
+  --ink: var(--d-ink);         --ink-2: var(--d-ink-2);
+  --ink-3: var(--d-ink-3);
+  --line: var(--d-line);       --line-2: var(--d-line-2);
 
-  --accent:      #93b4ff;
-  --accent-hi:   #b9cfff;
-  --accent-soft: rgba(147, 180, 255, .13);
-  --accent-line: rgba(147, 180, 255, .34);
-  --on-accent:   #0c0a09;
+  --accent: var(--d-accent);       --accent-hi: var(--d-accent-hi);
+  --accent-soft: var(--d-accent-soft);
+  --accent-line: var(--d-accent-line);
+  --on-accent: var(--d-on-accent);
 
-  --btn-bg:   #fafaf9;
-  --btn-fg:   #1c1917;
-  --btn-bg-h: #ffffff;
+  --btn-bg: var(--d-btn-bg); --btn-fg: var(--d-btn-fg);
+  --btn-bg-h: var(--d-btn-bg-h);
 
-  --sig-go:    #4ade80;
-  --sig-wait:  #fbbf24;
-  --sig-error: #f87171;
+  --sig-go: var(--d-sig-go); --sig-wait: var(--d-sig-wait);
+  --sig-error: var(--d-sig-error);
 
-  --sh-1: 0 1px 2px rgba(0, 0, 0, .5);
-  --sh-2: 0 1px 2px rgba(0, 0, 0, .5), 0 8px 24px -12px rgba(0, 0, 0, .7);
-  --sh-3: 0 2px 4px rgba(0, 0, 0, .5), 0 20px 48px -20px rgba(0, 0, 0, .8);
+  --sh-1: var(--d-sh-1); --sh-2: var(--d-sh-2); --sh-3: var(--d-sh-3);
 }
 
 /* ---------------------------------------------------------------- reset -- */
@@ -218,6 +235,8 @@ main { padding-top: var(--nav-h); }
 .mt-section + .mt-section { padding-top: 0; }
 .mt-section-sunk + .mt-section,
 .mt-section + .mt-section-sunk { padding-top: var(--section-y); }
+/* 紧跟导航的第一个区块不需要顶部留白（原先写成 style="padding-top:0"） */
+.mt-section.is-flush { padding-top: 0; }
 
 .mt-section-head { margin-bottom: clamp(32px, 4vw, 52px); max-width: 60ch; }
 .mt-section-head p { margin-top: 12px; color: var(--ink-2); font-size: 1.0625rem; }
@@ -553,46 +572,86 @@ a.mt-card:hover { border-color: var(--line-2); box-shadow: var(--sh-2); transfor
 .mt-tests > a:nth-child(5) { grid-column: span 4; }
 .mt-tests > a:nth-child(6) { grid-column: span 12; }
 
+/* 3D 卡片悬浮特效 —— 按《3D卡片悬浮特效》一文的代码实现。
+   分层对应：.mt-tile → .card（perspective:2500px）
+             .mt-tile-wrapper → .wrapper（封面背板，hover 后倾）
+             .mt-tile-cover → .cover-image
+             h3 → .title（hover 上浮 translate3d）
+             .mt-tile-ico / p / .mt-tile-go → .character（向观众弹出） */
 .mt-tile {
   position: relative;
-  overflow: hidden;
   display: flex; flex-direction: column;
   justify-content: flex-end;
   gap: 8px;
   min-height: 190px;
   padding: 22px;
-  border-radius: var(--r-card);
-  background: var(--surface);
-  border: 1px solid var(--line);
+  perspective: 2500px;
   color: var(--ink);
   isolation: isolate;
-  transition: border-color .22s var(--ease), box-shadow .22s var(--ease), transform .22s var(--ease);
 }
-.mt-tile:hover { border-color: var(--line-2); box-shadow: var(--sh-2); transform: translateY(-3px); }
 .mt-tile-tall { min-height: 300px; }
 .mt-tile-wide { min-height: 170px; }
 
-.mt-tile-ico { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 10px; background: var(--surface-2); color: var(--ink-2); margin-bottom: auto; }
-.mt-tile h3 { font-size: 1.1875rem; letter-spacing: -.02em; }
-.mt-tile p { font-size: .9375rem; color: var(--ink-2); line-height: 1.55; max-width: 42ch; }
-.mt-tile-go { font-size: 14px; font-weight: 600; color: var(--accent); }
+.mt-tile-wrapper {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: var(--r-card);
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  transition: all .5s;
+}
+.mt-tile-ico { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 10px; background: var(--surface-2); color: var(--ink-2); margin-bottom: auto; transition: transform .5s; }
+.mt-tile h3 { font-size: 1.1875rem; letter-spacing: -.02em; transition: transform .5s; }
+.mt-tile p { font-size: .9375rem; color: var(--ink-2); line-height: 1.55; max-width: 42ch; transition: transform .5s; }
+.mt-tile-go { font-size: 14px; font-weight: 600; color: var(--accent); transition: transform .5s; }
 
-/* photographic cells give the grid real visual variation */
-.mt-tile-img { border: 0; color: #fff; }
-.mt-tile-img::before {
-  content: "";
-  position: absolute; inset: 0; z-index: -2;
-  background-image: var(--img);
-  background-size: cover; background-position: center;
-  transform: scale(1.02);
-  transition: transform .5s var(--ease);
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  /* 封面背板后倾 25°，投下深影 —— 文章 .card:hover .wrapper */
+  .mt-tile:hover .mt-tile-wrapper {
+    transform: perspective(900px) translateY(-5%) rotateX(25deg) translateZ(0);
+    box-shadow: 2px 35px 32px -8px rgba(0, 0, 0, .75);
+    -webkit-box-shadow: 2px 35px 32px -8px rgba(0, 0, 0, .75);
+    border-color: var(--line-2);
+  }
+  /* 标题上浮 —— 文章 .card:hover .title */
+  .mt-tile:hover h3 { transform: translate3d(0%, -50px, 100px); }
+  /* 其余内容向观众弹出 —— 文章 .card:hover .character */
+  .mt-tile:hover .mt-tile-ico,
+  .mt-tile:hover p,
+  .mt-tile:hover .mt-tile-go { transform: translate3d(0%, -30%, 100px); }
 }
-.mt-tile-img::after {
-  content: "";
-  position: absolute; inset: 0; z-index: -1;
-  background: linear-gradient(180deg, rgba(12,10,9,.15) 0%, rgba(12,10,9,.55) 55%, rgba(12,10,9,.85) 100%);
+
+/* 图片卡：封面贴在 wrapper 内，配文章的暗角渐变（.wrapper::before/::after） */
+.mt-tile-img { color: #fff; }
+.mt-tile-img .mt-tile-wrapper { border: 0; background: #191c29; }
+.mt-tile-cover { width: 100%; height: 100%; object-fit: cover; display: block; }
+.mt-tile-img .mt-tile-wrapper::before,
+.mt-tile-img .mt-tile-wrapper::after {
+  content: '';
+  opacity: 0;
+  width: 100%;
+  height: 100px;
+  transition: all .5s;
+  position: absolute;
+  left: 0;
 }
-.mt-tile-img:hover::before { transform: scale(1.06); }
+.mt-tile-img .mt-tile-wrapper::before {
+  top: 0;
+  height: 100%;
+  background-image: linear-gradient(to top, transparent 46%, rgba(12, 13, 19, .5) 68%, rgba(12, 13, 19) 97%);
+}
+.mt-tile-img .mt-tile-wrapper::after {
+  bottom: 0;
+  opacity: 1;
+  background-image: linear-gradient(to bottom, transparent 46%, rgba(12, 13, 19, .5) 68%, rgba(12, 13, 19) 97%);
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .mt-tile-img:hover .mt-tile-wrapper::before,
+  .mt-tile-img .mt-tile-wrapper::after { opacity: 1; }
+  .mt-tile-img:hover .mt-tile-wrapper::after { height: 140px; }
+}
 .mt-tile-img h3 { color: #fff; }
 .mt-tile-img p { color: rgba(255,255,255,.86); }
 .mt-tile-img .mt-tile-go { color: #fff; }
@@ -724,7 +783,8 @@ a.mt-card:hover { border-color: var(--line-2); box-shadow: var(--sh-2); transfor
   transition: border-color .2s var(--ease), background .2s var(--ease), transform .2s var(--ease);
 }
 .mt-more a:hover { border-color: var(--line-2); background: var(--surface-2); transform: translateY(-2px); }
-.mt-more svg { flex-shrink: 0; color: var(--ink-3); }
+/* margin-left:auto 原先写在 6 个测试页共 30 个 <svg> 的 style 属性里 */
+.mt-more svg { flex-shrink: 0; margin-left: auto; color: var(--ink-3); }
 .mt-more a:hover svg { color: var(--accent); }
 
 /* ==========================================================================

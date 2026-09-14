@@ -1,3 +1,4 @@
+import { createLifecycle } from "./_lifecycle.js";
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
@@ -981,8 +982,6 @@ function createDitheredObject(elements, options = {}) {
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
   }
-  const observer = new ResizeObserver(resize);
-  observer.observe(canvas);
   resize();
   applyOptions();
   loadAsset();
@@ -1024,15 +1023,23 @@ function createDitheredObject(elements, options = {}) {
     loopRunning = false;
     renderer.setAnimationLoop(null);
   }
-  const viewObserver = typeof IntersectionObserver !== "undefined" ? new IntersectionObserver((entries) => {
-    inView = entries[entries.length - 1]?.isIntersecting ?? true;
-    if (inView) {
+  /* 生命周期统一到 _lifecycle.js。这 5 个 three.js 组件此前既没有
+     visibilitychange 也没有上下文丢失处理 —— 标签页切到后台，
+     renderer.setAnimationLoop 照样在跑。接进来之后两者补齐，
+     并且 destroy() 会把监听全部摘干净（此前是逐个手写，容易漏）。 */
+  const lifecycle = createLifecycle({
+    target: canvas,
+    onResize: resize,
+    onShow: () => {
+      inView = true;
       startLoop();
-    } else {
+    },
+    onHide: () => {
+      inView = false;
       stopLoop();
-    }
-  }) : null;
-  viewObserver?.observe(canvas);
+    },
+    onMotionChange
+  });
   let lastTime = 0;
   let elapsed = Math.random() * 100;
   startLoop();
@@ -1067,9 +1074,7 @@ function createDitheredObject(elements, options = {}) {
       disposed = true;
       loadToken += 1;
       stopLoop();
-      observer.disconnect();
-      viewObserver?.disconnect();
-      motionQuery.removeEventListener("change", onMotionChange);
+      lifecycle.destroy();
       controls.dispose();
       clearModel();
       if (roomScene) disposeObject(roomScene);

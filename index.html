@@ -7,7 +7,6 @@
 <title>MindTrainer 认知测试与速读训练</title>
 <meta name="description" content="6 项认知基准测试：反应时间、瞄准、序列记忆、数字记忆、多目标追踪、斯特鲁普。另有速读、闪视、照相记忆与冥想训练。打开即用，无需注册。">
 
-<link rel="canonical" href="https://picktests.com/">
 <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/icons/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/icons/favicon-16x16.png">
@@ -15,15 +14,39 @@
 
 <meta property="og:title" content="MindTrainer 认知测试与速读训练">
 <meta property="og:description" content="6 项认知基准测试，另有速读、闪视、照相记忆与冥想训练。打开即用，无需注册。">
-<meta property="og:url" content="https://picktests.com/">
 <meta property="og:type" content="website">
 
 <!-- theme bootstrap: applied before first paint so there is no flash -->
 <script>try{var t=localStorage.getItem('mt-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
 
-<link rel="stylesheet" href="/assets/css/mt.css?v=20270101">
-<script src="/assets/js/mt-nav.js?v=20270101" defer></script>
-<script src="/assets/js/mt-app.js?v=20270101" defer></script>
+<link rel="stylesheet" href="/assets/css/mt.css?v=20260915">
+<style>
+/* 首页彩蛋「数字雨」与提示链接的样式。
+   原先全部以 element.style.cssText / style="" 写在脚本与标记里，
+   既无法被 mt.css 的主题变量覆盖，也没法集中维护。仅首页用到，
+   所以放页内 <style>，不占用其它 17 个页面的样式体积。 */
+.mt-rain-canvas { position: fixed; inset: 0; z-index: 20000; background: #000; }
+.mt-rain-msg {
+  position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  z-index: 20001; text-align: center;
+  font: 700 26px/1.75 "SF Mono", Menlo, Consolas, monospace;
+  color: #00ff41;
+  text-shadow: 0 0 12px rgba(0,255,65,.85), 0 0 34px rgba(0,255,65,.45);
+  opacity: 0; pointer-events: none; transition: opacity 1.6s ease;
+  letter-spacing: .06em;
+}
+.mt-rain-msg .sub   { font-size: 15px; opacity: .82; line-height: 1.95; }
+.mt-rain-msg .brand { display: block; margin-top: 22px; font-size: 13px; font-weight: 600; letter-spacing: .22em; opacity: .72; }
+.mt-rain-hint {
+  position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%);
+  z-index: 20001; font: 600 12px/1.4 -apple-system, "PingFang SC", sans-serif;
+  color: #00ff41; opacity: .85; letter-spacing: .12em;
+  text-shadow: 0 0 8px rgba(0,255,65,.7);
+}
+.mt-hint-link { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+</style>
+<script src="/assets/js/mt-nav.js?v=20260915" defer></script>
+<script src="/assets/js/mt-app.js?v=20260915" defer></script>
 </head>
 <body>
 <header id="mt-header"></header>
@@ -60,8 +83,10 @@
       </div>
 
       <div class="mt-tests">
-        <a class="mt-tile mt-tile-tall mt-tile-img" href="/reaction-time-test/" data-reveal="0"
-           style="--img:url('/assets/images/other/hero-test-reaction.svg')">
+        <a class="mt-tile mt-tile-tall mt-tile-img" href="/reaction-time-test/" data-reveal="0">
+          <span class="mt-tile-wrapper" aria-hidden="true">
+            <img class="mt-tile-cover" src="/assets/images/other/hero-test-reaction.svg" alt="">
+          </span>
           <span class="mt-tile-ico">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l14 9-6 1 3 8-14-9 6-1-3-8z"/></svg>
           </span>
@@ -71,6 +96,7 @@
         </a>
 
         <a class="mt-tile mt-tile-tall" href="/aim-trainer/" data-reveal="60">
+          <span class="mt-tile-wrapper" aria-hidden="true"></span>
           <span class="mt-tile-ico">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg>
           </span>
@@ -80,6 +106,7 @@
         </a>
 
         <a class="mt-tile" href="/sequence-memory-test/" data-reveal="0">
+          <span class="mt-tile-wrapper" aria-hidden="true"></span>
           <span class="mt-tile-ico">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
           </span>
@@ -89,6 +116,7 @@
         </a>
 
         <a class="mt-tile" href="/number-memory-test/" data-reveal="60">
+          <span class="mt-tile-wrapper" aria-hidden="true"></span>
           <span class="mt-tile-ico">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg>
           </span>
@@ -98,6 +126,7 @@
         </a>
 
         <a class="mt-tile" href="/multiple-object-tracking-test/" data-reveal="120">
+          <span class="mt-tile-wrapper" aria-hidden="true"></span>
           <span class="mt-tile-ico">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.5 6h7M8.5 18h7M6 8.5v7M18 8.5v7"/></svg>
           </span>
@@ -106,8 +135,10 @@
           <span class="mt-tile-go">开始测试 &rarr;</span>
         </a>
 
-        <a class="mt-tile mt-tile-wide mt-tile-img" href="/stroop-test/" data-reveal="0"
-           style="--img:url('/assets/images/other/hero-test-stroop.svg')">
+        <a class="mt-tile mt-tile-wide mt-tile-img" href="/stroop-test/" data-reveal="0">
+          <span class="mt-tile-wrapper" aria-hidden="true">
+            <img class="mt-tile-cover" src="/assets/images/other/hero-test-stroop.svg" alt="">
+          </span>
           <span class="mt-tile-ico">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a9 9 0 1 0 0 18 3 3 0 0 0 0-6 3 3 0 0 1 0-6 3 3 0 0 0 0-6Z"/><circle cx="9" cy="9" r="1"/><circle cx="15" cy="9" r="1"/></svg>
           </span>
@@ -240,7 +271,7 @@
     </div>
   </section>
 
-  <section class="mt-section" style="padding-top:0">
+  <section class="mt-section is-flush">
     <div class="mt-wrap">
       <div class="mt-cta">
         <div>
@@ -301,7 +332,7 @@
     if (state === 'go') {
       var ms = Math.round(performance.now() - goAt);
       set('done', '你的成绩', ms + ' ms', '这只是一轮。完整测试可以做五轮取平均。');
-      hint.innerHTML = '这只是一轮。<a href="/reaction-time-test/" style="color:inherit;text-decoration:underline;text-underline-offset:3px">做完整测试 &rarr;</a>';
+      hint.innerHTML = '这只是一轮。<a class="mt-hint-link" href="/reaction-time-test/">做完整测试 &rarr;</a>';
     }
   });
 })();
@@ -319,8 +350,19 @@
   function startRain() {
     if (active) { active.stop(); active = null; return; }
 
+    // 全屏高对比闪烁 + 每帧符号跳变：对前庭敏感与光敏用户有风险。
+    // 站点里 33 个 canvasui 组件都做了这项判断，唯独首页彩蛋漏了。
+    if (window.matchMedia &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    // 集中管理所有延时，退出时统一清理（原先 openMessage 里的两层
+    // setTimeout 没被记录，退出后仍会执行并触碰已移除的 DOM）
+    var timers = [];
+    function later(fn, ms) { var id = setTimeout(fn, ms); timers.push(id); return id; }
+    function clearTimers() { for (var i = 0; i < timers.length; i++) clearTimeout(timers[i]); timers.length = 0; }
+
     var canvas = document.createElement('canvas');
-    canvas.style.cssText = 'position:fixed;inset:0;z-index:20000;background:#000;';
+    canvas.className = 'mt-rain-canvas';
     document.body.appendChild(canvas);
     var ctx = canvas.getContext('2d');
 
@@ -333,34 +375,42 @@
                  'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     var SYMBOLS = ':-=+*#%@$?';
     var fontSize = 16, cols = 0, drops = [];
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var vw = 0, vh = 0, wash = null;
 
     function resize() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      cols = Math.max(1, Math.floor(canvas.width / fontSize));
+      vw = window.innerWidth; vh = window.innerHeight;
+      // 按设备像素比开画布：原先直接用 CSS 像素，Retina 上整幅被拉伸成糊图
+      canvas.width = Math.round(vw * dpr);
+      canvas.height = Math.round(vh * dpr);
+      canvas.style.width = vw + 'px';
+      canvas.style.height = vh + 'px';
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      cols = Math.max(1, Math.floor(vw / fontSize));
       drops = [];
       for (var i = 0; i < cols; i++) {
         drops[i] = { y: (Math.random() * -80) | 0, spd: 0.5 + Math.random() * 1.1 };
       }
+      // 渐变只在尺寸变化时重建，原先每帧新建一个
+      wash = ctx.createLinearGradient(0, 0, 0, vh * 0.11);
+      wash.addColorStop(0, 'rgba(0,255,65,0.06)');
+      wash.addColorStop(1, 'rgba(0,255,65,0)');
     }
     resize();
     window.addEventListener('resize', resize);
 
-    var raf = 0, running = true, paused = false, msgTimer = 0;
+    var raf = 0, running = true, paused = false;
     function frame() {
       if (!running) return;
-      // when the message moment is on, freeze the rain (movie-style glitch pause)
-      if (paused) { raf = requestAnimationFrame(frame); return; }
+      // 暂停时直接不续帧（原先空转 rAF 白白占用一帧回调），恢复时再启动
+      if (paused) return;
       // fade toward black — each bright lead glyph leaves a fading drape above it
       ctx.fillStyle = 'rgba(0,0,0,0.06)';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillRect(0, 0, vw, vh);
 
       // a faint green wash at the top, the "source" of the stream
-      var wash = ctx.createLinearGradient(0, 0, 0, canvas.height * 0.11);
-      wash.addColorStop(0, 'rgba(0,255,65,0.06)');
-      wash.addColorStop(1, 'rgba(0,255,65,0)');
       ctx.fillStyle = wash;
-      ctx.fillRect(0, 0, canvas.width, canvas.height * 0.11);
+      ctx.fillRect(0, 0, vw, vh * 0.11);
 
       ctx.font = 'bold ' + fontSize + 'px "SF Mono","Menlo","Consolas",monospace';
       ctx.textBaseline = 'top';
@@ -378,7 +428,7 @@
         var ch = GLYPHS.charAt((Math.random()*GLYPHS.length)|0);
         if (Math.random() < 0.04) ch = SYMBOLS.charAt((Math.random()*SYMBOLS.length)|0);
         ctx.fillText(ch, x, y);
-        if (y > canvas.height && Math.random() > 0.975) d.y = (Math.random() * -30) | 0;
+        if (y > vh && Math.random() > 0.975) d.y = (Math.random() * -30) | 0;
         d.y += d.spd;
       }
       raf = requestAnimationFrame(frame);
@@ -388,29 +438,24 @@
     // The Matrix-style pause + message: after the rain establishes, freeze it and
     // fade the iconic green lines in at center, hold, then fade out and resume.
     var msg = document.createElement('div');
-    msg.style.cssText = 'position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:20001;' +
-      'text-align:center;font:700 26px/1.75 "SF Mono",Menlo,Consolas,monospace;color:#00ff41;' +
-      'text-shadow:0 0 12px rgba(0,255,65,.85),0 0 34px rgba(0,255,65,.45);' +
-      'opacity:0;pointer-events:none;transition:opacity 1.6s ease;letter-spacing:.06em;';
+    msg.className = 'mt-rain-msg';
     msg.innerHTML = 'Wake up, Neo...<br>' +
-      '<span style="font-size:15px;opacity:.82;line-height:1.95">The Matrix has you.<br>Follow the white rabbit.</span>' +
-      '<span style="display:block;margin-top:22px;font-size:13px;font-weight:600;letter-spacing:.22em;opacity:.72">MIND TRAINER</span>';
+      '<span class="sub">The Matrix has you.<br>Follow the white rabbit.</span>' +
+      '<span class="brand">MIND TRAINER</span>';
     document.body.appendChild(msg);
 
     function openMessage() {
       paused = true;
       msg.style.opacity = '1';
-      setTimeout(function () {
+      later(function () {
         msg.style.opacity = '0';
-        setTimeout(function () { paused = false; }, 1600);
+        later(function () { paused = false; raf = requestAnimationFrame(frame); }, 1600);
       }, 4200);
     }
-    msgTimer = setTimeout(openMessage, 1500);
+    later(openMessage, 1500);
 
     var hint = document.createElement('div');
-    hint.style.cssText = 'position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:20001;' +
-      'font:600 12px/1.4 -apple-system,"PingFang SC",sans-serif;color:#00ff41;opacity:.85;' +
-      'letter-spacing:.12em;text-shadow:0 0 8px rgba(0,255,65,.7);';
+    hint.className = 'mt-rain-hint';
     hint.textContent = '按 Esc 或 点击任意处 退出';
     document.body.appendChild(hint);
 
@@ -423,10 +468,10 @@
       stop: function () {
         running = false;
         cancelAnimationFrame(raf);
+        clearTimers();
         window.removeEventListener('resize', resize);
         document.removeEventListener('keydown', onKey);
         canvas.removeEventListener('click', onCanvasClick);
-        clearTimeout(msgTimer);
         canvas.remove();
         hint.remove();
         msg.remove();
@@ -440,13 +485,13 @@
     if (!brand) return;
     var count = 0, timer = null;
     brand.addEventListener('click', function (e) {
-      // On the homepage the logo links back to itself; keep the page so the
-      // triple-click can be counted and the rain can trigger (a reload resets it).
-      e.preventDefault();
       count++;
       clearTimeout(timer);
       if (count >= 3) {
         count = 0;
+        // 只在真正触发彩蛋时拦截跳转。原先无条件 preventDefault，
+        // 首页单击 logo（含键盘回车）完全没有任何反应。
+        e.preventDefault();
         startRain();
       } else {
         timer = setTimeout(function () { count = 0; }, 650);
@@ -455,6 +500,6 @@
   });
 })();
 </script>
-<script src="/assets/js/feedback-marker.js?v=20270101" defer></script>
+<script src="/assets/js/feedback-marker.js?v=20260915" defer></script>
 </body>
 </html>

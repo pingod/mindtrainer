@@ -113,63 +113,137 @@
    * 原理：每行随机点以周期 T 重复（背景），图案区域的点额外偏移 shift，
    * 平行视线（两眼注视图后方）时背景重合、图案区域因视差浮起。
    * 模式：pic 图片（中央圆+星） | txt 文字（"3D"） | anim 动画（移动小球） */
+  const SIRDS_COLORS = ['#a03a2e', '#c96a3a', '#7a2e26', '#b5502f', '#8a4a2f'];
+
+  function hexToRgb(hex) {
+    const n = parseInt(hex.slice(1), 16);
+    return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+  }
+  const SIRDS_RGB = SIRDS_COLORS.map(hexToRgb);
+
+  /* 缓存：点阵只依赖 (w,h,seed)，文字掩膜只依赖 (w,h)，离屏画布只依赖物理尺寸。
+     原先这三样每帧重建 —— anim 模式每帧新建离屏 canvas、整幅 getImageData
+     （1.6MB+），再加约 3 万次 fillRect（每次还重设 fillStyle 字符串），
+     帧率直接崩塌且 GC 剧烈抖动。 */
+  const _sirds = { key: '', pts: null, txtKey: '', txtMask: null, off: null, offCtx: null, img: null, offKey: '' };
+
+  /* 每行随机点：只与 (宽,高,种子) 有关 */
+  function sirdsPoints(w, h, seed) {
+    const W = Math.max(1, Math.round(w)), H = Math.max(1, Math.round(h));
+    const key = W + 'x' + H + '@' + seed;
+    if (_sirds.key === key) return _sirds.pts;
+    const T = 72;
+    const pts = new Array(H);
+    for (let y = 0; y < H; y++) {
+      const rowRnd = mulberry32(((Math.floor(seed * 1e5) + y * 131) >>> 0));
+      const n = Math.max(5, Math.floor(T / 6));
+      const row = new Array(n);
+      for (let i = 0; i < n; i++) {
+        row[i] = { x: rowRnd() * T, c: Math.floor(rowRnd() * SIRDS_COLORS.length) };
+      }
+      pts[y] = row;
+    }
+    _sirds.key = key;
+    _sirds.pts = pts;
+    return pts;
+  }
+
+  /* 文字深度掩膜：只与 (宽,高) 有关 */
+  function sirdsTextMask(w, h) {
+    const W = Math.max(1, Math.round(w)), H = Math.max(1, Math.round(h));
+    const key = W + 'x' + H;
+    if (_sirds.txtKey === key && _sirds.txtMask) return _sirds.txtMask;
+    const off = document.createElement('canvas');
+    off.width = W; off.height = H;
+    const octx = off.getContext('2d');
+    octx.clearRect(0, 0, W, H);
+    octx.fillStyle = '#fff';
+    octx.font = `bold ${Math.min(150, W * 0.22)}px "PingFang SC", "Microsoft YaHei", sans-serif`;
+    octx.textAlign = 'center'; octx.textBaseline = 'middle';
+    octx.fillText('3D', W / 2, H / 2 - 30);
+    octx.font = `bold ${Math.min(44, W * 0.07)}px "PingFang SC", "Microsoft YaHei", sans-serif`;
+    octx.fillText('视线平行 · 看后方虚像', W / 2, H / 2 + 95);
+    const data = octx.getImageData(0, 0, W, H).data;
+    const mask = new Uint8Array(W * H);
+    for (let i = 0, p = 3; i < mask.length; i++, p += 4) mask[i] = data[p] > 128 ? 1 : 0;
+    _sirds.txtKey = key;
+    _sirds.txtMask = mask;
+    return mask;
+  }
+
   function draw3D(ctx, w, h, mode, seed, t) {
     const shift = 26, T = 72;
     const cx = w / 2, cy = h / 2;
+    const pts = sirdsPoints(w, h, seed);
+    const W = Math.max(1, Math.round(w));
     let region;
     if (mode === 'txt') {
-      // 离屏 canvas 画文字，取笔画区域做深度
-      const off = document.createElement('canvas');
-      off.width = w; off.height = h;
-      const octx = off.getContext('2d');
-      octx.clearRect(0, 0, w, h);
-      octx.fillStyle = '#fff';
-      octx.font = `bold ${Math.min(150, w * 0.22)}px "PingFang SC", "Microsoft YaHei", sans-serif`;
-      octx.textAlign = 'center'; octx.textBaseline = 'middle';
-      octx.fillText('3D', w / 2, h / 2 - 30);
-      octx.font = `bold ${Math.min(44, w * 0.07)}px "PingFang SC", "Microsoft YaHei", sans-serif`;
-      octx.fillText('视线平行 · 看后方虚像', w / 2, h / 2 + 95);
-      const data = octx.getImageData(0, 0, w, h).data;
-      region = (x, y) => data[((y * w + x) | 0) * 4 + 3] > 128;
+      const mask = sirdsTextMask(w, h);
+      region = (x, y) => {
+        const xi = x | 0, yi = y | 0;
+        if (xi < 0 || yi < 0 || xi >= W || yi >= Math.round(h)) return false;
+        return mask[yi * W + xi] === 1;
+      };
     } else if (mode === 'anim') {
-      // 移动小球区域做深度（凝视时球浮起并移动）
       const bx = cx + Math.sin(t / 900) * w * 0.2;
       const by = cy + Math.cos(t / 1300) * h * 0.15;
-      const br = Math.min(w, h) * 0.13;
-      region = (x, y) => {
-        const dx = x - bx, dy = y - by;
-        return dx * dx + dy * dy < br * br;
-      };
+      const br = Math.min(w, h) * 0.13, br2 = br * br;
+      region = (x, y) => { const dx = x - bx, dy = y - by; return dx * dx + dy * dy < br2; };
     } else {
-      // 图片模式：中央圆 + 菱形星浮起
-      const rr = Math.min(w, h) * 0.17;
+      const rr = Math.min(w, h) * 0.17, rr2 = rr * rr;
       const starR = Math.min(w, h) * 0.11;
       region = (x, y) => {
         const dx = x - cx, dy = y - cy;
-        if (dx * dx + dy * dy < rr * rr) return true;
+        if (dx * dx + dy * dy < rr2) return true;
         return Math.abs(dx) + Math.abs(dy) < starR;
       };
     }
-    // 生成 SIRDS：每行周期随机点（周期内点固定颜色，重复时同色 → 双目匹配成立），深度区域偏移 shift
-    // 用红棕色调多色点，还原原版 6_5 截图的暗红棕斑纹质感
-    const SIRDS_COLORS = ['#a03a2e', '#c96a3a', '#7a2e26', '#b5502f', '#8a4a2f'];
-    for (let y = 0; y < h; y++) {
-      const rowRnd = mulberry32(((Math.floor(seed * 1e5) + y * 131) >>> 0));
-      const pts = [];
-      const n = Math.max(5, Math.floor(T / 6));
-      for (let i = 0; i < n; i++) {
-        pts.push({ x: rowRnd() * T, c: SIRDS_COLORS[Math.floor(rowRnd() * SIRDS_COLORS.length)] });
-      }
+
+    // 按物理像素生成，与 Canvas.setup 的 dpr 保持一致，最终 1:1 不糊
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const pw = Math.max(1, Math.round(w * dpr)), ph = Math.max(1, Math.round(h * dpr));
+    const offKey = pw + 'x' + ph;
+    if (_sirds.offKey !== offKey || !_sirds.off) {
+      _sirds.off = document.createElement('canvas');
+      _sirds.off.width = pw; _sirds.off.height = ph;
+      _sirds.offKey = offKey;
+      _sirds.offCtx = _sirds.off.getContext('2d');
+      _sirds.img = _sirds.offCtx.createImageData(pw, ph);
+    }
+    const img = _sirds.img, buf = img.data;
+    buf.fill(0);   // 透明底，让下层 bg 透出
+
+    const dot = Math.max(2, Math.round(3 * dpr));
+    const rows = pts.length;
+    for (let py = 0; py < ph; py++) {
+      const y = py / dpr;
+      const row = pts[Math.min(rows - 1, y | 0)];
+      if (!row) continue;
       for (let k = 0; k <= w / T; k++) {
-        for (const p of pts) {
+        for (let i = 0; i < row.length; i++) {
+          const p = row[i];
           const x = k * T + p.x;
           if (x > w) continue;
           const d = region(x, y) ? shift : 0;
-          ctx.fillStyle = p.c;
-          ctx.fillRect(x + d, y, 3, 3);
+          const px = Math.round((x + d) * dpr);
+          const rgb = SIRDS_RGB[p.c];
+          for (let dy = 0; dy < dot; dy++) {
+            const yy = py + dy;
+            if (yy >= ph) break;
+            for (let dx = 0; dx < dot; dx++) {
+              const xx = px + dx;
+              if (xx >= pw) break;
+              const o = (yy * pw + xx) * 4;
+              buf[o] = rgb[0]; buf[o + 1] = rgb[1]; buf[o + 2] = rgb[2]; buf[o + 3] = 255;
+            }
+          }
         }
       }
     }
+    _sirds.offCtx.putImageData(img, 0, 0);
+    // drawImage 会跟随 ctx 的 dpr 变换，绘制到逻辑 (0,0,w,h) 即物理 1:1
+    ctx.drawImage(_sirds.off, 0, 0, w, h);
+
     if (mode === 'anim') {
       // 动画模式：在球位置画一个小圆点做参考（可选）
       const bx = cx + Math.sin(t / 900) * w * 0.2;
@@ -322,36 +396,6 @@
       }
     }
 
-    /* 点击处理（记忆训练/瞬间计算） */
-    handleClick(e) {
-      const t = this.training.type;
-      if (!this.running) return;
-      if (t === 'memory') {
-        if (this.memMode === 'pos' && this.memReveal) return;
-        const rect = this.canvas.getBoundingClientRect();
-        const x = e.clientX - rect.left, y = e.clientY - rect.top;
-        const rows = this.memMode === 'find' ? 4 : 3;
-        const cols = this.memMode === 'find' ? 6 : 4;
-        const cellW = this.cw / cols, cellH = this.ch / rows;
-        const ci = Math.floor(x / cellW), cj = Math.floor(y / cellH);
-        if (ci < 0 || ci >= cols || cj < 0 || cj >= rows) return;
-        const idx = cj * cols + ci;
-        this.memClick(idx);
-      } else if (t === 'fastcalc') {
-        if (this.fcPhase === 'idle') {
-          this.startFastCalc();
-        } else if (this.fcPhase === 'question') {
-          // 点击不处理，用选项
-        } else if (this.fcPhase === 'feedback' && performance.now() - this.fcMsgT > 1000) {
-          this.startFastCalc();
-        }
-      } else if (t === 'mandala') {
-        this.mandalaFilled = !this.mandalaFilled;
-        Sound.flip();
-        if (!this.running) this.draw();
-      }
-    }
-
     memClick(idx) {
       const g = this.memGrid[idx];
       if (!g || g.matched) return;
@@ -370,19 +414,21 @@
             this.memFlip = [];
             if (this.memFound >= this.memPairs) {
               this.memMsg = '完成！用时 ' + Math.floor(this.elapsed) + 's';
-              Sound.done();
-              this.memFlip = null;
+              Sound.safe(() => Sound.done());
+              // 原先这里置 null，而 draw 每帧执行 memFlip.includes(...)，
+              // null.includes 抛 TypeError 会直接打断整条 rAF 链。
+              this.memFlip = [];
               this.memDone = true;
             }
           } else {
             Sound.err();
-            setTimeout(() => { this.memFlip = []; this.draw(); }, 500);
+            // 保存句柄：切换训练后旧的延时回调仍会跑，可能把新状态清掉
+            clearTimeout(this._memFlipTimer);
+            this._memFlipTimer = setTimeout(() => { this.memFlip = []; this.draw(); }, 500);
           }
         }
       } else {
         // 图片位置记忆：点击格子，判断是否为当前目标图案的位置
-        const g = this.memGrid[idx];
-        if (!g || g.matched) return;
         if (idx === this.memTarget) {
           g.matched = true;
           this.memShown.push(idx);
@@ -392,7 +438,7 @@
           const remain = this.memGrid.filter(x => !x.matched);
           if (remain.length === 0) {
             this.memDone = true;
-            Sound.done();
+            Sound.safe(() => Sound.done());
           } else {
             this.memTarget = remain[Math.floor(Math.random() * remain.length)].i;
             Sound.flip();
@@ -451,6 +497,7 @@
       const { ctx, cw: w, ch: h, params: p } = this;
       if (!w || !h) return;
       const t = this.training.type;
+      ensureAssets(t);   // 幂等：只在该类型首次绘制时发起对应素材请求
       Canvas.clear(ctx, w, h, p.bg);
       switch (t) {
         case 'tricolor': this.drawTricolor(ctx, w, h); break;
@@ -654,15 +701,13 @@
         if (this.sirdsTxtCache && this.sirdsTxtCache.url === txtUrl && this.sirdsTxtCache.text) {
           this._drawSirdsTxt(ctx, w, h, this.sirdsTxtCache.text, idx);
         } else {
-          const that = this;
-          fetch(txtUrl).then(r => r.text()).then(t => {
-            that.sirdsTxtCache = { url: txtUrl, text: t };
-            if (that.training && that.training.type === 'card3d') that.draw();
-          }).catch(() => {});
+          // 原先直接在这里 fetch：draw 每帧执行，缓存命中前会每秒发起几十个
+          // 请求；快速换图还会并发多个、回调乱序覆盖缓存。改为带去重与中止。
+          this._fetchSirdsTxt(txtUrl);
           ctx.fillStyle = 'rgba(148,163,184,0.6)';
           ctx.font = '14px sans-serif';
           ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-          ctx.fillText('加载 3D 文字中…', w / 2, h / 2);
+          ctx.fillText(this._txtErr ? '3D 文字加载失败' : '加载 3D 文字中…', w / 2, h / 2);
         }
       } else {
         // 动画模式：程序生成 SIRDS + 移动小球
@@ -672,6 +717,34 @@
         ctx.fillStyle = 'rgba(148,163,184,0.9)';
         ctx.fillText('凝视三维图同时观察移动小球 · 点击换图', w / 2, h - 14);
       }
+    }
+
+    /* 3D 文字素材：in-flight 去重 + 可中止，避免每帧重复请求与乱序覆盖 */
+    _fetchSirdsTxt(url) {
+      if (this._txtReq && this._txtReq.url === url) return;
+      if (this._txtReq && this._txtReq.ctrl) {
+        try { this._txtReq.ctrl.abort(); } catch (e) { /* 已完成的请求无需中止 */ }
+      }
+      let ctrl = null;
+      if (typeof AbortController !== 'undefined') ctrl = new AbortController();
+      this._txtReq = { url, ctrl };
+      this._txtErr = false;
+      const that = this;
+      fetch(url, ctrl ? { signal: ctrl.signal } : undefined)
+        .then(r => r.text())
+        .then(t => {
+          if (!that._txtReq || that._txtReq.url !== url) return;   // 已被更新的请求取代
+          that.sirdsTxtCache = { url, text: t };
+          that._txtReq = null;
+          if (that.training && that.training.type === 'card3d') that.draw();
+        })
+        .catch(err => {
+          if (err && err.name === 'AbortError') return;
+          if (!that._txtReq || that._txtReq.url !== url) return;
+          that._txtReq = null;
+          that._txtErr = true;
+          if (that.training && that.training.type === 'card3d') that.draw();
+        });
     }
 
     /* 3D 文字：等宽字体渲染 ASCII 纹理（SIRDS 文本模式） */
@@ -729,7 +802,8 @@
         this.memGrid.forEach((g) => {
           const ci = g.i % cols, cj = Math.floor(g.i / cols);
           const x = ci * cellW, y = cj * cellH;
-          const revealed = g.matched || this.memShown.includes(g.i) || this.memFlip.includes(g.i);
+          const flip = this.memFlip || [];
+          const revealed = g.matched || this.memShown.includes(g.i) || flip.includes(g.i);
           ctx.fillStyle = revealed ? 'rgba(30,41,59,0.85)' : 'rgba(51,65,85,0.25)';
           ctx.fillRect(x + 3, y + 3, cellW - 6, cellH - 6);
           ctx.strokeStyle = 'rgba(148,163,184,0.35)';
@@ -765,7 +839,7 @@
           const shown = this.memReveal || g.matched;
           if (shown) {
             if (g.img && g.img.complete && g.img.naturalWidth > 0) {
-              drawImageCover(ctx, g.img, cellW - 6, cellH - 6);
+              drawImageCover(ctx, g.img, cellW - 6, cellH - 6, x + 3, y + 3);
             } else {
               genPattern(ctx, x + cellW / 2, y + cellH / 2, Math.min(cellW, cellH) * 0.3, g.seed * 0.7);
             }
@@ -795,7 +869,9 @@
         } else if (this.memTarget >= 0) {
           const tg = this.memGrid[this.memTarget];
           if (tg.img && tg.img.complete && tg.img.naturalWidth > 0) {
-            drawImageCover(ctx, tg.img, 52, 52);
+            // 与下面 genPattern 的兜底位置（中心 42,38 = 左上角 16,12 + 26）
+            // 对齐，此前漏了偏移，目标图被画到画布外。
+            drawImageCover(ctx, tg.img, 52, 52, 16, 12);
           } else {
             genPattern(ctx, 42, 38, 26, tg.seed * 0.7);
           }
@@ -882,6 +958,9 @@
       this.fcMsgT = performance.now();
     }
 
+    /* 点击处理：覆盖三色卡/几何卡/3D 卡换图、记忆格子命中、瞬间计算选项。
+       原先类里有两个同名 handleClick，前一个（不含 tricolor/geom/fastcalc
+       选项命中）会被后一个整体覆盖，是 dead code 且极易误导维护。 */
     handleClick(e) {
       const t = this.training.type;
       // 三色卡/几何卡：训练中也可点击切换（换一种颜色/形状继续练习）
@@ -993,85 +1072,69 @@
     sirds: [],      // 3D 立体图 3D0001-18.jpg
     sirdsTxt: [],   // 3D 文字 3D0001-16.txt
   };
-  function preloadAssets() {
+  /* 素材按需加载。原先 init() 里无条件 new Image() 103 张（约 5.7MB），
+     即使用户只想练三色卡（纯色矩形，零素材），首屏带宽与解码全部浪费。
+     改为按训练类型分组加载，图片就绪后回调触发一次重绘。 */
+  const LOADED_GROUPS = new Set();
+  let redrawHook = null;
+
+  function setRedrawHook(fn) { redrawHook = fn; }
+
+  function loadGroup(name) {
+    if (LOADED_GROUPS.has(name)) return;
+    LOADED_GROUPS.add(name);
     const make = (n, prefix, pad, ext) => Array.from({ length: n }, (_, i) => {
       const num = String(i + 1).padStart(pad, '0');
       const img = new Image();
+      img.onload = img.onerror = () => { if (redrawHook) redrawHook(); };
       img.src = 'assets/' + prefix + num + ext;
       return img;
     });
-    ASSETS.mandala = make(23, 'mandala/M', 2, '.jpg');
-    ASSETS.picmemory = make(38, 'picmemory/PM', 4, '.jpg');
-    ASSETS.pics = make(24, 'pics/PM', 4, '.jpg');
-    ASSETS.sirds = make(18, 'sirds/3D', 4, '.jpg');
+    if (name === 'mandala') ASSETS.mandala = make(23, 'mandala/M', 2, '.jpg');
+    else if (name === 'picmemory') ASSETS.picmemory = make(38, 'picmemory/PM', 4, '.jpg');
+    else if (name === 'pics') ASSETS.pics = make(24, 'pics/PM', 4, '.jpg');
+    else if (name === 'sirds') ASSETS.sirds = make(18, 'sirds/3D', 4, '.jpg');
+  }
+
+  /* 3D 文字只是 URL 列表，体积可忽略，随 sirds 组一起备好 */
+  function initSirdsTxt() {
+    if (ASSETS.sirdsTxt.length) return;
     for (let i = 1; i <= 16; i++) {
       ASSETS.sirdsTxt.push('assets/sirds-txt/3D' + String(i).padStart(4, '0') + '.txt');
     }
   }
-  /* 图片 cover 填充绘制（等比缩放铺满画布） */
-  function drawImageCover(ctx, img, w, h) {
+
+  /* 按训练类型准备素材（幂等，Set 保证只加载一次） */
+  function ensureAssets(type) {
+    if (type === 'mandala') loadGroup('mandala');
+    else if (type === 'card3d') { loadGroup('sirds'); initSirdsTxt(); }
+    else if (type === 'picview') loadGroup('pics');
+    else if (type === 'memory') loadGroup('picmemory');
+  }
+  /* 图片 cover 填充绘制（等比缩放铺满画布）
+     ox/oy：绘制区域左上角偏移。原先没有这两个参数，记忆格子里的图片
+     全部被画到画布左上角那一小块区域，而不是各自的格子里。 */
+  function drawImageCover(ctx, img, w, h, ox, oy) {
     const iw = img.naturalWidth, ih = img.naturalHeight;
     if (!iw || !ih) return;
     const scale = Math.max(w / iw, h / ih);
     const dw = iw * scale, dh = ih * scale;
-    ctx.drawImage(img, (w - dw) / 2, (h - dh) / 2, dw, dh);
+    ctx.drawImage(img, (ox || 0) + (w - dw) / 2, (oy || 0) + (h - dh) / 2, dw, dh);
   }
 
   /* ---------------- 页面初始化 ---------------- */
+  /* ---------------- 页面初始化 ---------------- */
   function init() {
-    preloadAssets();
-    const canvas = $('#canvas');
-    const stage = $('#stage');
-    const trainer = new PhotoTrainer({ canvas });
-
-    const listEl = $('#trainList');
-    TRAININGS.forEach(t => {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'sr-train-item';
-      btn.dataset.id = t.id;
-      btn.innerHTML = `<span class="sr-train-num">${String(t.num).padStart(2, '0')}</span>${t.name}`;
-      btn.addEventListener('click', () => select(t, btn));
-      listEl.appendChild(btn);
+    SR.createTrainingPage({
+      TrainerClass: PhotoTrainer,
+      TRAININGS,
+      paramDefsOf,
+      onInit({ trainer, canvas }) {
+        setRedrawHook(() => { if (!trainer.running) trainer.draw(); });
+        canvas.addEventListener('click', e => trainer.handleClick(e));
+      }
     });
-
-    const paramPanel = $('#paramPanel');
-    const methodBox = $('#methodBox');
-    const nameEl = $('#statusName');
-
-    function select(t, btn) {
-      $$('.sr-train-item').forEach(b => b.classList.remove('active'));
-      if (btn) btn.classList.add('active');
-      trainer.selectTraining(t);
-      nameEl.textContent = t.name;
-      methodBox.innerHTML = `<b>训练方法：</b>${t.method}`;
-      const defs = paramDefsOf(t);
-      SR.buildParamPanel(paramPanel, defs, null, () => {
-        trainer.applyParams(SR.readParams(paramPanel, defs));
-      });
-    }
-
-    SR.buildControls($('#controls'), trainer);
-    SR.bindKeyboard(trainer);
-    canvas.addEventListener('click', e => trainer.handleClick(e));
-
-    const ro = new ResizeObserver(() => {
-      trainer.resize();
-      if (!trainer.running) trainer.draw();
-    });
-    ro.observe(stage);
-
-    const first = listEl.querySelector('.sr-train-item[data-id]');
-    if (first) select(TRAININGS[0], first);
-
-    // 支持 URL ?train=id 直接选中（训练计划执行器使用）
-    const urlTrain = new URLSearchParams(location.search).get('train');
-    if (urlTrain) {
-      const btn = listEl.querySelector(`[data-id="${urlTrain}"]`);
-      if (btn) btn.click();
-    }
   }
-
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {

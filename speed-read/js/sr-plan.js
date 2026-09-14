@@ -238,10 +238,10 @@
       execState = { idx: 0, remaining: currentPlan.steps[0].minutes * 60, paused: false };
       const panel = $('#execPanel');
       panel.style.display = 'block';
-      $('#execStartBtn').style.display = 'none';
-      $('#execPauseBtn').style.display = '';
+      $('#execStartBtn').hidden = true;
+      $('#execPauseBtn').hidden = false;
       $('#execPauseBtn').textContent = '暂停';
-      $('#execStopBtn').style.display = '';
+      $('#execStopBtn').hidden = false;
       loadStep(0);
     }
 
@@ -254,24 +254,30 @@
       $('#execStepName').textContent = `第 ${i + 1}/${currentPlan.steps.length} 步 · ${stepLabel(step)}`;
       const frame = $('#execFrame');
       frame.src = stepUrl(step);
-      execState.lastTick = Date.now();
+      armDeadline();
       if (execTimer) clearInterval(execTimer);
       execTimer = setInterval(tick, 500);
     }
 
+    /* 用 performance.now() 的截止时刻计时。
+       原先是 Date.now() 差值累加：后台标签页里 setInterval 会被节流到 ≥1s，
+       且 Date.now() 受系统时钟调整影响，两者叠加会让训练时长系统性偏长。 */
+    function armDeadline() {
+      if (!execState) return;
+      execState.deadline = performance.now() + execState.remaining * 1000;
+    }
+
     function tick() {
       if (!execState || execState.paused) return;
-      const now = Date.now();
-      const dt = (now - execState.lastTick) / 1000;
-      execState.lastTick = now;
-      execState.remaining -= dt;
+      execState.remaining = Math.max(0, (execState.deadline - performance.now()) / 1000);
       const m = Math.floor(execState.remaining / 60), s = Math.floor(execState.remaining % 60);
       $('#execCountdown').textContent = `剩余 ${m}:${String(s).padStart(2, '0')}`;
       const total = currentPlan.steps[execState.idx].minutes * 60;
       const pct = Math.max(0, Math.min(100, ((total - execState.remaining) / total) * 100));
       $('#execProgress').style.width = pct + '%';
       if (execState.remaining <= 0) {
-        Sound.done();
+        if (execTimer) { clearInterval(execTimer); execTimer = null; }
+        Sound.safe(() => Sound.done());
         loadStep(execState.idx + 1);
       }
     }
@@ -280,14 +286,13 @@
       if (execTimer) clearInterval(execTimer);
       execTimer = null;
       execState = null;
-      const panel = $('#execPanel');
       $('#execFrame').src = 'about:blank';
       $('#execStepName').textContent = '🎉 计划完成！恭喜你完成本次训练。';
       $('#execCountdown').textContent = '';
       $('#execProgress').style.width = '100%';
-      $('#execStartBtn').style.display = '';
-      $('#execPauseBtn').style.display = 'none';
-      $('#execStopBtn').style.display = 'none';
+      $('#execStartBtn').hidden = false;
+      $('#execPauseBtn').hidden = true;
+      $('#execStopBtn').hidden = true;
       Sound.good(); Sound.good();
     }
 
@@ -295,9 +300,9 @@
       if (execTimer) clearInterval(execTimer);
       execTimer = null;
       execState = null;
+      $('#execFrame').src = 'about:blank';
       const panel = $('#execPanel');
       panel.style.display = 'none';
-      $('#execFrame').src = 'about:blank';
     }
 
     $('#execStartBtn').addEventListener('click', startExec);
@@ -305,7 +310,7 @@
       if (!execState) return;
       execState.paused = !execState.paused;
       $('#execPauseBtn').textContent = execState.paused ? '继续' : '暂停';
-      if (!execState.paused) execState.lastTick = Date.now();
+      if (!execState.paused) armDeadline();   // 继续时按剩余量重设截止时刻
     });
     $('#execStopBtn').addEventListener('click', stopExec);
 

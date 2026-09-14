@@ -1,3 +1,4 @@
+import { createLifecycle } from "./_lifecycle.js";
 const CHARSETS = {
   ascii: [
     0,
@@ -881,36 +882,28 @@ function initializeAsciify(elements, options) {
     reducedMotion = motionQuery.matches;
     start();
   }
-  motionQuery.addEventListener("change", onMotionChange);
-  let themeTimer = 0;
-  function onThemeShift() {
-    syncBacking();
-    start();
-    window.clearTimeout(themeTimer);
-    themeTimer = window.setTimeout(() => {
-      syncBacking();
-      queueFallbackCapture();
+  /* 生命周期统一到 _lifecycle.js：尺寸观察、进出视口、标签页前后台、
+     prefers-reduced-motion、WebGL 上下文丢失提示、销毁时摘监听，全在那边。
+     这里只声明本组件在“变成可见 / 不可见”时各自要做什么。 */
+  const lifecycle = createLifecycle({
+    target: output,
+    watch: [content],
+    onResize: () => {
+      if (syncCanvasSize()) queueFallbackCapture();
       start();
-    }, 300);
-  }
-  const themeObserver = new MutationObserver(onThemeShift);
-  themeObserver.observe(document.documentElement, {
-    attributes: true,
-    attributeFilter: ["class", "style", "data-theme"]
+    },
+    onShow: () => {
+      visible = true;
+      start();
+    },
+    onHide: () => {
+      visible = false;
+      running = false;
+      if (raf) { cancelAnimationFrame(raf); raf = 0; }
+    },
+    onMotionChange,
+    gl
   });
-  const schemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
-  schemeQuery.addEventListener("change", onThemeShift);
-  const observer = new ResizeObserver(() => {
-    if (syncCanvasSize()) queueFallbackCapture();
-    start();
-  });
-  observer.observe(output);
-  observer.observe(content);
-  const intersection = new IntersectionObserver((entries) => {
-    visible = entries[entries.length - 1]?.isIntersecting ?? true;
-    if (visible) start();
-  });
-  intersection.observe(output);
   const listenTarget = output.parentElement ?? output;
   const contentObserver = htmlInCanvas ? null : new MutationObserver(() => queueFallbackCapture());
   contentObserver?.observe(content, {
@@ -1005,12 +998,10 @@ function initializeAsciify(elements, options) {
       window.clearTimeout(fallbackCaptureTimer);
       window.clearTimeout(fallbackScrollCaptureTimer);
       window.clearTimeout(maskTimer);
-      observer.disconnect();
-      intersection.disconnect();
+      lifecycle.destroy();
       themeObserver.disconnect();
       contentObserver?.disconnect();
       schemeQuery.removeEventListener("change", onThemeShift);
-      motionQuery.removeEventListener("change", onMotionChange);
       listenTarget.removeEventListener("pointermove", onPointerMove);
       listenTarget.removeEventListener("pointerleave", onPointerLeave);
       content.removeEventListener("scroll", onContentScroll, true);

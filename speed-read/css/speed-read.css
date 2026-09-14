@@ -136,14 +136,16 @@
 .sr-stage-hint {
   position: absolute; bottom: 10px; left: 50%;
   transform: translateX(-50%);
-  color: rgb(148 163 184 / 62%);
-  font-size: 12px; white-space: nowrap; pointer-events: none;
+  /* 原为 62% 透明度，叠在深色舞台上对比度仅约 4.0:1，贴着 AA 下限；
+     小字号需要更高对比，提到 88%（约 6.5:1）并放大到 13px。 */
+  color: rgb(148 163 184 / 88%);
+  font-size: 13px; white-space: nowrap; pointer-events: none;
 }
 .sr-inline-status {
   position: absolute; top: 12px; left: 14px; right: 14px;
   display: flex; justify-content: space-between;
-  color: rgb(148 163 184 / 62%);
-  font-size: 12px; pointer-events: none;
+  color: rgb(148 163 184 / 88%);
+  font-size: 13px; pointer-events: none;
   font-variant-numeric: tabular-nums;
 }
 
@@ -164,9 +166,18 @@
   transition: background .16s var(--ease), border-color .16s var(--ease), transform .1s ease;
 }
 .sr-btn:hover { background: var(--surface-2); border-color: var(--ink-3); }
+/* .sr-btn 自己声明了 display:inline-flex，会盖掉 UA 的 [hidden]{display:none}，
+   这里按元素+属性提升一级特异性，让 hidden 属性真正生效 */
+.sr-btn[hidden] { display: none; }
 .sr-btn:active { transform: scale(.975); }
+/* 键盘焦点指示：input/select 有，按钮原先没有，键盘用户看不到焦点在哪 */
+.sr-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
 .sr-btn-start { background: var(--btn-bg); border-color: var(--btn-bg); color: var(--btn-fg); }
 .sr-btn-start:hover { background: var(--btn-bg-h); border-color: var(--btn-bg-h); color: var(--btn-fg); }
+.sr-btn-start:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 .sr-state {
   margin-left: auto;
@@ -221,6 +232,12 @@
   font-size: 13.5px; line-height: 1.75; color: var(--ink-2);
 }
 .sr-method b { color: var(--ink); font-weight: 650; }
+/* 行内样式收编：原先写在 HTML 的 style="" 属性里。
+   .sr-unit 的 #64748b 是冷灰且不随主题切换，深色模式下几乎看不清；
+   改用 --ink-3 与站内其余次要文字一致。 */
+.sr-method.is-tight { margin-top: 12px; }
+.sr-unit { font-size: 13px; color: var(--ink-3); }
+.sr-input-narrow { width: 80px; }
 
 /* ------------------------------------------------- evidence note (hub) --- */
 /* Deliberately plain and readable rather than styled like a disclaimer nobody

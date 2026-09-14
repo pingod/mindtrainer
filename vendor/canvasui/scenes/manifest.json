@@ -1,0 +1,61 @@
+{
+  "_doc": "CanvasUI 33 个独立场景的元数据。父页面 canvasui-gallery.html 读这个文件构建 sidebar,不再硬编码。",
+  "_schema": {
+    "name": "kebab-case,对应 scenes/<name>.html 和 assets/js/canvasui/<name>.js",
+    "createName": "PascalCase 工厂函数名,旧 .js 文件导出 create<CreateName>",
+    "displayName": "UI 上显示的中英文名",
+    "description": "一句话中文描述",
+    "category": "分类 key,见 CATEGORY_LABELS",
+    "isObject3D": "true = 走 Three.js + GLTF 路径(接收 {canvas} 而非 {source,content,output})",
+    "content": "card | scroll — #content 形态(决定 setupContent 行为)",
+    "events": "autoInteract 要合成的事件列表"
+  },
+  "CATEGORY_LABELS": {
+    "reveal": "揭示 / 破碎",
+    "distort": "扭曲 / 变形",
+    "atmosphere": "氛围 / 天气",
+    "grid": "网格 / 粒子",
+    "object3d": "3D 物体",
+    "material": "材质 / 光效"
+  },
+  "components": [
+    { "name": "particle-reveal",  "createName": "ParticleReveal",  "displayName": "ParticleReveal",  "description": "粒子揭示:光标消散显现文字",       "category": "reveal",     "isObject3D": false, "content": "card",   "events": ["pointermove"] },
+    { "name": "decryptreveal",    "createName": "DecryptReveal",   "displayName": "DecryptReveal",   "description": "解密揭示:字符解密显现",           "category": "reveal",     "isObject3D": false, "content": "card",   "events": ["pointermove"] },
+    { "name": "shatter",          "createName": "Shatter",         "displayName": "Shatter",         "description": "破碎:碎块迸裂",                "category": "reveal",     "isObject3D": false, "content": "card",   "events": ["pointermove"] },
+    { "name": "peel",             "createName": "Peel",            "displayName": "Peel",            "description": "剥离:页面剥离",                "category": "reveal",     "isObject3D": false, "content": "card",   "events": ["pointermove"] },
+
+    { "name": "liquid",           "createName": "Liquid",          "displayName": "Liquid",          "description": "液体流动:流体扭曲内容",         "category": "distort",    "isObject3D": false, "content": "card",   "events": ["pointermove"] },
+    { "name": "bend",             "createName": "Bend",            "displayName": "Bend",            "description": "弯曲:内容扭曲弯折",             "category": "distort",    "isObject3D": false, "content": "scroll", "events": ["pointermove", "scroll"] },
+    { "name": "displacement",     "createName": "Displacement",    "displayName": "Displacement",    "description": "置换:位移扭曲",                "category": "distort",    "isObject3D": false, "content": "card",   "events": ["pointermove"] },
+    { "name": "ripple",           "createName": "Ripple",          "displayName": "Ripple",          "description": "波纹:涟漪扩散",                "category": "distort",    "isObject3D": false, "content": "card",   "events": ["pointermove", "pointerdown", "pointerup", "click"] },
+    { "name": "magnify",          "createName": "Magnify",         "displayName": "Magnify",         "description": "放大镜:局部放大",              "category": "distort",    "isObject3D": false, "content": "card",   "events": ["pointermove"] },
+    { "name": "glitch",           "createName": "Glitch",          "displayName": "Glitch",          "description": "故障:信号失真",                "category": "distort",    "isObject3D": false, "content": "card",   "events": ["pointermove"] },
+    { "name": "vhs",              "createName": "VHS",             "displayName": "VHS",             "description": "复古录像:VHS 特效",            "category": "distort",    "isObject3D": false, "content": "card",   "events": ["pointermove"] },
+    { "name": "retrodither",      "createName": "RetroDither",     "displayName": "RetroDither",     "description": "复古抖动:像素噪点",             "category": "distort",    "isObject3D": false, "content": "card",   "events": ["pointermove"] },
+    { "name": "frost",            "createName": "Frost",           "displayName": "Frost",           "description": "磨砂:霜冻玻璃",                "category": "distort",    "isObject3D": false, "content": "card",   "events": ["pointermove"] },
+
+    { "name": "blaze",            "createName": "Blaze",           "displayName": "Blaze",           "description": "火焰:燃烧效果",                "category": "atmosphere", "isObject3D": false, "content": "card",   "events": ["pointermove"] },
+    { "name": "flamewrap",        "createName": "FlameWrap",       "displayName": "FlameWrap",       "description": "火焰包裹:火焰环绕",             "category": "atmosphere", "isObject3D": false, "content": "card",   "events": ["pointermove"] },
+    { "name": "clouds",           "createName": "Clouds",          "displayName": "Clouds",          "description": "云:流动云层",                  "category": "atmosphere", "isObject3D": false, "content": "card",   "events": ["pointermove"] },
+    { "name": "droplets",         "createName": "Droplets",        "displayName": "Droplets",        "description": "水滴:雨水滴落",                "category": "atmosphere", "isObject3D": false, "content": "card",   "events": ["pointermove"] },
+    { "name": "forcefield",       "createName": "ForceField",      "displayName": "ForceField",      "description": "力场:能量场波动",              "category": "atmosphere", "isObject3D": false, "content": "card",   "events": ["pointermove"] },
+    { "name": "bubble",           "createName": "Bubble",          "displayName": "Bubble",          "description": "气泡:漂浮气泡",                "category": "atmosphere", "isObject3D": false, "content": "card",   "events": ["pointermove"] },
+    { "name": "cloth",            "createName": "Cloth",           "displayName": "Cloth",           "description": "布料:织物飘动",                "category": "atmosphere", "isObject3D": false, "content": "card",   "events": ["pointermove"] },
+
+    { "name": "grid",             "createName": "Grid",            "displayName": "Grid",            "description": "网格:动态网格场",              "category": "grid",       "isObject3D": false, "content": "card",   "events": ["pointermove"] },
+    { "name": "hexfloat",         "createName": "HexFloat",        "displayName": "HexFloat",        "description": "六边形漂浮:悬浮六边形",          "category": "grid",       "isObject3D": false, "content": "card",   "events": ["pointermove"] },
+    { "name": "glyphrain",        "createName": "GlyphRain",       "displayName": "GlyphRain",       "description": "字符雨:数字雨下落",             "category": "grid",       "isObject3D": false, "content": "card",   "events": ["pointermove"] },
+    { "name": "particlescroll",   "createName": "ParticleScroll",  "displayName": "ParticleScroll",  "description": "滚动粒子:滚动粒子背景",          "category": "grid",       "isObject3D": false, "content": "card",   "events": ["pointermove"] },
+
+    { "name": "asciiobject",      "createName": "AsciiObject",     "displayName": "AsciiObject",     "description": "ASCII 物体:字符构成 3D 模型",   "category": "object3d",   "isObject3D": true,  "content": "card",   "events": ["pointermove"] },
+    { "name": "ditheredobject",   "createName": "DitheredObject",  "displayName": "DitheredObject",  "description": "抖动点阵:像素化模型",           "category": "object3d",   "isObject3D": true,  "content": "card",   "events": ["pointermove"] },
+    { "name": "glassobject",      "createName": "GlassObject",     "displayName": "GlassObject",     "description": "玻璃物体:玻璃质感模型",          "category": "object3d",   "isObject3D": true,  "content": "card",   "events": ["pointermove"] },
+    { "name": "liquidobject",     "createName": "LiquidObject",    "displayName": "LiquidObject",    "description": "液体物体:流体包裹模型",          "category": "object3d",   "isObject3D": true,  "content": "card",   "events": ["pointermove"] },
+    { "name": "particleobject",   "createName": "ParticleObject",  "displayName": "ParticleObject",  "description": "粒子物体:粒子构成模型",          "category": "object3d",   "isObject3D": true,  "content": "card",   "events": ["pointermove"] },
+
+    { "name": "glass",            "createName": "Glass",           "displayName": "Glass",           "description": "玻璃:毛玻璃折射",              "category": "material",   "isObject3D": false, "content": "card",   "events": ["pointermove"] },
+    { "name": "laser",            "createName": "Laser",           "displayName": "Laser",           "description": "激光:激光光束",                "category": "material",   "isObject3D": false, "content": "card",   "events": ["pointermove"] },
+    { "name": "canvas",           "createName": "Canvas",          "displayName": "Canvas",          "description": "画布:基础画布",                "category": "material",   "isObject3D": false, "content": "card",   "events": ["pointermove"] },
+    { "name": "asciify",          "createName": "Asciify",         "displayName": "Asciify",         "description": "ASCII 滤镜:画面字符化",         "category": "material",   "isObject3D": false, "content": "card",   "events": ["pointermove"] }
+  ]
+}

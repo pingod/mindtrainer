@@ -1,3 +1,4 @@
+import { createLifecycle } from "./_lifecycle.js";
 const DEFAULT_CHARSET = "\uFF71\uFF72\uFF73\uFF74\uFF75\uFF76\uFF77\uFF78\uFF79\uFF7A\uFF7B\uFF7C\uFF7D\uFF7E\uFF7F\uFF80\uFF81\uFF82\uFF83\uFF84\uFF85\uFF86\uFF87\uFF88\uFF89\uFF8A\uFF8B\uFF8C\uFF8D\uFF8E\uFF8F\uFF90\uFF91\uFF92\uFF93\uFF94\uFF95\uFF96\uFF97\uFF98\uFF99\uFF9A\uFF9B\uFF9C\uFF9D0123456789Z*+-<>\xA6=:.";
 const DEFAULTS = {
   charset: DEFAULT_CHARSET,
@@ -611,56 +612,28 @@ function createGlyphRain(elements, options = {}) {
     }
     start();
   }
-  motionQuery.addEventListener("change", onMotionChange);
-  content.addEventListener("scroll", start, { passive: true });
-  const pointerHost = output.parentElement ?? output;
-  function pointerNorm(event) {
-    const box = output.getBoundingClientRect();
-    if (box.width < 1) return -1;
-    return (event.clientX - box.left) / box.width;
-  }
-  function onPointerMove(event) {
-    if (reducedMotion) return;
-    const x = pointerNorm(event);
-    if (x < 0) return;
-    pointerX = x;
-    tracking = true;
-    start();
-  }
-  function onPointerLeave() {
-    tracking = false;
-  }
-  function onPointerDown(event) {
-    if (reducedMotion || stirAmount() <= 1e-3) return;
-    const x = pointerNorm(event);
-    if (x < 0) return;
-    pointerX = x;
-    tracking = true;
-    const span = wakeSpan() * 1.8;
-    for (let i = 0; i < WAKE_RES; i++) {
-      const d = Math.abs((i + 0.5) / WAKE_RES - x) / span;
-      if (d >= 1) continue;
-      const t = 1 - d;
-      const burst = t * t * (3 - 2 * t);
-      if (burst > wakeCharge[i]) wakeCharge[i] = burst;
-    }
-    start();
-  }
-  pointerHost.addEventListener("pointermove", onPointerMove, { passive: true });
-  pointerHost.addEventListener("pointerleave", onPointerLeave, { passive: true });
-  pointerHost.addEventListener("pointercancel", onPointerLeave, { passive: true });
-  pointerHost.addEventListener("pointerdown", onPointerDown, { passive: true });
-  const observer = new ResizeObserver(() => {
-    syncCanvasSize();
-    start();
+  /* 生命周期统一到 _lifecycle.js：尺寸观察、进出视口、标签页前后台、
+     prefers-reduced-motion、WebGL 上下文丢失提示、销毁时摘监听，全在那边。
+     这里只声明本组件在“变成可见 / 不可见”时各自要做什么。 */
+  const lifecycle = createLifecycle({
+    target: output,
+    watch: [content],
+    onResize: () => {
+      syncCanvasSize();
+      start();
+    },
+    onShow: () => {
+      visible = true;
+      start();
+    },
+    onHide: () => {
+      visible = false;
+      running = false;
+      if (raf) { cancelAnimationFrame(raf); raf = 0; }
+    },
+    onMotionChange,
+    gl
   });
-  observer.observe(output);
-  observer.observe(content);
-  const intersection = new IntersectionObserver((entries) => {
-    visible = entries[entries.length - 1]?.isIntersecting ?? true;
-    if (visible) start();
-  });
-  intersection.observe(output);
   return {
     setOptions(next) {
       let changed = false;
@@ -689,9 +662,7 @@ function createGlyphRain(elements, options = {}) {
     destroy() {
       destroyed = true;
       cancelAnimationFrame(raf);
-      observer.disconnect();
-      intersection.disconnect();
-      motionQuery.removeEventListener("change", onMotionChange);
+      lifecycle.destroy();
       content.removeEventListener("scroll", start);
       pointerHost.removeEventListener("pointermove", onPointerMove);
       pointerHost.removeEventListener("pointerleave", onPointerLeave);

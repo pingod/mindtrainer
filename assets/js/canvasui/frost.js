@@ -1,3 +1,4 @@
+import { createLifecycle } from "./_lifecycle.js";
 const DEFAULTS = {
   frost: 0.05,
   strength: 0.7,
@@ -901,48 +902,28 @@ function createFrost(elements, options = {}) {
     reducedMotion = motionQuery.matches;
     if (!reducedMotion) start();
   }
-  motionQuery.addEventListener("change", onMotionChange);
-  function onPointerMove(event) {
-    if (reducedMotion) return;
-    const rect = output.getBoundingClientRect();
-    pointerX = (event.clientX - rect.left) / Math.max(rect.width, 1);
-    pointerY = (event.clientY - rect.top) / Math.max(rect.height, 1);
-    pointerOn = true;
-    activeUntil = performance.now() + refreezeDelayMs();
-    start();
-  }
-  function onPointerLeave() {
-    pointerOn = false;
-    activeUntil = performance.now() + refreezeDelayMs();
-    start();
-  }
-  const listenTarget = output.parentElement ?? output;
-  listenTarget.addEventListener("pointermove", onPointerMove, { passive: true });
-  listenTarget.addEventListener("pointerdown", onPointerMove, { passive: true });
-  listenTarget.addEventListener(
-    "pointerleave",
-    onPointerLeave
-  );
-  listenTarget.addEventListener(
-    "pointercancel",
-    onPointerLeave
-  );
-  function onScroll() {
-    activeUntil = Math.max(activeUntil, performance.now() + 400);
-    if (htmlInCanvas) paintable.requestPaint?.();
-    start();
-  }
-  content.addEventListener("scroll", onScroll, { passive: true });
-  const observer = new ResizeObserver(() => {
-    syncCanvasSize();
-    start();
+  /* 生命周期统一到 _lifecycle.js：尺寸观察、进出视口、标签页前后台、
+     prefers-reduced-motion、WebGL 上下文丢失提示、销毁时摘监听，全在那边。
+     这里只声明本组件在“变成可见 / 不可见”时各自要做什么。 */
+  const lifecycle = createLifecycle({
+    target: output,
+    watch: [],
+    onResize: () => {
+      syncCanvasSize();
+      start();
+    },
+    onShow: () => {
+      visible = true;
+      start();
+    },
+    onHide: () => {
+      visible = false;
+      running = false;
+      if (raf) { cancelAnimationFrame(raf); raf = 0; }
+    },
+    onMotionChange,
+    gl
   });
-  observer.observe(output);
-  const intersection = new IntersectionObserver((entries) => {
-    visible = entries[entries.length - 1]?.isIntersecting ?? true;
-    if (visible) start();
-  });
-  intersection.observe(output);
   return {
     melt(x, y) {
       if (reducedMotion) return;
@@ -972,9 +953,7 @@ function createFrost(elements, options = {}) {
     destroy() {
       destroyed = true;
       cancelAnimationFrame(raf);
-      observer.disconnect();
-      intersection.disconnect();
-      motionQuery.removeEventListener("change", onMotionChange);
+      lifecycle.destroy();
       releaseTarget(noiseTarget);
       releaseTarget(frostTarget);
       releaseTarget(blurA);

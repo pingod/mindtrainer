@@ -4,26 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>特效画廊 — MindTrainer</title>
-    <meta name="description" content="33 个 WebGL 视觉组件画廊，全部可交互演示。">
+    <meta name="description" content="33 个 WebGL 视觉组件画廊,全部可交互演示,每个组件独立可复制。">
     <link rel="apple-touch-icon" sizes="180x180" href="assets/images/icons/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="assets/images/icons/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="assets/images/icons/favicon-16x16.png">
-    <link rel="stylesheet" href="/assets/css/mt.css?v=20270101">
-
-    <script type="importmap">
-    {
-        "imports": {
-            "three": "/vendor/canvasui-three/three.module.min.js",
-            "three/addons/": "/vendor/canvasui-three/"
-        }
-    }
-    </script>
-
+    <link rel="stylesheet" href="/assets/css/mt.css?v=20260915">
     <style>
-        /* The gallery is a full-screen dark showcase: it deliberately keeps its
-           own world rather than following the site theme, because the WebGL
-           demos are authored against a dark stage. Tokens it needs are declared
-           here so the page no longer depends on the retired redesign.css. */
         :root {
             --dark-bg: #080b16;
             --dark-surface: #0f1424;
@@ -33,9 +19,8 @@
             --dark-line: rgba(255, 255, 255, .07);
             --r-pill: 999px;
             --r-sm: 10px;
+            --r-card: 14px;
         }
-
-        /* ===== Page-specific full-screen gallery ===== */
         *, *::before, *::after { box-sizing: border-box; }
         html, body { height: 100%; margin: 0; overflow: hidden; }
         body {
@@ -44,8 +29,6 @@
             font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif;
             -webkit-font-smoothing: antialiased;
         }
-
-        /* ===== Mesh gradient background ===== */
         .gallery-bg {
             position: fixed; inset: 0; z-index: 0; pointer-events: none;
             background:
@@ -61,8 +44,6 @@
             -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, #000 20%, transparent 85%);
             mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, #000 20%, transparent 85%);
         }
-
-        /* ===== Top bar ===== */
         .gallery-topbar {
             position: relative; z-index: 10;
             display: flex; align-items: center; gap: 16px;
@@ -81,7 +62,7 @@
         .gallery-title {
             font-size: 16px; font-weight: 800; letter-spacing: -.02em; color: #fff;
         }
-        .gallery-count {
+        #count {
             margin-left: auto;
             font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
             color: var(--dark-ink-3);
@@ -89,7 +70,7 @@
             padding: 5px 12px; border-radius: var(--r-pill);
             border: 1px solid rgba(255,255,255,.08);
         }
-        .gallery-random {
+        .gallery-btn {
             display: inline-flex; align-items: center; gap: 6px;
             font-size: 13px; font-weight: 600; cursor: pointer;
             background: rgba(255,255,255,.06);
@@ -98,18 +79,14 @@
             padding: 6px 14px; border-radius: var(--r-pill);
             transition: background .2s ease, border-color .2s ease;
         }
-        .gallery-random:hover { background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.2); }
-        .gallery-random svg { width: 14px; height: 14px; }
-
-        /* ===== Layout ===== */
+        .gallery-btn:hover { background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.2); }
+        .gallery-btn svg { width: 14px; height: 14px; }
         .gallery-body {
             position: relative; z-index: 1;
             display: flex;
             height: calc(100vh - 56px);
             height: calc(100dvh - 56px);
         }
-
-        /* ===== Sidebar ===== */
         .gallery-sidebar {
             width: 260px; flex: none;
             background: rgba(15,20,36,.5);
@@ -143,10 +120,7 @@
             width: 15px; height: 15px; color: var(--dark-ink-3);
             pointer-events: none;
         }
-        .sidebar-nav {
-            flex: 1; overflow-y: auto;
-            padding: 4px 10px 16px;
-        }
+        .sidebar-nav { flex: 1; overflow-y: auto; padding: 4px 10px 16px; }
         .sidebar-nav::-webkit-scrollbar { width: 5px; }
         .sidebar-nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,.12); border-radius: 3px; }
         .sidebar-cat {
@@ -179,8 +153,6 @@
             flex-shrink: 0;
         }
         .comp-btn.active small { color: rgba(255,255,255,.45); }
-
-        /* ===== Demo stage ===== */
         .gallery-stage {
             flex: 1; display: flex; flex-direction: column;
             min-width: 0; padding: 16px;
@@ -193,23 +165,12 @@
             border: 1px solid rgba(255,255,255,.08);
             box-shadow: 0 30px 80px -30px rgba(0,0,0,.5);
         }
-        #source-canvas {
-            position: absolute; inset: 0; width: 100%; height: 100%;
-            opacity: 0; pointer-events: none;
-        }
-        #content {
+        #stageFrame {
             position: absolute; inset: 0;
-            display: flex; align-items: center; justify-content: center;
-            font-size: clamp(28px, 5.5vw, 72px);
-            font-weight: 800; letter-spacing: .04em;
-            color: #fff; text-align: center; line-height: 1.15;
-            pointer-events: none;
+            width: 100%; height: 100%;
+            border: 0; background: #0a0e1a;
+            /* sandbox 在 HTML 属性里设 */
         }
-        #output-canvas {
-            position: absolute; inset: 0; width: 100%; height: 100%;
-        }
-
-        /* Stage overlay badges */
         .stage-hint {
             position: absolute; top: 14px; left: 14px;
             display: inline-flex; align-items: center; gap: 6px;
@@ -223,8 +184,6 @@
             opacity: 0; transition: opacity .3s ease;
         }
         .stage-hint.show { opacity: 1; }
-
-        /* Info bar */
         .stage-info {
             display: flex; align-items: center; gap: 14px;
             padding: 14px 4px 0;
@@ -239,13 +198,11 @@
             margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
         }
         .info-err { color: #f87171; font-size: 12.5px; flex-shrink: 0; }
-
-        /* ===== Responsive ===== */
         @media (max-width: 768px) {
             .gallery-sidebar { width: 200px; }
             .gallery-stage { padding: 10px; }
             .gallery-topbar { padding: 0 14px; }
-            .gallery-count { display: none; }
+            #count { display: none; }
         }
         @media (max-width: 580px) {
             .gallery-body { flex-direction: column; }
@@ -258,12 +215,9 @@
             .sidebar-cat { display: none; }
             .comp-btn { width: auto; flex-shrink: 0; }
         }
-
         @media (prefers-reduced-motion: reduce) {
             * { transition-duration: .01ms !important; }
         }
-
-        /* ===== Self-test report ===== */
         .selftest {
             position: fixed; inset: 0; z-index: 100;
             display: none;
@@ -304,7 +258,6 @@
         .st-row + .st-row { border-top: 1px solid rgba(255,255,255,.04); }
         .st-ok   { color: #4ade80; }
         .st-bad  { color: #f87171; }
-        .st-warn { color: #fbbf24; }
         .st-name { color: #fff; font-weight: 600; }
         .st-msg  { color: var(--dark-ink-2); word-break: break-word; }
     </style>
@@ -318,15 +271,15 @@
             返回首页
         </a>
         <span class="gallery-title">特效画廊</span>
-        <button class="gallery-random" id="selftestBtn" title="依次加载全部组件并报告失败项">
+        <button class="gallery-btn" id="selftestBtn" title="依次加载全部组件并报告失败项">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
             自检
         </button>
-        <button class="gallery-random" id="randomBtn" title="随机组件">
+        <button class="gallery-btn" id="randomBtn" title="随机组件">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>
             随机
         </button>
-        <span class="gallery-count">33 组件</span>
+        <span id="count">…</span>
     </header>
 
     <div class="gallery-body">
@@ -339,11 +292,17 @@
         </aside>
 
         <main class="gallery-stage">
-            <div class="stage-canvas-wrap" id="stage">
+            <div class="stage-canvas-wrap">
                 <span class="stage-hint" id="stageHint">移动鼠标 / 点击交互</span>
-                <canvas id="source-canvas"></canvas>
-                <div id="content">MINDTRAINER<br>选一个测试</div>
-                <canvas id="output-canvas"></canvas>
+                <!-- allow-scripts + allow-same-origin 这对组合确实会削弱沙箱的
+                     隔离意义，但这里是同源静态资源：去掉 allow-same-origin 会让
+                     iframe 变成 opaque origin，postMessage 的 origin 校验和
+                     contentWindow 访问都会失效。保留它，其余能力（表单、弹窗、
+                     顶层导航）仍被沙箱限制。 -->
+                <iframe id="stageFrame"
+                        sandbox="allow-scripts allow-same-origin"
+                        title="WebGL 场景"
+                        referrerpolicy="no-referrer"></iframe>
             </div>
             <div class="stage-info">
                 <div class="info-left">
@@ -368,574 +327,7 @@
         </div>
     </div>
 
-    <script type="module">
-        /* ============================================================
-         * CanvasUI Gallery — Bug-fixed + taste-skill redesigned
-         * Bugs fixed:
-         *   1. Model path: box.glb → Box.glb (case-sensitive)
-         *   2. Per-component options (no generic radius:0.4 breaking particle-reveal)
-         *   3. Pass #content div as content element (not stage, fixes retrodither)
-         *   4. Fresh output canvas per component (prevents WebGL state leakage)
-         *   5. Proper source canvas drawing for dark theme
-         * ============================================================ */
-
-        const COMPONENTS = [
-            // [file, createFnName, displayName, description, category]
-            ['particle-reveal',    'ParticleReveal',  'ParticleReveal',  '粒子揭示：光标消散显现文字',     'reveal'],
-            ['decryptreveal',      'DecryptReveal',   'DecryptReveal',   '解密揭示：字符解密显现',         'reveal'],
-            ['shatter',            'Shatter',         'Shatter',         '破碎：碎块迸裂',                'reveal'],
-            ['peel',               'Peel',            'Peel',            '剥离：页面剥离',                'reveal'],
-
-            ['liquid',             'Liquid',          'Liquid',          '液体流动：流体扭曲内容',         'distort'],
-            ['bend',               'Bend',            'Bend',            '弯曲：内容扭曲弯折',             'distort'],
-            ['displacement',       'Displacement',    'Displacement',    '置换：位移扭曲',                'distort'],
-            ['ripple',             'Ripple',          'Ripple',          '波纹：涟漪扩散',                'distort'],
-            ['magnify',            'Magnify',         'Magnify',         '放大镜：局部放大',              'distort'],
-            ['glitch',             'Glitch',          'Glitch',          '故障：信号失真',                'distort'],
-            ['vhs',                'VHS',             'VHS',             '复古录像：VHS 特效',            'distort'],
-            ['retrodither',        'RetroDither',     'RetroDither',     '复古抖动：像素噪点',             'distort'],
-            ['frost',              'Frost',           'Frost',           '磨砂：霜冻玻璃',                'distort'],
-
-            ['blaze',              'Blaze',           'Blaze',           '火焰：燃烧效果',                'atmosphere'],
-            ['flamewrap',          'FlameWrap',       'FlameWrap',       '火焰包裹：火焰环绕',             'atmosphere'],
-            ['clouds',             'Clouds',          'Clouds',          '云：流动云层',                  'atmosphere'],
-            ['droplets',           'Droplets',        'Droplets',        '水滴：雨水滴落',                'atmosphere'],
-            ['forcefield',         'ForceField',      'ForceField',      '力场：能量场波动',              'atmosphere'],
-            ['bubble',             'Bubble',          'Bubble',          '气泡：漂浮气泡',                'atmosphere'],
-            ['cloth',              'Cloth',           'Cloth',           '布料：织物飘动',                'atmosphere'],
-
-            ['grid',               'Grid',            'Grid',            '网格：动态网格场',              'grid'],
-            ['hexfloat',           'HexFloat',        'HexFloat',        '六边形漂浮：悬浮六边形',          'grid'],
-            ['glyphrain',          'GlyphRain',       'GlyphRain',       '字符雨：数字雨下落',             'grid'],
-            ['particlescroll',     'ParticleScroll',  'ParticleScroll',  '滚动粒子：滚动粒子背景',          'grid'],
-
-            ['asciiobject',        'AsciiObject',     'AsciiObject',     'ASCII 物体：字符构成 3D 模型',   'object3d'],
-            ['ditheredobject',     'DitheredObject',  'DitheredObject',  '抖动点阵：像素化模型',           'object3d'],
-            ['glassobject',        'GlassObject',     'GlassObject',     '玻璃物体：玻璃质感模型',          'object3d'],
-            ['liquidobject',       'LiquidObject',    'LiquidObject',    '液体物体：流体包裹模型',          'object3d'],
-            ['particleobject',     'ParticleObject',  'ParticleObject',  '粒子物体：粒子构成模型',          'object3d'],
-
-            ['glass',              'Glass',           'Glass',           '玻璃：毛玻璃折射',              'material'],
-            ['laser',              'Laser',           'Laser',           '激光：激光光束',                'material'],
-            ['canvas',             'Canvas',          'Canvas',          '画布：基础画布',                'material'],
-            ['asciify',            'Asciify',         'Asciify',         'ASCII 滤镜：画面字符化',         'material'],
-        ];
-
-        const CATEGORY_LABELS = {
-            reveal:      '揭示 / 破碎',
-            distort:     '扭曲 / 变形',
-            atmosphere:  '氛围 / 天气',
-            grid:        '网格 / 粒子',
-            object3d:    '3D 物体',
-            material:    '材质 / 光效',
-        };
-
-        // Object-type components (Three.js + GLTF)
-        const OBJECT_COMPONENTS = new Set(['asciiobject', 'ditheredobject', 'glassobject', 'liquidobject', 'particleobject']);
-        // FIX: correct case — file is Box.glb not box.glb
-        const MODEL_URL = '/vendor/canvasui-three/models/Box.glb';
-
-        // FIX: per-component options instead of generic { rainbow: true, radius: 0.4 }
-        // particle-reveal default radius is 500 (px) — passing 0.4 made it invisible
-        const COMPONENT_OPTIONS = {
-            'particle-reveal':  { background: '#0a0e1a' },
-            'decryptreveal':    { background: '#0a0e1a' },
-            'shatter':          {},
-            'peel':             { reveal: 210, curl: 360, bow: 55, bulge: 50, shade: 0.32, shine: 1.25, zone: 240, perspective: 1750 },
-            'liquid':           { rainbow: true, radius: 0.3 },
-            'bend':             {},
-            'displacement':     {},
-            'ripple':           {},
-            'magnify':          {},
-            'glitch':           {},
-            'vhs':              {},
-            'retrodither':      { background: '#0a0e1a' },
-            'frost':            {},
-            'blaze':            {},
-            'flamewrap':        {},
-            'clouds':           {},
-            'droplets':         {},
-            'forcefield':       {},
-            'bubble':           {},
-            'cloth':            {},
-            'grid':             {},
-            'hexfloat':         {},
-            'glyphrain':        {},
-            'particlescroll':   {},
-            'glass':            {},
-            'laser':            {},
-            'canvas':           {},
-            'asciify':          { background: [0.04, 0.05, 0.1], backgroundOpacity: 1 },
-        };
-
-        /* ----- Per-effect showcase contract (the architecture fix) -----
-         * Each effect needs different things. The old gallery forced every effect
-         * onto one static, non-interactive #content + one shared source card and
-         * only dispatched events to the canvas, so content-listening effects
-         * (ripple/bend/magnify/…) never got their interaction and scroll-driven
-         * effects had nothing to scroll. This manifest tells the gallery what live
-         * content and synthetic events each effect needs.
-         *   content: 'card'   → rich static card (default)
-         *            'scroll' → tall scrollable long card (scroll-driven effects)
-         *   events: which pointer/click/scroll events to synthesize.
-         */
-        const COMPONENT_META = {
-            'bend':             { content: 'scroll', events: ['pointermove', 'scroll'] },
-            'ripple':           { events: ['pointermove', 'pointerdown', 'pointerup', 'click'] },
-            'magnify':          { events: ['pointermove'] },
-            'liquid':           { events: ['pointermove'] },
-            'displacement':     { events: ['pointermove'] },
-            'frost':            { events: ['pointermove'] },
-            'peel':             { events: ['pointermove'] },
-            'particle-reveal':  { events: ['pointermove'] },
-            'decryptreveal':    { events: ['pointermove'] },
-        };
-        const META = (name) => Object.assign({ content: 'card', events: ['pointermove'] }, COMPONENT_META[name] || {});
-
-        /* ----- Configure #content per effect before the component loads ----- */
-        function setupContent(name) {
-            const meta = META(name);
-            const c = content;
-            if (meta.content === 'scroll') {
-                c.style.display = 'block';
-                c.style.alignItems = 'normal';
-                c.style.justifyContent = 'normal';
-                c.style.textAlign = 'left';
-                c.style.overflowY = 'auto';
-                c.innerHTML = '<div style="padding:40px;font-size:27px;line-height:1.9;color:#f1f5f9;font-weight:800;letter-spacing:.01em">'
-                    + '选一个测试 · 挑一个现在就测<br>MINDTRAINER<br>'
-                    + ('—— 认知测试 ——<br>'.repeat(16))
-                    + '反应时间 · 瞄准 · 序列记忆 · 数字记忆 · 多目标追踪 · 斯特鲁普</div>';
-                c.scrollTop = 0;
-            } else {
-                c.style.display = 'flex';
-                c.style.alignItems = 'center';
-                c.style.justifyContent = 'center';
-                c.style.textAlign = 'center';
-                c.style.overflowY = '';
-                c.innerHTML = 'MINDTRAINER<br>选一个测试';
-                c.scrollTop = 0;
-            }
-        }
-
-        // State
-        let source = document.getElementById('source-canvas');
-        let output = document.getElementById('output-canvas');
-        const content = document.getElementById('content');
-        const stage = document.getElementById('stage');
-        const infoName = document.getElementById('info-name');
-        const infoDesc = document.getElementById('info-desc');
-        const infoErr = document.getElementById('info-err');
-        const stageHint = document.getElementById('stageHint');
-        let current = null;
-        let aiTimers = [];
-        let currentIndex = -1;
-
-        /* ----- Source canvas drawing (dark theme) ----- */
-        function drawSource() {
-            const dpr = Math.min(window.devicePixelRatio || 1, 2);
-            // BUG FIX: use source.clientWidth (the canvas's own layout size), not stage.clientWidth
-            const w = source.clientWidth || stage.clientWidth, h = source.clientHeight || stage.clientHeight;
-            if (!w || !h) return;
-            source.width = Math.round(w * dpr);
-            source.height = Math.round(h * dpr);
-            const ctx = source.getContext('2d');
-            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-            ctx.clearRect(0, 0, w, h);
-            // Dark base matching the stage
-            ctx.fillStyle = '#0a0e1a';
-            ctx.fillRect(0, 0, w, h);
-            // Full-bleed accent gradient so the whole sheet — including the left
-            // peel zone — carries visible tone for the curl to read against.
-            const g = ctx.createLinearGradient(0, 0, w, h);
-            g.addColorStop(0, '#111d3a');
-            g.addColorStop(.45, '#0a0e1a');
-            g.addColorStop(1, '#191024');
-            ctx.fillStyle = g;
-            ctx.fillRect(0, 0, w, h);
-            // Soft mesh glows top-left / bottom-right give the sheet soft shapes.
-            const gl = ctx.createRadialGradient(w * .12, h * .18, 0, w * .12, h * .18, Math.max(w, h) * .55);
-            gl.addColorStop(0, 'rgba(59,130,246,.30)');
-            gl.addColorStop(1, 'rgba(59,130,246,0)');
-            ctx.fillStyle = gl; ctx.fillRect(0, 0, w, h);
-            const gr = ctx.createRadialGradient(w * .9, h * .85, 0, w * .9, h * .85, Math.max(w, h) * .55);
-            gr.addColorStop(0, 'rgba(139,92,246,.24)');
-            gr.addColorStop(1, 'rgba(139,92,246,0)');
-            ctx.fillStyle = gr; ctx.fillRect(0, 0, w, h);
-            // Faint grid so the curl visibly bends the lines — makes the peel obvious.
-            ctx.strokeStyle = 'rgba(148,163,184,.12)';
-            ctx.lineWidth = Math.max(1, Math.round(dpr));
-            const step = Math.max(34, Math.round(Math.min(w, h) * .052));
-            for (let x = step; x < w; x += step) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke(); }
-            for (let y = step; y < h; y += step) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
-            // A row of coloured test swatches across the sheet: the left cells sit in
-            // the peel zone, so the fold visibly lifts and bends them.
-            const colors = ['#3b82f6', '#8b5cf6', '#06b6d4', '#f59e0b', '#ef4444', '#22c55e'];
-            const sh = Math.max(24, Math.round(h * .055));
-            const gap = Math.max(14, Math.round(w * .012));
-            const sw = sh, sy = h * .76;
-            let sx = w * .055;
-            for (const c of colors) {
-                ctx.fillStyle = c;
-                ctx.beginPath();
-                ctx.roundRect(sx, sy, sw, sh, Math.round(sw * .24));
-                ctx.fill();
-                sx += sw + gap;
-            }
-            // Brand title + subtitle
-            ctx.fillStyle = '#f1f5f9';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.font = '800 ' + Math.round(Math.min(w * .058, 58)) + 'px -apple-system, sans-serif';
-            ctx.fillText('MINDTRAINER', w / 2, h * .40);
-            ctx.font = '500 ' + Math.round(Math.min(w * .021, 19)) + 'px -apple-system, sans-serif';
-            ctx.fillStyle = 'rgba(241,245,249,.55)';
-            ctx.fillText('选一个测试 · 挑一个现在就测', w / 2, h * .40 + Math.max(30, h * .048));
-        }
-
-        /* ----- FIX: fresh output canvas per component + force WebGL context loss ----- */
-        function refreshOutputCanvas() {
-            if (current && current.destroy) {
-                try { current.destroy(); } catch (e) {}
-                current = null;
-            }
-            // BUG FIX: Force WebGL context loss on old canvas to prevent context exhaustion
-            // After switching through ~16 components, browsers refuse new WebGL contexts → black screen.
-            // Try webgl2 AND webgl1: the Three.js components may have fallen back to webgl1,
-            // and getContext() only ever returns the context type the canvas already has.
-            try {
-                const oldGl = output.getContext('webgl2') || output.getContext('webgl');
-                if (oldGl) {
-                    const ext = oldGl.getExtension('WEBGL_lose_context');
-                    if (ext) ext.loseContext();
-                }
-            } catch (e) {}
-            // Replace canvas element entirely — guarantees a clean WebGL context
-            const fresh = document.createElement('canvas');
-            fresh.id = 'output-canvas';
-            fresh.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;';
-            output.replaceWith(fresh);
-            output = fresh;
-        }
-
-        /* ----- Auto interaction (pointermove → pointerdown/up/click → move) -----
-         * Dispatch synthetic events to BOTH the output canvas AND the #content div.
-         * Different components listen on different elements: Peel listens on the stage
-         * (output.parentElement), while ripple/bend/magnify/etc. listen on #content.
-         * Sending to both (plus pointerdown/up, and isPrimary) ensures every effect's
-         * own listeners fire, so interactive effects actually show their effect.
-         * #content is pointer-events:none and a sibling of the canvas, so events on the
-         * canvas never reach it; dispatching straight to it (and to output) is the fix.
-         * Events on content bubble up to the stage, so stage listeners still fire too.
-         */
-        function autoInteract(inst, el, contentEl, events) {
-            if (!inst || !el) return;
-            events = events || ['pointermove'];
-            const has = (t) => events.includes(t);
-            const targets = contentEl ? [el, contentEl] : [el];
-            const rect = () => el.getBoundingClientRect();
-            const pt = (x, y) => ({ clientX: x, clientY: y, bubbles: true, cancelable: true, pointerType: 'mouse', button: 0, isPrimary: true });
-            const fire = (type, x, y) => {
-                for (const t of targets) { try { t.dispatchEvent(new PointerEvent(type, pt(x, y))); } catch (e) {} }
-            };
-            const cx = () => rect().left + rect().width / 2;
-            const cy = () => rect().top + rect().height / 2;
-            if (has('pointermove')) {
-                aiTimers.push(setTimeout(() => fire('pointermove', cx(), cy()), 300));
-            }
-            if (has('pointerdown') || has('pointerup') || has('click')) {
-                aiTimers.push(setTimeout(() => {
-                    for (const t of targets) {
-                        if (has('pointerdown')) { try { t.dispatchEvent(new PointerEvent('pointerdown', pt(cx(), cy()))); } catch (e) {} }
-                        if (has('pointerup')) { try { t.dispatchEvent(new PointerEvent('pointerup', pt(cx(), cy()))); } catch (e) {} }
-                        if (has('click')) { try { t.dispatchEvent(new MouseEvent('click', { clientX: cx(), clientY: cy(), bubbles: true, cancelable: true })); } catch (e) {} }
-                    }
-                }, 650));
-            }
-            if (has('scroll') && contentEl) {
-                // Scroll the long card up and back so scroll-driven effects (Bend) fold.
-                const total = 16;
-                for (let i = 0; i < total; i++) {
-                    const frac = Math.sin((i / (total - 1)) * Math.PI); // 0 → 1 → 0
-                    aiTimers.push(setTimeout(() => {
-                        const max = Math.max(0, contentEl.scrollHeight - contentEl.clientHeight);
-                        contentEl.scrollTop = max * frac;
-                    }, 500 + i * 140));
-                }
-            }
-            if (has('pointermove')) {
-                aiTimers.push(setTimeout(() => fire('pointermove', cx() + Math.min(120, rect().width * 0.2), cy() - Math.min(60, rect().height * 0.15)), 1300));
-            }
-        }
-
-        /* ----- Load a component ----- */
-        async function loadComponent(name, createName, displayName, desc) {
-            infoErr.textContent = '';
-            // Clear pending interaction timers
-            aiTimers.forEach(t => clearTimeout(t));
-            aiTimers = [];
-
-            // Show hint
-            stageHint.classList.add('show');
-            setTimeout(() => stageHint.classList.remove('show'), 3000);
-
-            // FIX: fresh canvas per component (with WebGL context loss)
-            refreshOutputCanvas();
-
-            // BUG FIX: wait one frame so the new canvas has proper layout dimensions
-            // Without this, output.clientWidth may be 0 → component gets bad dimensions → black screen
-            await new Promise(r => requestAnimationFrame(() => r()));
-
-            try {
-                // Bump this to refresh cached component modules after editing one.
-                const m = await import(`./assets/js/canvasui/${name}.js?v=20270102`);
-                let createFn = m[createName];
-                if (typeof createFn !== 'function') {
-                    const alt = Object.keys(m).find(k => k.startsWith('create') && typeof m[k] === 'function');
-                    if (!alt) throw new Error('无 create 函数');
-                    createFn = m[alt];
-                }
-
-                if (OBJECT_COMPONENTS.has(name)) {
-                    // BUG FIX: components expect config.src (not config.model) for model URL
-                    current = createFn({ canvas: output }, { src: MODEL_URL, autoRotate: true, autoRotateSpeed: 1.5 });
-                    infoErr.textContent = current ? '' : '（create 返回 null）';
-                } else {
-                    // Configure #content for this effect first, then redraw the source
-                    // card AFTER canvas replacement to ensure correct dimensions.
-                    setupContent(name);
-                    drawSource();
-                    // Pass content div (not stage), and per-component options
-                    const opts = COMPONENT_OPTIONS[name] || {};
-                    current = createFn({ source, content, output }, opts);
-                    infoErr.textContent = current ? '' : '（create 返回 null — WebGL 可能不可用）';
-                }
-
-                if (current) {
-                    autoInteract(current, output, content, META(name).events);
-                }
-            } catch (e) {
-                infoErr.textContent = '错误: ' + (e.message || e);
-                console.error('[Gallery] Component load error:', name, e);
-            }
-        }
-
-        /* ----- Build sidebar ----- */
-        function buildList() {
-            const wrap = document.getElementById('galleryList');
-            const grouped = {};
-            COMPONENTS.forEach((c, i) => {
-                const cat = c[4];
-                if (!grouped[cat]) grouped[cat] = [];
-                grouped[cat].push({ comp: c, index: i });
-            });
-
-            const catOrder = ['reveal', 'distort', 'atmosphere', 'grid', 'object3d', 'material'];
-            let html = '';
-            for (const cat of catOrder) {
-                if (!grouped[cat]) continue;
-                html += `<div class="sidebar-cat">${CATEGORY_LABELS[cat]}</div>`;
-                for (const { comp, index } of grouped[cat]) {
-                    const [file, fnName, dispName, desc] = comp;
-                    html += `<button class="comp-btn" data-index="${index}" data-name="${dispName.toLowerCase()}">
-                        <span>${dispName}</span>
-                        <small>${desc.split('：')[0]}</small>
-                    </button>`;
-                }
-            }
-            wrap.innerHTML = html;
-
-            // Click handlers
-            wrap.querySelectorAll('.comp-btn').forEach(btn => {
-                btn.addEventListener('click', () => selectComponent(parseInt(btn.dataset.index)));
-            });
-        }
-
-        /* ----- Select a component by index ----- */
-        function selectComponent(index) {
-            if (index < 0 || index >= COMPONENTS.length) return;
-            currentIndex = index;
-            const [file, fnName, dispName, desc] = COMPONENTS[index];
-
-            // Update active state
-            document.querySelectorAll('.comp-btn').forEach(b => b.classList.remove('active'));
-            const btn = document.querySelector(`.comp-btn[data-index="${index}"]`);
-            if (btn) {
-                btn.classList.add('active');
-                btn.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-            }
-
-            infoName.textContent = dispName;
-            infoDesc.textContent = desc;
-            loadComponent(file, `create${fnName}`, dispName, desc);
-        }
-
-        /* ----- Search ----- */
-        document.getElementById('gallerySearch').addEventListener('input', (e) => {
-            const q = e.target.value.toLowerCase().trim();
-            document.querySelectorAll('.comp-btn').forEach(btn => {
-                const match = !q || btn.dataset.name.includes(q);
-                btn.style.display = match ? '' : 'none';
-            });
-            // Hide empty category headers
-            document.querySelectorAll('.sidebar-cat').forEach(cat => {
-                let next = cat.nextElementSibling;
-                let hasVisible = false;
-                while (next && !next.classList.contains('sidebar-cat')) {
-                    if (next.style.display !== 'none') { hasVisible = true; break; }
-                    next = next.nextElementSibling;
-                }
-                cat.style.display = hasVisible ? '' : 'none';
-            });
-        });
-
-        /* ----- Random button ----- */
-        document.getElementById('randomBtn').addEventListener('click', () => {
-            let idx;
-            do { idx = Math.floor(Math.random() * COMPONENTS.length); }
-            while (idx === currentIndex && COMPONENTS.length > 1);
-            selectComponent(idx);
-        });
-
-        /* ----- Keyboard navigation ----- */
-        document.addEventListener('keydown', (e) => {
-            if (e.target.tagName === 'INPUT') return;
-            if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
-                e.preventDefault();
-                selectComponent(Math.min(currentIndex + 1, COMPONENTS.length - 1));
-            } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
-                e.preventDefault();
-                selectComponent(Math.max(currentIndex - 1, 0));
-            } else if (e.key === 'r' || e.key === 'R') {
-                document.getElementById('randomBtn').click();
-            }
-        });
-
-        /* ----- Resize ----- */
-        window.addEventListener('resize', () => {
-            if (!OBJECT_COMPONENTS.has(COMPONENTS[currentIndex]?.[0])) {
-                drawSource();
-            }
-            if (current && current.resize) {
-                try { current.resize(); } catch (e) {}
-            }
-        });
-
-        /* ============================================================
-         * Self-test
-         * A silently-black effect almost always means a shader failed to
-         * compile or link, and that failure never reaches the UI. So rather
-         * than eyeballing 33 demos, hook compileShader/linkProgram globally
-         * and load every component in turn, reporting what actually broke.
-         * ============================================================ */
-        const shaderFails = [];
-        (function instrumentGL() {
-            const targets = [
-                window.WebGL2RenderingContext && window.WebGL2RenderingContext.prototype,
-                window.WebGLRenderingContext && window.WebGLRenderingContext.prototype,
-            ].filter(Boolean);
-
-            for (const proto of targets) {
-                const compile = proto.compileShader;
-                proto.compileShader = function (shader) {
-                    compile.call(this, shader);
-                    if (!this.getShaderParameter(shader, this.COMPILE_STATUS)) {
-                        shaderFails.push('着色器编译失败: ' +
-                            (this.getShaderInfoLog(shader) || '').trim().split('\n')[0]);
-                    }
-                };
-                const link = proto.linkProgram;
-                proto.linkProgram = function (program) {
-                    link.call(this, program);
-                    if (!this.getProgramParameter(program, this.LINK_STATUS)) {
-                        shaderFails.push('程序链接失败: ' +
-                            (this.getProgramInfoLog(program) || '').trim().split('\n')[0]);
-                    }
-                };
-            }
-        })();
-
-        const stEl    = document.getElementById('selftest');
-        const stBody  = document.getElementById('stBody');
-        const stSum   = document.getElementById('stSum');
-        document.getElementById('stClose').addEventListener('click', () => stEl.classList.remove('show'));
-        stEl.addEventListener('click', (e) => { if (e.target === stEl) stEl.classList.remove('show'); });
-
-        /* Has the browser run out of WebGL contexts? (a real limit, not a component bug) */
-        function isContextExhausted() {
-            try {
-                const probe = document.createElement('canvas');
-                const gl = probe.getContext('webgl2') || probe.getContext('webgl');
-                if (gl && gl.isContextLost && gl.isContextLost()) return true;
-                if (gl) { const ext = gl.getExtension('WEBGL_lose_context'); if (ext) ext.loseContext(); return false; }
-                return true;
-            } catch (e) { return true; }
-        }
-
-        /* Does the output canvas actually have a live, uncorrupted GL context? */
-        function inspectCanvas(cv) {
-            if (!cv.clientWidth || !cv.clientHeight) return '画布尺寸为 0';
-            let gl = null;
-            try { gl = cv.getContext('webgl2') || cv.getContext('webgl'); } catch (e) {}
-            if (!gl) return '没有 WebGL 上下文';
-            if (gl.isContextLost && gl.isContextLost()) return 'WebGL 上下文已丢失（可能超出浏览器并发上限）';
-            const err = gl.getError();
-            if (err && err !== gl.NO_ERROR) return 'GL 错误码 ' + err;
-            return null;
-        }
-
-        async function runSelfTest() {
-            stEl.classList.add('show');
-            stBody.innerHTML = '';
-            let ok = 0, bad = 0, warn = 0;
-
-            for (let i = 0; i < COMPONENTS.length; i++) {
-                const [file, fnName, dispName] = COMPONENTS[i];
-                stSum.textContent = `检测中 ${i + 1}/${COMPONENTS.length}…`;
-
-                shaderFails.length = 0;
-                let problem = null;
-
-                try {
-                    await new Promise(r => setTimeout(r, 0));
-                    selectComponent(i);
-                    // give the component time to compile shaders and render a frame
-                    await new Promise(r => setTimeout(r, 700));
-
-                    if (infoErr.textContent) problem = infoErr.textContent;
-                    else if (!current) problem = isContextExhausted()
-                        ? 'WebGL 上下文已达浏览器并发上限（非组件故障，被跳过）'
-                        : 'create 返回 null';
-                    else if (shaderFails.length) problem = shaderFails[0];
-                    else problem = inspectCanvas(output);
-                } catch (e) {
-                    problem = '异常: ' + (e.message || e);
-                }
-
-                const isWarn = problem && /上下文已丢失|并发上限|被跳过/.test(problem);
-                const cls  = problem ? (isWarn ? 'st-warn' : 'st-bad') : 'st-ok';
-                const mark = problem ? (isWarn ? '!' : '✕') : '✓';
-                if (problem) { isWarn ? warn++ : bad++; } else { ok++; }
-
-                const row = document.createElement('div');
-                row.className = 'st-row';
-                row.innerHTML =
-                    `<span class="${cls}">${mark}</span>` +
-                    `<span class="st-name">${dispName}</span>` +
-                    `<span class="st-msg">${problem ? String(problem).replace(/</g, '&lt;') : '正常'}</span>`;
-                stBody.appendChild(row);
-                stBody.scrollTop = stBody.scrollHeight;
-            }
-
-            stSum.textContent = `正常 ${ok} · 失败 ${bad}` + (warn ? ` · 上下文受限 ${warn}` : '');
-        }
-
-        document.getElementById('selftestBtn').addEventListener('click', runSelfTest);
-
-        /* ----- Init ----- */
-        buildList();
-        selectComponent(0);
-    </script>
-<script src="/assets/js/feedback-marker.js?v=20270101" defer></script>
+    <script type="module" src="/assets/js/canvasui-gallery.js?v=20260915"></script>
+    <script src="/assets/js/feedback-marker.js?v=20260915" defer></script>
 </body>
 </html>

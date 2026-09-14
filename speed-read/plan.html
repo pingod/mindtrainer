@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>训练计划 – 飞克视读训练中心</title>
     <meta name="description" content="自定义训练计划：添加训练步骤与时长，一键按序执行整套训练教程。">
-    <link rel="icon" type="image/png" sizes="32x32" href="../assets/images/icons/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="../assets/images/icons/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/icons/favicon-16x16.png">
     <script>try{var t=localStorage.getItem('mt-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
-    <link rel="stylesheet" href="/assets/css/mt.css?v=20270101">
-    <link rel="stylesheet" href="css/speed-read.css?v=20270101">
+    <link rel="stylesheet" href="/assets/css/mt.css?v=20260915">
+    <link rel="stylesheet" href="css/speed-read.css?v=20260915">
     <style>
         /* plan builder, on the shared token system */
         .sr-plan-wrap { width: 100%; max-width: 960px; margin-inline: auto; padding: 8px 20px clamp(48px, 7vw, 80px); display: grid; gap: 16px; }
@@ -48,7 +48,7 @@
         #execStepName { font-size: 15px; font-weight: 600; color: var(--ink); }
         #execFrame { width: 100%; height: 62vh; border: 1px solid var(--line); border-radius: var(--r-stage); background: var(--sr-stage); }
     </style>
-    <script src="/assets/js/mt-nav.js?v=20270101" defer></script>
+    <script src="/assets/js/mt-nav.js?v=20260915" defer></script>
 </head>
 <body>
 <header id="mt-header"></header>
@@ -69,7 +69,7 @@
                 <button type="button" class="sr-btn" id="deletePlanBtn">🗑 删除</button>
                 <button type="button" class="sr-btn" id="exportPlanBtn">⬇ 导出</button>
                 <button type="button" class="sr-btn" id="importPlanBtn">⬆ 导入</button>
-                <input type="file" id="importFile" accept="application/json" style="display:none">
+                <input type="file" id="importFile" accept="application/json" hidden>
             </div>
         </div>
 
@@ -78,8 +78,8 @@
             <div class="sr-plan-row">
                 <select id="moduleSel"></select>
                 <select id="trainSel"></select>
-                <input type="number" id="stepMinutes" value="3" min="1" max="120" style="width:80px">
-                <span style="font-size:13px;color:#64748b">分钟</span>
+                <input type="number" id="stepMinutes" class="sr-input-narrow" value="3" min="1" max="120">
+                <span class="sr-unit">分钟</span>
                 <button type="button" class="sr-btn sr-btn-start" id="addStepBtn">＋ 添加</button>
             </div>
             <div id="stepList"></div>
@@ -89,8 +89,8 @@
         <div class="sr-plan-card" id="execPanel">
             <div class="exec-bar">
                 <button type="button" class="sr-btn sr-btn-start" id="execStartBtn">▶ 开始执行</button>
-                <button type="button" class="sr-btn" id="execPauseBtn" style="display:none">暂停</button>
-                <button type="button" class="sr-btn" id="execStopBtn" style="display:none">停止</button>
+                <button type="button" class="sr-btn" id="execPauseBtn" hidden>暂停</button>
+                <button type="button" class="sr-btn" id="execStopBtn" hidden>停止</button>
                 <span id="execStepName"></span>
                 <span id="execCountdown"></span>
                 <div class="exec-progress-wrap"><div id="execProgress"></div></div>
@@ -107,8 +107,8 @@
 
 <footer></footer>
 
-<script src="js/sr-common.js?v=20270101" defer></script>
-<script src="js/sr-plan.js?v=20270101" defer></script>
-<script src="/assets/js/feedback-marker.js?v=20270101" defer></script>
+<script src="js/sr-common.js?v=20260915" defer></script>
+<script src="js/sr-plan.js?v=20260915" defer></script>
+<script src="/assets/js/feedback-marker.js?v=20260915" defer></script>
 </body>
 </html>

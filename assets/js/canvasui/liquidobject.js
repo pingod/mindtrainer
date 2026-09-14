@@ -1,3 +1,4 @@
+import { createLifecycle } from "./_lifecycle.js";
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
@@ -1552,8 +1553,6 @@ function createLiquidObject(elements, options = {}) {
     aspect = width / height;
     splatPass.uniforms.uAspect.value = aspect;
   }
-  const observer = new ResizeObserver(resize);
-  observer.observe(canvas);
   resize();
   clearSimulation();
   applyOptions();
@@ -1617,15 +1616,23 @@ function createLiquidObject(elements, options = {}) {
     loopRunning = false;
     renderer.setAnimationLoop(null);
   }
-  const viewObserver = typeof IntersectionObserver !== "undefined" ? new IntersectionObserver((entries) => {
-    inView = entries[entries.length - 1]?.isIntersecting ?? true;
-    if (inView) {
+  /* 生命周期统一到 _lifecycle.js。这 5 个 three.js 组件此前既没有
+     visibilitychange 也没有上下文丢失处理 —— 标签页切到后台，
+     renderer.setAnimationLoop 照样在跑。接进来之后两者补齐，
+     并且 destroy() 会把监听全部摘干净（此前是逐个手写，容易漏）。 */
+  const lifecycle = createLifecycle({
+    target: canvas,
+    onResize: resize,
+    onShow: () => {
+      inView = true;
       startLoop();
-    } else {
+    },
+    onHide: () => {
+      inView = false;
       stopLoop();
-    }
-  }) : null;
-  viewObserver?.observe(canvas);
+    },
+    onMotionChange
+  });
   startLoop();
   return {
     setOptions(next) {
@@ -1657,13 +1664,11 @@ function createLiquidObject(elements, options = {}) {
       disposed = true;
       loadToken += 1;
       stopLoop();
-      observer.disconnect();
-      viewObserver?.disconnect();
+      lifecycle.destroy();
       canvas.removeEventListener("pointermove", onPointerMove);
       canvas.removeEventListener("pointerdown", onPointerDown);
       canvas.removeEventListener("pointerleave", onPointerLeave);
       canvas.removeEventListener("pointercancel", onPointerLeave);
-      motionQuery.removeEventListener("change", onMotionChange);
       controls.dispose();
       clearAsset();
       if (roomScene) disposeObject(roomScene);

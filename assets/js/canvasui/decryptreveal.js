@@ -1,3 +1,4 @@
+import { createLifecycle } from "./_lifecycle.js";
 const PRINTABLE_ASCII = Array.from(
   { length: 95 },
   (_, i) => String.fromCharCode(32 + i)
@@ -794,18 +795,28 @@ function createDecryptReveal(elements, options = {}) {
     reducedMotion = motionQuery.matches;
     start();
   }
-  motionQuery.addEventListener("change", onMotionChange);
-  const observer = new ResizeObserver(() => {
-    syncCanvasSize();
-    start();
+  /* 生命周期统一到 _lifecycle.js：尺寸观察、进出视口、标签页前后台、
+     prefers-reduced-motion、WebGL 上下文丢失提示、销毁时摘监听，全在那边。
+     这里只声明本组件在“变成可见 / 不可见”时各自要做什么。 */
+  const lifecycle = createLifecycle({
+    target: output,
+    watch: [content],
+    onResize: () => {
+      syncCanvasSize();
+      start();
+    },
+    onShow: () => {
+      visible = true;
+      start();
+    },
+    onHide: () => {
+      visible = false;
+      running = false;
+      if (raf) { cancelAnimationFrame(raf); raf = 0; }
+    },
+    onMotionChange,
+    gl
   });
-  observer.observe(output);
-  observer.observe(content);
-  const intersection = new IntersectionObserver((entries) => {
-    visible = entries[entries.length - 1]?.isIntersecting ?? true;
-    if (visible) start();
-  });
-  intersection.observe(output);
   const listenTarget = output.parentElement ?? output;
   function onPointerMove(event) {
     const rect = output.getBoundingClientRect();
@@ -860,9 +871,7 @@ function createDecryptReveal(elements, options = {}) {
     destroy() {
       destroyed = true;
       cancelAnimationFrame(raf);
-      observer.disconnect();
-      intersection.disconnect();
-      motionQuery.removeEventListener("change", onMotionChange);
+      lifecycle.destroy();
       listenTarget.removeEventListener("pointermove", onPointerMove);
       listenTarget.removeEventListener("pointerleave", onPointerLeave);
       gl.deleteTexture(contentTexture);

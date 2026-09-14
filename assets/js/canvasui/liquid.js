@@ -1,3 +1,4 @@
+import { createLifecycle } from "./_lifecycle.js";
 const DEFAULTS = {
   simResolution: 128,
   dyeResolution: 512,
@@ -668,44 +669,28 @@ function createLiquid(elements, options = {}) {
     reducedMotion = motionQuery.matches;
     if (!reducedMotion) start();
   }
-  motionQuery.addEventListener("change", onMotionChange);
-  const pointers = /* @__PURE__ */ new Map();
-  function onPointerMove(event) {
-    if (reducedMotion) return;
-    const rect = output.getBoundingClientRect();
-    const px = event.clientX - rect.left;
-    const py = event.clientY - rect.top;
-    const previous = pointers.get(event.pointerId);
-    pointers.set(event.pointerId, { x: px, y: py });
-    if (!previous) return;
-    const dx = (px - previous.x) * config.force;
-    const dy = -(py - previous.y) * config.force;
-    queued.push([px / rect.width, 1 - py / rect.height, dx, dy]);
-    start();
-  }
-  function onPointerLeave(event) {
-    pointers.delete(event.pointerId);
-  }
-  const listenTarget = output.parentElement ?? output;
-  listenTarget.addEventListener("pointermove", onPointerMove, { passive: true });
-  listenTarget.addEventListener(
-    "pointerleave",
-    onPointerLeave
-  );
-  listenTarget.addEventListener(
-    "pointercancel",
-    onPointerLeave
-  );
-  const observer = new ResizeObserver(() => {
-    syncCanvasSize();
-    start();
+  /* 生命周期统一到 _lifecycle.js：尺寸观察、进出视口、标签页前后台、
+     prefers-reduced-motion、WebGL 上下文丢失提示、销毁时摘监听，全在那边。
+     这里只声明本组件在“变成可见 / 不可见”时各自要做什么。 */
+  const lifecycle = createLifecycle({
+    target: output,
+    watch: [],
+    onResize: () => {
+      syncCanvasSize();
+      start();
+    },
+    onShow: () => {
+      visible = true;
+      start();
+    },
+    onHide: () => {
+      visible = false;
+      running = false;
+      if (raf) { cancelAnimationFrame(raf); raf = 0; }
+    },
+    onMotionChange,
+    gl
   });
-  observer.observe(output);
-  const intersection = new IntersectionObserver((entries) => {
-    visible = entries[entries.length - 1]?.isIntersecting ?? true;
-    if (visible) start();
-  });
-  intersection.observe(output);
   return {
     splat(x, y, dx, dy) {
       if (reducedMotion) return;
@@ -728,9 +713,7 @@ function createLiquid(elements, options = {}) {
     destroy() {
       destroyed = true;
       cancelAnimationFrame(raf);
-      observer.disconnect();
-      intersection.disconnect();
-      motionQuery.removeEventListener("change", onMotionChange);
+      lifecycle.destroy();
       releaseAll();
       gl.deleteTexture(contentTexture);
       programs.forEach((program) => gl.deleteProgram(program));

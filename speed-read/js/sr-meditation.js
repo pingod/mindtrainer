@@ -1,6 +1,7 @@
 /* ============================================================
  * MindTrainer — 飞克视读 Web 重写 · 冥想训练
- * 双脑同步声频（双耳节拍 binaural beats）+ 呼吸引导 + 曼陀罗动画
+ * 双耳节拍（binaural beats）+ 可选背景音乐（原版 Music.mp3）
+ * + 呼吸引导 + 曼陀罗动画
  * ============================================================ */
 (function () {
   'use strict';
@@ -17,6 +18,19 @@
   ];
 
   const CARRIER = 200; // 载波频率 200Hz，左右声道相差 beatHz
+
+  /* AudioContext 全局单例。
+     原先每次 startAudio 都 new 一个，切档位又是 stopAudio + startAudio
+     （再建一个），而 close() 是异步的 —— 快速连点会短暂突破浏览器约 6 个
+     AudioContext 上限，之后出声失败且控制台刷警告。 */
+  let sharedAudio = null;
+  function getSharedAudio() {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    if (!sharedAudio || sharedAudio.state === 'closed') sharedAudio = new AC();
+    if (sharedAudio.state === 'suspended') sharedAudio.resume();
+    return sharedAudio;
+  }
 
   class MeditationEngine {
     constructor(canvas) {
@@ -36,13 +50,20 @@
       this.breathPhase = 'inhale';
       this.breathT = 0;
       this.wave = WAVES[2]; // 默认 α
-      this.params = { vol: 0.35, breath: true, anim: true, breathe: 'box' };
+      /* vol 是 0~1 的实际增益，volPct/bgmPct 是参数面板上 0~100 的百分比。
+         原先面板直接写 vol（5~80），startAudio 又把它当作增益塞进
+         master.gain —— 用户只要动过任意一个参数（面板会把整份参数回传），
+         增益就会从 0.35 变成 35，音量暴增百倍并严重削波。 */
+      this.params = { vol: 0.35, volPct: 35, bgmOn: true, bgmPct: 40, anim: true, breathe: 'box' };
+      this.bgm = null;              // 背景音乐 Music.mp3（原版飞克视读的资源，默认随训练开启）
       this.breathPatterns = {
         box: { inhale: 4, hold: 4, exhale: 4, rest: 4 },
         relax: { inhale: 4, hold: 7, exhale: 8, rest: 0 },
         quick: { inhale: 3, hold: 0, exhale: 3, rest: 0 }
       };
       this._ro = null;
+      this._raf = 0;
+      this._boundLoop = this.loop.bind(this);   // 预绑定，避免每帧新建函数对象
     }
 
     resize() {
@@ -52,16 +73,58 @@
 
     setWave(wave) { this.wave = wave; }
 
-    applyParams(p) { Object.assign(this.params, p); }
+    /* 节拍音量：面板百分比 -> 0~1 增益，并实时生效（原先只在 start 时设一次，
+       训练中拖动音量滑杆完全没反应）。 */
+    setVolume(v) {
+      this.params.vol = Math.max(0, Math.min(1, v));
+      if (this.gainNode && this.audio) {
+        try {
+          this.gainNode.gain.setTargetAtTime(this.params.vol, this.audio.currentTime, 0.05);
+        } catch (e) { /* 上下文已关闭 */ }
+      }
+    }
 
-    /* 启动音频 */
+    /* ---------------- 背景音乐（原版飞克视读 Music.mp3） ---------------- */
+    startBgm() {
+      if (!this.params.bgmOn) return false;
+      if (!this.bgm) {
+        this.bgm = new Audio('/speed-read/assets/music/Music.mp3');
+        this.bgm.loop = true;
+        this.bgm.preload = 'none';
+      }
+      this.bgm.volume = Math.max(0, Math.min(1, (this.params.bgmPct || 0) / 100));
+      const pr = this.bgm.play();
+      // 自动播放策略可能拒绝，等用户下次手势；这里静默即可
+      if (pr && pr.catch) pr.catch(() => {});
+      return true;
+    }
+
+    stopBgm() { if (this.bgm) this.bgm.pause(); }
+
+    setBgmVolume(pct) {
+      this.params.bgmPct = pct;
+      if (this.bgm) this.bgm.volume = Math.max(0, Math.min(1, pct / 100));
+    }
+
+    applyParams(p) {
+      const prevBgmOn = this.params.bgmOn;
+      if (p.volPct != null) { this.params.volPct = p.volPct; this.setVolume(p.volPct / 100); }
+      if (p.bgmPct != null) this.setBgmVolume(p.bgmPct);
+      Object.assign(this.params, p);
+      // 运行中切换背景音乐开关即时生效
+      if (this.params.bgmOn !== prevBgmOn && this.running) {
+        if (this.params.bgmOn) this.startBgm(); else this.stopBgm();
+      }
+    }
+
+    /* 启动音频（复用单例上下文） */
     startAudio() {
-      const AC = window.AudioContext || window.webkitAudioContext;
-      if (!AC) return false;
-      this.audio = new AC();
-      const c = this.audio;
+      const c = getSharedAudio();
+      if (!c) return false;
+      this.audio = c;
       const master = c.createGain();
-      master.gain.value = this.params.vol || 0.35;
+      // 用 typeof 判断而非 ||：0 是合法的静音值，|| 会把它顶成 0.35
+      master.gain.value = typeof this.params.vol === 'number' ? this.params.vol : 0.35;
       master.connect(c.destination);
 
       // 左声道：载波
@@ -103,9 +166,20 @@
       try {
         if (this.oscL) this.oscL.stop();
         if (this.oscR) this.oscR.stop();
-        if (this.audio) this.audio.close();
-      } catch (e) {}
-      this.oscL = this.oscR = this.audio = null;
+        // 不 close 单例上下文，只挂起：下次 start 复用，避免反复创建/销毁
+        if (this.audio && this.audio.state === 'running') this.audio.suspend();
+      } catch (e) { /* 振荡器已停止等情况忽略 */ }
+      this.oscL = this.oscR = null;
+      this.audio = null;
+    }
+
+    /* 切换档位时只改右声道频率，不重建整套音频节点 */
+    updateWaveAudio() {
+      if (!this.audio || !this.oscR) return false;
+      try {
+        this.oscR.frequency.setTargetAtTime(CARRIER + this.wave.freq, this.audio.currentTime, 0.05);
+        return true;
+      } catch (e) { return false; }
     }
 
     start() {
@@ -117,12 +191,20 @@
       this.breathPhase = 'inhale';
       this.t = 0;
       this.startAudio();
-      requestAnimationFrame(this.loop.bind(this));
+      this.startBgm();
+      this._stopLoop();
+      this._raf = requestAnimationFrame(this._boundLoop);
     }
 
     stop() {
       this.running = false;
+      this._stopLoop();
       this.stopAudio();
+      this.stopBgm();
+    }
+
+    _stopLoop() {
+      if (this._raf) { cancelAnimationFrame(this._raf); this._raf = 0; }
     }
 
     toggle() {
@@ -151,7 +233,7 @@
         this.breathPhase = 'rest';
       }
       this.draw();
-      requestAnimationFrame(this.loop.bind(this));
+      this._raf = requestAnimationFrame(this._boundLoop);
     }
 
     draw() {
@@ -228,26 +310,24 @@
       btn.innerHTML = `<b>${w.name}</b><small>${w.desc}</small>`;
       btn.title = w.desc;
       btn.addEventListener('click', () => {
-        $$('.wave-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
+        SR.markActive(btn, '.wave-btn');
         engine.setWave(w);
-        // 如果正在运行，重建音频
-        if (engine.running) {
-          engine.stopAudio();
-          engine.startAudio();
-        }
+        // 运行中切档位只改频率。原先是 stopAudio + startAudio 整套重建，
+        // 会再开一个 AudioContext 并让声音中断一下。
+        if (engine.running) engine.updateWaveAudio();
         SR.Sound.ok();
       });
       wavePanel.appendChild(btn);
     });
-    // 默认 α
     const alphaBtn = wavePanel.querySelector('[data-id="alpha"]');
-    if (alphaBtn) alphaBtn.classList.add('active');
+    if (alphaBtn) SR.markActive(alphaBtn, '.wave-btn');   // 默认 α
 
     // 参数面板
     const paramPanel = $('#paramPanel');
     const defs = [
-      { key: 'vol', label: '音量', type: 'range', min: 5, max: 80, def: 35, display: v => Math.round(v) + '%' },
+      { key: 'volPct', label: '节拍音量', type: 'range', min: 0, max: 100, def: 35, display: v => Math.round(v) + '%' },
+      { key: 'bgmOn', label: '背景音乐', type: 'check', def: true },
+      { key: 'bgmPct', label: '音乐音量', type: 'range', min: 0, max: 100, def: 40, display: v => Math.round(v) + '%' },
       { key: 'breathe', label: '呼吸节奏', type: 'select', def: 'box',
         options: [['box', '4-4-4-4 盒式'], ['relax', '4-7-8 放松'], ['quick', '3-3 快速']] },
       { key: 'anim', label: '曼陀罗动画', type: 'check', def: true }
@@ -287,6 +367,15 @@
     // 点击页面任意处恢复音频上下文
     document.addEventListener('click', () => {
       if (engine.audio && engine.audio.state === 'suspended') engine.audio.resume();
+    });
+
+    // 切到后台时停止：原先 rAF 被浏览器节流但振荡器仍在发声，动画与声音
+    // 脱节，回到前台还会累积 elapsed。
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden && engine.running) {
+        engine.stop();
+        startBtn.textContent = '开始冥想';
+      }
     });
 
     const ro = new ResizeObserver(() => {

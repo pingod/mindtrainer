@@ -265,6 +265,11 @@
           if (p.manual) this.phase = 'wait_click';
           else this.toTest();
         }
+      } else if (this.phase === 'feedback') {
+        // 反馈态原先完全没有出口：updateFeedback 定义了却从不被调用，
+        // 默认 test:true 时答完第一题就永久停在「✓ 正确」。
+        // phaseT 已在本方法顶部统一累加，这里传 0 避免双倍计时。
+        this.updateFeedback(0);
       }
     }
 
@@ -523,60 +528,17 @@
   }
 
   /* ---------------- 页面初始化 ---------------- */
+  /* ---------------- 页面初始化 ---------------- */
   function init() {
-    const canvas = $('#canvas');
-    const stage = $('#stage');
-    const trainer = new FlashTrainer({ canvas });
-
-    const listEl = $('#trainList');
-    TRAININGS.forEach(t => {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'sr-train-item';
-      btn.dataset.id = t.id;
-      btn.innerHTML = `<span class="sr-train-num">${String(t.num).padStart(2, '0')}</span>${t.name}`;
-      btn.addEventListener('click', () => select(t, btn));
-      listEl.appendChild(btn);
+    SR.createTrainingPage({
+      TrainerClass: FlashTrainer,
+      TRAININGS,
+      paramDefsOf,
+      onInit({ trainer, canvas }) {
+        canvas.addEventListener('click', e => trainer.handleClick(e));
+      }
     });
-
-    const paramPanel = $('#paramPanel');
-    const methodBox = $('#methodBox');
-    const nameEl = $('#statusName');
-
-    function select(t, btn) {
-      $$('.sr-train-item').forEach(b => b.classList.remove('active'));
-      if (btn) btn.classList.add('active');
-      trainer.selectTraining(t);
-      nameEl.textContent = t.name;
-      methodBox.innerHTML = `<b>训练方法：</b>${t.method}`;
-      const defs = paramDefsOf(t);
-      SR.buildParamPanel(paramPanel, defs, null, () => {
-        trainer.applyParams(SR.readParams(paramPanel, defs));
-      });
-    }
-
-    SR.buildControls($('#controls'), trainer);
-    SR.bindKeyboard(trainer);
-
-    canvas.addEventListener('click', e => trainer.handleClick(e));
-
-    const ro = new ResizeObserver(() => {
-      trainer.resize();
-      if (!trainer.running) trainer.draw();
-    });
-    ro.observe(stage);
-
-    const first = listEl.querySelector('.sr-train-item[data-id]');
-    if (first) select(TRAININGS[0], first);
-
-    // 支持 URL ?train=id 直接选中（训练计划执行器使用）
-    const urlTrain = new URLSearchParams(location.search).get('train');
-    if (urlTrain) {
-      const btn = listEl.querySelector(`[data-id="${urlTrain}"]`);
-      if (btn) btn.click();
-    }
   }
-
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {

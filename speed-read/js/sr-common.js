@@ -53,7 +53,15 @@
     good() { this.tone(880, 0.1, 'sine'); this.tone(1320, 0.12, 'sine', 0.1, 0.1); },
     err() { this.tone(220, 0.16, 'square', 0.06); },
     click() { this.tone(440, 0.03, 'triangle', 0.06); },
-    flip() { this.tone(520, 0.05, 'sine', 0.05); }
+    flip() { this.tone(520, 0.05, 'sine', 0.05); },
+    /* 训练完成音：一度被各模块调用却从未定义，导致 5 处 TypeError
+       （视读表/记忆训练/速读定时/训练计划切步的完成分支全部中断）。 */
+    done() { this.good(); this.tone(1760, 0.18, 'sine', 0.1, 0.12); },
+    /* 兜底：音频异常绝不应拖垮训练状态机（Web Audio 在无用户手势、
+       无音频设备或上下文超限时都可能抛错）。 */
+    safe(fn) {
+      try { return fn(); } catch (e) { /* 音频失败静默降级 */ }
+    }
   };
 
   /* ---------------- Canvas: 高清适配 ---------------- */
@@ -196,9 +204,18 @@
       this.elapsed = 0;           // 训练总耗时(秒)
       this.frame = 0;
       this.onStateChange = opts.onStateChange || null;
+      // rAF 句柄 + 预绑定回调：原先每帧 `this._loop.bind(this)` 都会新建一个
+      // 函数对象，且从不 cancelAnimationFrame —— 重置后立即开始会出现两条
+      // 并行循环，导致 elapsed/dt 双倍累加。
+      this._raf = 0;
+      this._boundLoop = this._loop.bind(this);
     }
 
     setParams(p) { Object.assign(this.params, p); }
+
+    _stopLoop() {
+      if (this._raf) { cancelAnimationFrame(this._raf); this._raf = 0; }
+    }
 
     start() {
       if (this.running) return;
@@ -209,7 +226,8 @@
       this._last = performance.now();
       this.onStart && this.onStart();
       this._emit();
-      requestAnimationFrame(this._loop.bind(this));
+      this._stopLoop();
+      this._raf = requestAnimationFrame(this._boundLoop);
     }
 
     pause() {
@@ -222,6 +240,7 @@
     stop() {
       this.running = false;
       this.paused = false;
+      this._stopLoop();
       this._emit();
     }
 
@@ -246,7 +265,7 @@
         this.update(dt, now);
       }
       this.draw();
-      requestAnimationFrame(this._loop.bind(this));
+      this._raf = requestAnimationFrame(this._boundLoop);
     }
 
     // 子类覆写
@@ -254,6 +273,12 @@
     draw() {}
     onStart() {}
     onReset() {}
+
+    /* 页面卸载 / 切换训练时调用，彻底停掉循环 */
+    destroy() {
+      this.stop();
+      this.onStateChange = null;
+    }
 
     _emit() {
       if (this.onStateChange) {
@@ -333,7 +358,10 @@
 
     if (extraButtons) extraButtons.forEach(b => btn(b.label, b.cls || '', b.fn));
 
+    // 原先直接覆盖，把构造函数传入的 opts.onStateChange 静默丢弃了。
+    const prevStateChange = trainer.onStateChange;
     trainer.onStateChange = s => {
+      if (prevStateChange) prevStateChange(s);
       startBtn.textContent = s.running && !s.paused ? '暂停' : (s.running ? '继续' : '开始');
       speedEl.textContent = '速度 ×' + s.speedMul.toFixed(1);
       timeEl.textContent = '时长 ' + Math.floor(s.elapsed) + 's';
@@ -347,7 +375,10 @@
   /* ---------------- 键盘绑定 ---------------- */
   function bindKeyboard(trainer, opts) {
     const keydown = e => {
-      if (e.target && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return;
+      const t = e.target;
+      // 原先只排除 INPUT|TEXTAREA|SELECT：焦点在按钮上时空格会既激活按钮
+      // 又被这里 preventDefault 吞掉一次，行为互相打架。
+      if (t && (/INPUT|TEXTAREA|SELECT|BUTTON|A/.test(t.tagName) || t.isContentEditable)) return;
       switch (e.key) {
         case 'ArrowUp': case 'w': case 'W':
           e.preventDefault(); trainer.speedUp(); break;
@@ -370,6 +401,20 @@
     return () => document.removeEventListener('keydown', keydown);
   }
 
+  /* ---------------- 训练项选中态 ---------------- */
+  /* 选中态原先只有 .active 这一个视觉 class，屏幕阅读器无从得知当前选中的
+     是哪一项。这里同时写入 aria-current。 */
+  function markActive(btn, selector) {
+    $$(selector || '.sr-train-item').forEach(b => {
+      b.classList.remove('active');
+      b.removeAttribute('aria-current');
+    });
+    if (btn) {
+      btn.classList.add('active');
+      btn.setAttribute('aria-current', 'true');
+    }
+  }
+
   /* ---------------- 模块标题 ---------------- */
   function pageHeader(title, subtitle) {
     const hero = $('#sr-hero');
@@ -378,5 +423,93 @@
     if (subtitle && hero.querySelector('p')) hero.querySelector('p').textContent = subtitle;
   }
 
-  window.SR = { $, $$, Store, Sound, Canvas, Color, Trainer, buildParamPanel, readParams, buildControls, bindKeyboard, pageHeader };
+  /* ---------------- 速读四页初始化模板 ---------------- */
+  /* sr-basic / sr-flash / sr-speed / sr-photo 四份 init() 逐字重复，
+     变化点只有：Trainer 类、训练列表、paramDefsOf、是否按 group 分组、
+     额外的 DOM（文章面板/剪贴板/点击处理）以及键盘扩展。
+     抽成工厂后，四页只保留各自的数据与特殊逻辑。 */
+  function createTrainingPage({
+    TrainerClass,
+    TRAININGS,
+    paramDefsOf,
+    hasGroups = false,
+    groupLabel = null,
+    bindKeyboard: kbConfig = true,
+    onInit = null
+  }) {
+    const canvas = $('#canvas');
+    const stage = $('#stage');
+    const trainer = new TrainerClass({ canvas });
+
+    const listEl = $('#trainList');
+    let lastGroup = '';
+    TRAININGS.forEach(t => {
+      if (hasGroups && t.group && t.group !== lastGroup) {
+        const g = document.createElement('div');
+        g.className = 'sr-train-item sr-train-group';
+        g.style.cssText = 'font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em;padding:10px 10px 2px;cursor:default;';
+        g.textContent = groupLabel[t.group];
+        listEl.appendChild(g);
+        lastGroup = t.group;
+      }
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'sr-train-item';
+      btn.dataset.id = t.id;
+      btn.innerHTML = `<span class="sr-train-num">${String(t.num).padStart(2, '0')}</span>${t.name}`;
+      btn.addEventListener('click', () => select(t, btn));
+      listEl.appendChild(btn);
+    });
+
+    const paramPanel = $('#paramPanel');
+    const methodBox = $('#methodBox');
+    const nameEl = $('#statusName');
+
+    function select(t, btn) {
+      markActive(btn);
+      trainer.selectTraining(t);
+      nameEl.textContent = t.name;
+      methodBox.innerHTML = `<b>训练方法：</b>${t.method}`;
+      const defs = paramDefsOf(t);
+      buildParamPanel(paramPanel, defs, null, () => {
+        trainer.applyParams(readParams(paramPanel, defs));
+      });
+    }
+
+    const controls = $('#controls');
+    buildControls(controls, trainer);
+
+    if (kbConfig) {
+      const opts = typeof kbConfig === 'object' && typeof kbConfig.opts === 'function'
+        ? kbConfig.opts(trainer)
+        : (typeof kbConfig === 'object' ? kbConfig.opts : undefined);
+      bindKeyboard(trainer, opts);
+    }
+
+    const ro = new ResizeObserver(() => {
+      if (trainer.resize) trainer.resize();
+      if (!trainer.running) trainer.draw();
+    });
+    ro.observe(stage);
+
+    if (onInit) onInit({ trainer, canvas, stage, controls, listEl, paramPanel, methodBox, nameEl });
+
+    const first = listEl.querySelector('.sr-train-item[data-id]');
+    if (first) select(TRAININGS[0], first);
+
+    // 支持 URL ?train=id 直接选中（训练计划执行器使用）。
+    // 必须先在 TRAININGS 白名单里命中，再拿 id 拼属性选择器，避免注入。
+    const urlTrain = new URLSearchParams(location.search).get('train');
+    if (urlTrain) {
+      const urlHit = TRAININGS.find(t => t.id === urlTrain);
+      if (urlHit) {
+        const btn = listEl.querySelector('.sr-train-item[data-id="' + urlHit.id + '"]');
+        if (btn) btn.click();
+      }
+    }
+
+    return trainer;
+  }
+
+  window.SR = { $, $$, Store, Sound, Canvas, Color, Trainer, markActive, buildParamPanel, readParams, buildControls, bindKeyboard, pageHeader, createTrainingPage };
 })();

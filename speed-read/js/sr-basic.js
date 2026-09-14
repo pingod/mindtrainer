@@ -185,9 +185,18 @@
       if (!w || !h) return;
       Canvas.clear(ctx, w, h, p.bg);
       if (this.st && this.st.draw) this.st.draw(ctx, w, h, this);
-      const info = $('#statusInfo');
-      if (info && this.running) {
-        info.textContent = '时长 ' + Math.floor(this.elapsed) + 's · 速度 ×' + this.speedMul.toFixed(1);
+      // 原先每帧 querySelector + 写 textContent，60 次/秒的 layout thrashing。
+      // 改为缓存元素，只在整秒或倍率变化时才写 DOM。
+      if (this.running) {
+        if (!this._infoEl) this._infoEl = $('#statusInfo');
+        if (this._infoEl) {
+          const secs = Math.floor(this.elapsed);
+          if (secs !== this._infoSecs || this.speedMul !== this._infoSpeed) {
+            this._infoSecs = secs;
+            this._infoSpeed = this.speedMul;
+            this._infoEl.textContent = '时长 ' + secs + 's · 速度 ×' + this.speedMul.toFixed(1);
+          }
+        }
       }
     }
   }
@@ -584,13 +593,11 @@
 
   /* ---- 眼动：高亮圆沿路径 ---- */
   class SEyeMove {
-    constructor(shape) { this.shape = shape; this.t = 0; this.dir = 1; this.arcShape = 0; }
-    update(dt, now, tr) {
-      const p = tr.params;
-      const sp = Math.max(0.05, p.speed / 100);
-      this.t += dt * sp * (this.shape === 'circle' ? p.dir : 1) * this.dir;
-      // 点击反向
-      tr.onClick = (e) => {
+    constructor(shape) {
+      this.shape = shape; this.t = 0; this.dir = 1; this.arcShape = 0;
+      // 点击回调原先写在 update 里，每帧重建两个闭包（60 次/秒的 GC 垃圾）。
+      // 提到构造里只建一次，update 中仅在尚未挂载时赋值。
+      this._onClick = () => {
         if (this.shape === 'circle' || this.shape === 'arc') {
           this.dir *= -1;
           SR.Sound.flip();
@@ -600,12 +607,21 @@
           SR.Sound.click();
         }
       };
-      tr.onRClick = (e) => {
+      this._onRClick = () => {
         if (this.shape === 'arc') {
           this.arcShape = (this.arcShape + 1) % 3;
           SR.Sound.click();
         }
       };
+    }
+    update(dt, now, tr) {
+      const p = tr.params;
+      const sp = Math.max(0.05, p.speed / 100);
+      this.t += dt * sp * (this.shape === 'circle' ? p.dir : 1) * this.dir;
+      if (tr.onClick !== this._onClick) {
+        tr.onClick = this._onClick;
+        tr.onRClick = this._onRClick;
+      }
     }
     _path(ph, w, h) {
       const cx = w / 2, cy = h / 2;
@@ -660,13 +676,15 @@
 
   /* ---- 凝视 ---- */
   class SGaze {
-    constructor(kind) { this.kind = kind; this.t0 = 0; }
-    reinit() { this.t0 = performance.now(); }
+    constructor(kind) { this.kind = kind; }
+    reinit() { /* 计时走 tr.elapsed，无需自有起点 */ }
     update() { /* 计时在 draw 中 */ }
     draw(c, w, h, tr) {
       const p = tr.params;
       const cx = w / 2, cy = h / 2;
-      const secs = (performance.now() - this.t0) / 1000;
+      // 用训练器自己的 elapsed。原先吃 performance.now()，暂停后计时照走，
+      // 与状态栏显示的时长对不上。
+      const secs = tr.elapsed;
       if (this.kind === 'point') {
         // 十字 + 中心圆
         const r = Math.max(30, Math.min(w, h) * 0.06);
@@ -727,6 +745,10 @@
       } else {
         seq = TABLE_CN_CHARS.slice(0, n).split('');
       }
+      // 洗牌前的原始序列就是期望顺序：字母表 A,B,C… / 数字 1,2,3… / 汉字笔画序。
+      // 原先 click 与 draw 一律用 String(this.next) 比较，与字母表、汉字表
+      // 的内容永不相符 —— 这两项训练每次点击都判「顺序错误」，完全不可玩。
+      this.expected = seq.slice();
       // Fisher-Yates 洗牌
       for (let i = seq.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -736,11 +758,12 @@
       this.next = 1;
       this.done = false;
       this.msg = '';
-      const cv = $('canvas');
-      if (cv) {
-        cv.onclick = (e) => this.click(e);
-      }
+      // 走 Trainer 的统一分发点。原先直接改全局 canvas 的 onclick，切到别的
+      // 训练后旧回调不会解除，点击仍会命中上一个视读表实例。
+      tr.onClick = e => this.click(e);
     }
+    /* 当前应寻找的目标字符 */
+    want() { return this.expected ? this.expected[this.next - 1] : String(this.next); }
     click(e) {
       const tr = currentTrainer;
       if (!tr) return;
@@ -753,14 +776,14 @@
       const ci = Math.floor(x / cellW), cj = Math.floor(y / cellH);
       if (ci < 0 || ci >= cols || cj < 0 || cj >= rows) return;
       const idx = cj * cols + ci;
-      const want = String(this.next);
+      const want = this.want();
       if (this.cells[idx] === want) {
         SR.Sound.good();
         this.next++;
         if (this.next > this.cells.length) {
           this.done = true;
           this.msg = '完成！用时 ' + Math.floor(tr.elapsed) + 's';
-          SR.Sound.done();
+          SR.Sound.safe(() => SR.Sound.done());
         }
       } else {
         SR.Sound.err();
@@ -773,7 +796,7 @@
       const p = tr.params;
       const rows = p.rows || 5, cols = p.cols || 5;
       const cellW = w / cols, cellH = h / rows;
-      const targetIdx = this.cells.findIndex(v => v === String(this.next));
+      const targetIdx = this.cells.findIndex(v => v === this.want());
       for (let j = 0; j < rows; j++) {
         for (let i = 0; i < cols; i++) {
           const idx = j * cols + i;
@@ -812,93 +835,37 @@
   let currentTrainer = null;
 
   /* ---------------- 页面初始化 ---------------- */
+  /* ---------------- 页面初始化 ---------------- */
   function init() {
-    const canvas = $('#canvas');
-    const stage = $('#stage');
-    const trainer = new BasicTrainer({ canvas });
+    const trainer = SR.createTrainingPage({
+      TrainerClass: BasicTrainer,
+      TRAININGS,
+      paramDefsOf,
+      hasGroups: true,
+      groupLabel: GROUP_LABEL,
+      bindKeyboard: {
+        opts: tr => ({
+          onKey(e) {
+            if (e.key === 'Enter') {
+              // 回车重排视读表
+              if (tr.training && tr.training.type === 'table' && tr.st) tr.st.build();
+            }
+          }
+        })
+      }
+    });
     currentTrainer = trainer;
 
-    // 训练列表
-    const listEl = $('#trainList');
-    let lastGroup = '';
-    TRAININGS.forEach(t => {
-      if (t.group !== lastGroup) {
-        const g = document.createElement('div');
-        g.className = 'sr-train-item sr-train-group';
-        g.style.cssText = 'font-size:11px;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em;padding:10px 10px 2px;cursor:default;';
-        g.textContent = GROUP_LABEL[t.group];
-        listEl.appendChild(g);
-        lastGroup = t.group;
-      }
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'sr-train-item';
-      btn.dataset.id = t.id;
-      btn.innerHTML = `<span class="sr-train-num">${String(t.num).padStart(2, '0')}</span>${t.name}`;
-      btn.addEventListener('click', () => select(t, btn));
-      listEl.appendChild(btn);
-    });
-
-    const paramPanel = $('#paramPanel');
-    const methodBox = $('#methodBox');
-    const nameEl = $('#statusName');
-
-    function select(t, btn) {
-      $$('.sr-train-item').forEach(b => b.classList.remove('active'));
-      if (btn) btn.classList.add('active');
-      trainer.selectTraining(t);
-      nameEl.textContent = t.name;
-      methodBox.innerHTML = `<b>训练方法：</b>${t.method}`;
-      // 重建参数面板
-      const defs = paramDefsOf(t);
-      SR.buildParamPanel(paramPanel, defs, null, () => {
-        trainer.applyParams(SR.readParams(paramPanel, defs));
-      });
-    }
-
-    // 控制条
-    SR.buildControls($('#controls'), trainer);
-
-    // 键盘
-    SR.bindKeyboard(trainer, {
-      onKey(e) {
-        if (e.key === 'Enter') {
-          // 回车重排视读表
-          if (trainer.training && trainer.training.type === 'table' && trainer.st) {
-            trainer.st.build();
-          }
-        }
-      }
-    });
-
-    // resize
-    const ro = new ResizeObserver(() => {
-      if (trainer.resize) trainer.resize();
-      if (!trainer.running) trainer.draw();
-    });
-    ro.observe(stage);
-
-    // 默认选中第一项
-    const first = listEl.querySelector('.sr-train-item[data-id]');
-    if (first) select(TRAININGS[0], first);
-
-    // 支持 URL ?train=id 直接选中（训练计划执行器使用）
-    const urlTrain = new URLSearchParams(location.search).get('train');
-    if (urlTrain) {
-      const btn = listEl.querySelector(`[data-id="${urlTrain}"]`);
-      if (btn) btn.click();
-    }
-
-    // 记住上次训练
+    // localStorage 记忆上次训练（URL 优先已在工厂里处理）
     const saved = Store.get('basic_last', null);
     if (saved) {
-      const idx = TRAININGS.findIndex(t => t.id === saved);
-      if (idx >= 0) {
-        const btn = listEl.querySelector(`[data-id="${saved}"]`);
-        if (btn) select(TRAININGS[idx], btn);
+      const hit = TRAININGS.find(t => t.id === saved);
+      if (hit) {
+        const listEl = $('#trainList');
+        const btn = listEl.querySelector('.sr-train-item[data-id="' + hit.id + '"]');
+        if (btn) btn.click();
       }
     }
-    trainer.onSelect = (id) => Store.set('basic_last', id);
 
     // 覆盖 onStart 记录选择
     const origSelect = trainer.selectTraining.bind(trainer);
@@ -907,7 +874,6 @@
       Store.set('basic_last', t.id);
     };
   }
-
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {

@@ -53,6 +53,8 @@
       this.articleName = '励志篇';
       this.eyestopT = 0;
       this.eyemoveT = 0;
+      this.saccading = false;
+      this.prevIdx = -1;          // 眼跳过渡时仍要画的前一行
       this.phase = 'idle';        // idle | run | done
     }
 
@@ -82,15 +84,25 @@
       this.rebuildLines();
     }
 
+    /* 每行字数：全局唯一公式，rebuildLines 与 drawCombat 共用。
+       原先 rebuildLines 写 /fontsize*2、drawCombat 写 /(fontsize*2)，
+       两者相差 4 倍 —— 内置文章只有几百字，切出来整篇只剩 1 行，
+       「阅读训练 / 实战训练」就反复显示同一行。 */
+    perLine() {
+      const p = this.params;
+      return Math.max(3, Math.round(p.lineWidth / ((p.fontsize || 32) * 2)));
+    }
+
     rebuildLines() {
       const p = this.params;
-      const perLine = Math.max(3, Math.round(p.lineWidth / (p.fontsize || 32) * 2));
-      this.lines = splitLines(this.source, perLine);
+      this.lines = splitLines(this.source, this.perLine());
       if (this.lines.length === 0) this.lines = ['（请先输入文章或选择文章来源）'];
       this.lineIdx = 0;
       this.progress = 0;
       this.eyestopT = 0;
       this.eyemoveT = 0;
+      this.saccading = false;
+      this.prevIdx = -1;
       this.phase = 'idle';
     }
 
@@ -112,6 +124,15 @@
       const p = this.params;
       const t = this.training.type;
 
+      // 定时结束原先挂在「一轮读完」的分支里，文章长短直接决定定时精度
+      // （短文章几十秒才判一次）。提到顶部按 elapsed 独立判定。
+      if (p.timer > 0 && this.elapsed >= p.timer) {
+        this.phase = 'done';
+        this.stop();
+        Sound.safe(() => Sound.done());
+        return;
+      }
+
       if (t === 'text_move') {
         // 字块沿路线移动：progress 0->1 移动一行字块
         this.progress += dt * (p.speed / 60);
@@ -127,21 +148,20 @@
         // 眼停 + 眼跳：眼停时间显示当前行，眼跳时间过渡
         const stopMs = Math.max(50, p.eyestop * 10);
         const moveMs = Math.max(20, p.eyemove * 10);
-        if (this.phase === 'run') {
+        // 眼跳阶段：切行后先经过一段过渡再进入下一次眼停。
+        // 原先 eyemoveT 累加后从不被读取，p.eyemove 是完全无效的死参数。
+        if (this.saccading) {
+          this.eyemoveT += dt * 1000;
+          if (this.eyemoveT >= moveMs) { this.saccading = false; this.eyemoveT = 0; }
+        } else {
           this.eyestopT += dt * 1000;
           if (this.eyestopT >= stopMs) {
             this.eyestopT = 0;
-            this.eyemoveT += dt * 1000;
-            // 眼跳动画简化：直接切行
+            this.prevIdx = this.lineIdx;
             this.lineIdx++;
-            if (this.lineIdx >= this.lines.length) {
-              this.lineIdx = 0;
-              if (this.elapsed > 2 && p.timer > 0 && this.elapsed >= p.timer) {
-                this.phase = 'done';
-                this.stop();
-                Sound.done();
-              }
-            }
+            if (this.lineIdx >= this.lines.length) this.lineIdx = 0;
+            this.saccading = true;
+            this.eyemoveT = 0;
           }
         }
       }
@@ -270,18 +290,36 @@
     }
 
     /* ---- 阅读训练：行块自上而下闪现 ---- */
+    /* 眼跳过渡进度 0→1。非过渡期恒为 1，绘制结果与旧版逐像素一致。 */
+    saccadeK() {
+      if (!this.saccading) return 1;
+      const moveMs = Math.max(20, (this.params.eyemove || 0) * 10);
+      return Math.max(0, Math.min(1, this.eyemoveT / moveMs));
+    }
+
     drawReadTrain(ctx, w, h) {
       const p = this.params;
       const fs = p.fontsize;
       const displayLines = p.displayLines || 1;
       const midY = h / 2;
-      // 显示当前行（可多行）
+      const step = fs * 1.6;
+      const k = this.saccadeK();
+      // 内容整体上移一行：过渡中新行从下方滑入，旧行滑出到上方
+      const dy = (1 - k) * step;
+      const yAt = i => midY + (i - (displayLines - 1) / 2) * step;
       ctx.font = `${fs}px "PingFang SC", "Microsoft YaHei", sans-serif`;
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      if (this.saccading && this.prevIdx >= 0) {
+        ctx.fillStyle = p.fg;
+        for (let k2 = 0; k2 < displayLines; k2++) {
+          const idx = (this.prevIdx + k2) % this.lines.length;
+          ctx.fillText(this.lines[idx] || '', w / 2, yAt(k2) - k * step);
+        }
+      }
       ctx.fillStyle = p.fg;
-      for (let k = 0; k < displayLines; k++) {
-        const idx = (this.lineIdx + k) % this.lines.length;
-        ctx.fillText(this.lines[idx] || '', w / 2, midY + (k - (displayLines - 1) / 2) * fs * 1.6);
+      for (let k2 = 0; k2 < displayLines; k2++) {
+        const idx = (this.lineIdx + k2) % this.lines.length;
+        ctx.fillText(this.lines[idx] || '', w / 2, yAt(k2) + dy);
       }
       // 引导线
       ctx.strokeStyle = Color.rgba(p.fg, 0.2);
@@ -306,14 +344,15 @@
       if (p.verticalText) {
         // 竖排：一列一列从上往下，每列从右到左
         const colH = Math.floor((h - 40) / (fs * 1.5));
-        const totalChars = this.lines.length * (p.lineWidth / (fs * 2));
+        const perLine = this.perLine();
+        const totalChars = this.lines.length * perLine;
         const cols = Math.max(1, Math.floor(totalChars / colH));
         for (let c = 0; c < cols; c++) {
           const x = w - 30 - c * fs * 2.2;
           for (let r = 0; r < colH; r++) {
             const charIdx = c * colH + r;
-            const lineIdx = Math.floor(charIdx / Math.max(1, Math.round(p.lineWidth / (fs * 2))));
-            const ch = this.lines[lineIdx] ? this.lines[lineIdx][charIdx % Math.max(1, Math.round(p.lineWidth / (fs * 2)))] : '';
+            const lineIdx = Math.floor(charIdx / perLine);
+            const ch = this.lines[lineIdx] ? this.lines[lineIdx][charIdx % perLine] : '';
             if (ch) ctx.fillText(ch, x, 30 + r * fs * 1.5);
           }
         }
@@ -386,120 +425,76 @@
   }
 
   /* ---------------- 页面初始化 ---------------- */
+  /* ---------------- 页面初始化 ---------------- */
   function init() {
-    const canvas = $('#canvas');
-    const stage = $('#stage');
-    const trainer = new SpeedTrainer({ canvas });
+    SR.createTrainingPage({
+      TrainerClass: SpeedTrainer,
+      TRAININGS,
+      paramDefsOf,
+      onInit({ trainer }) {
+        const articlePanel = $('#articlePanel');
+        if (!articlePanel) return;
 
-    const listEl = $('#trainList');
-    TRAININGS.forEach(t => {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'sr-train-item';
-      btn.dataset.id = t.id;
-      btn.innerHTML = `<span class="sr-train-num">${String(t.num).padStart(2, '0')}</span>${t.name}`;
-      btn.addEventListener('click', () => select(t, btn));
-      listEl.appendChild(btn);
-    });
-
-    const paramPanel = $('#paramPanel');
-    const methodBox = $('#methodBox');
-    const nameEl = $('#statusName');
-    const articlePanel = $('#articlePanel');
-
-    function select(t, btn) {
-      $$('.sr-train-item').forEach(b => b.classList.remove('active'));
-      if (btn) btn.classList.add('active');
-      trainer.selectTraining(t);
-      nameEl.textContent = t.name;
-      methodBox.innerHTML = `<b>训练方法：</b>${t.method}`;
-      const defs = paramDefsOf(t);
-      SR.buildParamPanel(paramPanel, defs, null, () => {
-        trainer.applyParams(SR.readParams(paramPanel, defs));
-      });
-    }
-
-    SR.buildControls($('#controls'), trainer);
-    SR.bindKeyboard(trainer);
-
-    // 文章面板
-    if (articlePanel) {
-      const sel = document.createElement('select');
-      sel.id = 'articleSelect';
-      sel.className = 'sr-article-select';
-      Object.keys(ARTICLES).forEach(k => {
-        const opt = document.createElement('option');
-        opt.value = k; opt.textContent = k;
-        sel.appendChild(opt);
-      });
-      const customOpt = document.createElement('option');
-      customOpt.value = 'custom'; customOpt.textContent = '自定义文本';
-      sel.appendChild(customOpt);
-      sel.addEventListener('change', () => {
-        if (sel.value === 'custom') {
-          textarea.style.display = '';
-          trainer.setCustomText(textarea.value);
-        } else {
-          textarea.style.display = 'none';
-          trainer.setArticle(sel.value);
-        }
-        if (!trainer.running) trainer.draw();
-      });
-      articlePanel.appendChild(sel);
-
-      const textarea = document.createElement('textarea');
-      textarea.id = 'articleText';
-      textarea.className = 'sr-article-text';
-      textarea.placeholder = '粘贴或输入要训练的文章…';
-      textarea.rows = 6;
-      textarea.style.display = 'none';
-      textarea.addEventListener('input', () => {
-        if (sel.value === 'custom') {
-          trainer.setCustomText(textarea.value);
-          if (!trainer.running) trainer.draw();
-        }
-      });
-      articlePanel.appendChild(textarea);
-
-      const clipBtn = document.createElement('button');
-      clipBtn.type = 'button';
-      clipBtn.className = 'sr-btn';
-      clipBtn.textContent = '📋 读取剪贴板';
-      clipBtn.addEventListener('click', async () => {
-        try {
-          const text = await navigator.clipboard.readText();
-          if (text) {
-            sel.value = 'custom';
+        const sel = document.createElement('select');
+        sel.id = 'articleSelect';
+        sel.className = 'sr-article-select';
+        Object.keys(ARTICLES).forEach(k => {
+          const opt = document.createElement('option');
+          opt.value = k; opt.textContent = k;
+          sel.appendChild(opt);
+        });
+        const customOpt = document.createElement('option');
+        customOpt.value = 'custom'; customOpt.textContent = '自定义文本';
+        sel.appendChild(customOpt);
+        sel.addEventListener('change', () => {
+          if (sel.value === 'custom') {
             textarea.style.display = '';
-            textarea.value = text;
-            trainer.setCustomText(text);
-            if (!trainer.running) trainer.draw();
-            SR.Sound.ok();
+            trainer.setCustomText(textarea.value);
+          } else {
+            textarea.style.display = 'none';
+            trainer.setArticle(sel.value);
           }
-        } catch (e) {
-          SR.Sound.err();
-        }
-      });
-      articlePanel.appendChild(clipBtn);
-    }
+          if (!trainer.running) trainer.draw();
+        });
+        articlePanel.appendChild(sel);
 
-    const ro = new ResizeObserver(() => {
-      trainer.resize();
-      if (!trainer.running) trainer.draw();
+        const textarea = document.createElement('textarea');
+        textarea.id = 'articleText';
+        textarea.className = 'sr-article-text';
+        textarea.placeholder = '粘贴或输入要训练的文章…';
+        textarea.rows = 6;
+        textarea.style.display = 'none';
+        textarea.addEventListener('input', () => {
+          if (sel.value === 'custom') {
+            trainer.setCustomText(textarea.value);
+            if (!trainer.running) trainer.draw();
+          }
+        });
+        articlePanel.appendChild(textarea);
+
+        const clipBtn = document.createElement('button');
+        clipBtn.type = 'button';
+        clipBtn.className = 'sr-btn';
+        clipBtn.textContent = '📋 读取剪贴板';
+        clipBtn.addEventListener('click', async () => {
+          try {
+            const text = await navigator.clipboard.readText();
+            if (text) {
+              sel.value = 'custom';
+              textarea.style.display = '';
+              textarea.value = text;
+              trainer.setCustomText(text);
+              if (!trainer.running) trainer.draw();
+              SR.Sound.ok();
+            }
+          } catch (e) {
+            SR.Sound.err();
+          }
+        });
+        articlePanel.appendChild(clipBtn);
+      }
     });
-    ro.observe(stage);
-
-    const first = listEl.querySelector('.sr-train-item[data-id]');
-    if (first) select(TRAININGS[0], first);
-
-    // 支持 URL ?train=id 直接选中（训练计划执行器使用）
-    const urlTrain = new URLSearchParams(location.search).get('train');
-    if (urlTrain) {
-      const btn = listEl.querySelector(`[data-id="${urlTrain}"]`);
-      if (btn) btn.click();
-    }
   }
-
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {

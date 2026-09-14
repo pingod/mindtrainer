@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>冥想训练 – 飞克视读训练中心</title>
     <meta name="description" content="冥想训练：双脑同步声频（双耳节拍）、呼吸引导与曼陀罗动画，激活右脑，放松身心。">
-    <link rel="icon" type="image/png" sizes="32x32" href="../assets/images/icons/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="../assets/images/icons/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/icons/favicon-16x16.png">
     <script>try{var t=localStorage.getItem('mt-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
-    <link rel="stylesheet" href="/assets/css/mt.css?v=20270101">
-    <link rel="stylesheet" href="css/speed-read.css?v=20270101">
+    <link rel="stylesheet" href="/assets/css/mt.css?v=20260915">
+    <link rel="stylesheet" href="css/speed-read.css?v=20260915">
     <style>
         /* liquid canvas backdrop behind the hero */
         .liq-hero-wrap { position: relative; overflow: hidden; border-radius: var(--r-card); }
@@ -28,7 +28,7 @@
         .wave-btn.active { background: var(--ink); border-color: var(--ink); color: var(--bg); }
         .wave-btn.active small { color: inherit; opacity: .7; }
     </style>
-    <script src="/assets/js/mt-nav.js?v=20270101" defer></script>
+    <script src="/assets/js/mt-nav.js?v=20260915" defer></script>
 </head>
 <body>
 <header id="mt-header"></header>
@@ -56,7 +56,7 @@
 
         <div class="sr-stage-wrap">
             <div class="sr-stage sr-meditation-stage" id="stage">
-                <canvas id="canvas"></canvas>
+                <canvas id="canvas" role="img" aria-label="冥想训练画布：呼吸引导与曼陀罗动画">您的浏览器不支持 canvas，无法运行该训练。</canvas>
                 <div class="sr-stage-hint">佩戴耳机效果最佳 · 点击页面任意处可恢复声音</div>
             </div>
             <div class="sr-control-bar" id="controls"></div>
@@ -71,11 +71,12 @@
 
 <footer></footer>
 
-<script src="js/sr-common.js?v=20270101" defer></script>
-<script src="js/sr-meditation.js?v=20270101" defer></script>
+<script src="js/sr-common.js?v=20260915" defer></script>
+<script src="js/sr-meditation.js?v=20260915" defer></script>
 <script type="module">
     // 冥想页 hero 液体流动背景（Canvas UI Liquid，无构建）
-    import { createLiquid } from '../assets/js/canvasui/liquid.js';
+    // 用绝对路径，与全站其余引用一致，部署到子路径时不会失效
+    import { createLiquid } from '/assets/js/canvasui/liquid.js';
     (function () {
         const source = document.getElementById('liq-source');
         const output = document.getElementById('liq-output');
@@ -114,12 +115,25 @@
                   pressure: 0.8, curl: 1.5, radius: 0.35, force: 1.0, intensity: 2.2,
                   distortion: 0.4, blend: 4, rainbow: true }
             );
-            window.__medLiq = inst;
         }
         init();
-        window.addEventListener('resize', () => { drawSource(); if (inst) { try { inst.resize(); } catch (e) {} } });
+
+        // resize 加防抖：原写法每次尺寸变化都同步重绘 source 并重建 WebGL
+        // 帧缓冲，拖动窗口时会连续触发几十次。
+        let resizeTimer = 0;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                drawSource();
+                if (inst) { try { inst.resize(); } catch (e) { /* 实例已销毁 */ } }
+            }, 150);
+        });
+        // 页面卸载时释放，避免把实例挂在 window 上造成全局污染
+        window.addEventListener('pagehide', () => {
+            if (inst) { try { inst.destroy && inst.destroy(); } catch (e) {} inst = null; }
+        });
     })();
 </script>
-<script src="/assets/js/feedback-marker.js?v=20270101" defer></script>
+<script src="/assets/js/feedback-marker.js?v=20260915" defer></script>
 </body>
 </html>

@@ -1,3 +1,4 @@
+import { createLifecycle } from "./_lifecycle.js";
 const DEFAULTS = {
   grid: 50,
   cellAspect: 1,
@@ -382,65 +383,28 @@ function createDisplacement(elements, options = {}) {
     }
     start();
   }
-  motionQuery.addEventListener("change", onMotionChange);
-  const pointerHost = output.parentElement ?? output;
-  function onPointerMove(event) {
-    if (reducedMotion) return;
-    const box = output.getBoundingClientRect();
-    if (box.width < 1 || box.height < 1) return;
-    const x = (event.clientX - box.left) / box.width;
-    const y = (event.clientY - box.top) / box.height;
-    const now = performance.now();
-    if (!tracking) {
-      tracking = true;
-      mouse.prevX = x;
-      mouse.prevY = y;
-      mouse.speed = 0;
-      mouse.gate = 0;
-      mouse.lastT = now;
-    }
-    mouse.vX = x - mouse.prevX;
-    mouse.vY = y - mouse.prevY;
-    const dt = Math.max((now - mouse.lastT) / 1e3, 1e-3);
-    mouse.lastT = now;
-    const distPx = Math.hypot(mouse.vX * box.width, mouse.vY * box.height);
-    const instSpeed = distPx / dt;
-    mouse.speed += (instSpeed - mouse.speed) * Math.min(dt * 25, 1);
-    const threshold = Math.max(config.threshold, 0);
-    if (threshold <= 0) {
-      mouse.gate = 1;
-    } else {
-      const ramp = (mouse.speed - threshold) / threshold;
-      const step = Math.min(Math.max(ramp, 0), 1);
-      mouse.gate = step * step * (3 - 2 * step);
-    }
-    mouse.prevX = x;
-    mouse.prevY = y;
-    mouse.x = x;
-    mouse.y = y;
-    start();
-  }
-  function onPointerLeave() {
-    tracking = false;
-    mouse.vX = 0;
-    mouse.vY = 0;
-    mouse.speed = 0;
-    mouse.gate = 0;
-  }
-  pointerHost.addEventListener("pointermove", onPointerMove, { passive: true });
-  pointerHost.addEventListener("pointerleave", onPointerLeave, { passive: true });
-  pointerHost.addEventListener("pointercancel", onPointerLeave, { passive: true });
-  const observer = new ResizeObserver(() => {
-    syncCanvasSize();
-    start();
+  /* 生命周期统一到 _lifecycle.js：尺寸观察、进出视口、标签页前后台、
+     prefers-reduced-motion、WebGL 上下文丢失提示、销毁时摘监听，全在那边。
+     这里只声明本组件在“变成可见 / 不可见”时各自要做什么。 */
+  const lifecycle = createLifecycle({
+    target: output,
+    watch: [content],
+    onResize: () => {
+      syncCanvasSize();
+      start();
+    },
+    onShow: () => {
+      visible = true;
+      start();
+    },
+    onHide: () => {
+      visible = false;
+      running = false;
+      if (raf) { cancelAnimationFrame(raf); raf = 0; }
+    },
+    onMotionChange,
+    gl
   });
-  observer.observe(output);
-  observer.observe(content);
-  const intersection = new IntersectionObserver((entries) => {
-    visible = entries[entries.length - 1]?.isIntersecting ?? true;
-    if (visible) start();
-  });
-  intersection.observe(output);
   return {
     setOptions(next) {
       let changed = false;
@@ -464,9 +428,7 @@ function createDisplacement(elements, options = {}) {
     destroy() {
       destroyed = true;
       cancelAnimationFrame(raf);
-      observer.disconnect();
-      intersection.disconnect();
-      motionQuery.removeEventListener("change", onMotionChange);
+      lifecycle.destroy();
       pointerHost.removeEventListener("pointermove", onPointerMove);
       pointerHost.removeEventListener("pointerleave", onPointerLeave);
       pointerHost.removeEventListener("pointercancel", onPointerLeave);
