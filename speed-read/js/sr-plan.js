@@ -43,6 +43,41 @@
     { module: 'photo', train: 'mandala', label: '曼陀罗卡片', minutes: 3 },
     { module: 'meditation', train: 'meditation', label: '冥想', minutes: 5 }
   ];
+  const MAX_PLAN_STEPS = 50;
+  const MAX_STEP_MINUTES = 120;
+  const MAX_IMPORT_BYTES = 128 * 1024;
+
+  function planName(value, fallback) {
+    const name = typeof value === 'string' ? value.trim().slice(0, 40) : '';
+    return name || fallback;
+  }
+
+  function normalizeStep(value) {
+    if (!value || typeof value !== 'object') return null;
+    const module = typeof value.module === 'string' ? value.module : '';
+    const catalog = CATALOG[module];
+    const train = typeof value.train === 'string' ? value.train : '';
+    if (!catalog || !catalog.trains.some(item => item[0] === train)) return null;
+    const minutes = Number(value.minutes);
+    if (!Number.isFinite(minutes)) return null;
+    return {
+      module,
+      train,
+      label: typeof value.label === 'string' ? value.label.trim().slice(0, 60) : '',
+      minutes: Math.min(MAX_STEP_MINUTES, Math.max(1, Math.round(minutes)))
+    };
+  }
+
+  function normalizePlan(value, fallbackName) {
+    if (!value || typeof value !== 'object' || !Array.isArray(value.steps)) return null;
+    const source = value.steps.slice(0, MAX_PLAN_STEPS);
+    const steps = source.map(normalizeStep).filter(Boolean);
+    return {
+      name: planName(value.name, fallbackName),
+      steps,
+      rejected: value.steps.length - steps.length
+    };
+  }
 
   function stepUrl(step) {
     const mod = CATALOG[step.module];
@@ -60,8 +95,20 @@
     return t ? t[1] : mod.label;
   }
 
-  function loadPlans() { return Store.get('plans', []); }
-  function savePlans(plans) { Store.set('plans', plans); }
+  function loadPlans() {
+    const stored = Store.get('plans', []);
+    if (!Array.isArray(stored)) return [];
+    return stored.slice(0, 100).map((plan, index) => {
+      return normalizePlan(plan, '训练计划 ' + (index + 1));
+    }).filter(Boolean).map(plan => ({ name: plan.name, steps: plan.steps }));
+  }
+
+  function savePlans(plans) {
+    const safePlans = Array.isArray(plans) ? plans.slice(0, 100).map((plan, index) => {
+      return normalizePlan(plan, '训练计划 ' + (index + 1));
+    }).filter(Boolean).map(plan => ({ name: plan.name, steps: plan.steps })) : [];
+    Store.set('plans', safePlans);
+  }
 
   /* ---------------- 页面初始化 ---------------- */
   function init() {
@@ -78,8 +125,16 @@
     const exportBtn = $('#exportPlanBtn');
     const importBtn = $('#importPlanBtn');
     const importFile = $('#importFile');
+    const planStatus = $('#planStatus');
 
     let currentPlan = { name: '我的训练计划', steps: DEFAULTS.map(s => Object.assign({}, s)) };
+
+    function setPlanStatus(message, isError) {
+      if (!planStatus) return;
+      planStatus.textContent = message;
+      planStatus.classList.remove('is-error');
+      if (isError) planStatus.classList.add('is-error');
+    }
 
     /* 模块选择联动训练下拉 */
     function fillModuleSel(selected) {
@@ -142,10 +197,17 @@
 
     /* 添加步骤 */
     function addStep() {
+      if (currentPlan.steps.length >= MAX_PLAN_STEPS) {
+        setPlanStatus(`单个计划最多可添加 ${MAX_PLAN_STEPS} 个步骤。`, true);
+        Sound.err();
+        return;
+      }
       const mod = moduleSel.value;
       const train = trainSel.value;
-      const minutes = Math.max(1, parseInt(minuteInput.value, 10) || 3);
+      const minutes = Math.min(MAX_STEP_MINUTES, Math.max(1, parseInt(minuteInput.value, 10) || 3));
+      minuteInput.value = minutes;
       currentPlan.steps.push({ module: mod, train, label: '', minutes });
+      setPlanStatus('');
       render();
       Sound.ok();
     }
@@ -153,7 +215,7 @@
 
     /* 保存计划 */
     function savePlan() {
-      currentPlan.name = nameInput.value || '我的训练计划';
+      currentPlan.name = planName(nameInput.value, '我的训练计划');
       const plans = loadPlans();
       const existing = plans.findIndex(p => p.name === currentPlan.name);
       const copy = { name: currentPlan.name, steps: currentPlan.steps.map(s => Object.assign({}, s)) };
@@ -161,6 +223,7 @@
       else plans.push(copy);
       savePlans(plans);
       refreshPlanSel(currentPlan.name);
+      setPlanStatus('计划已保存。');
       Sound.good();
     }
     saveBtn.addEventListener('click', savePlan);
@@ -209,20 +272,42 @@
     /* 导入 JSON */
     importBtn.addEventListener('click', () => importFile.click());
     importFile.addEventListener('change', () => {
-      const f = importFile.files[0];
-      if (!f) return;
+      const file = importFile.files[0];
+      if (!file) return;
+      if (file.size > MAX_IMPORT_BYTES) {
+        setPlanStatus('导入失败：计划文件不能超过 128 KB。', true);
+        importFile.value = '';
+        Sound.err();
+        return;
+      }
       const reader = new FileReader();
       reader.onload = () => {
         try {
-          const data = JSON.parse(reader.result);
-          if (data && Array.isArray(data.steps)) {
-            currentPlan = { name: data.name || '导入计划', steps: data.steps.map(s => Object.assign({}, s)) };
-            render();
-            Sound.ok();
+          const plan = normalizePlan(JSON.parse(reader.result), '导入计划');
+          if (!plan || (plan.steps.length === 0 && plan.rejected > 0)) {
+            setPlanStatus('导入失败：文件中没有可用的训练步骤。', true);
+            Sound.err();
+            return;
           }
-        } catch (e) { Sound.err(); }
+          currentPlan = { name: plan.name, steps: plan.steps };
+          render();
+          setPlanStatus(plan.rejected
+            ? `已导入 ${plan.steps.length} 个步骤，已忽略 ${plan.rejected} 个无效或超出范围的步骤。`
+            : `已导入 ${plan.steps.length} 个步骤。`);
+          Sound.ok();
+        } catch (e) {
+          setPlanStatus('导入失败：请选择格式正确的训练计划 JSON 文件。', true);
+          Sound.err();
+        } finally {
+          importFile.value = '';
+        }
       };
-      reader.readAsText(f);
+      reader.onerror = () => {
+        setPlanStatus('导入失败：无法读取该文件。', true);
+        importFile.value = '';
+        Sound.err();
+      };
+      reader.readAsText(file);
     });
 
     /* 执行计划 */
@@ -234,7 +319,7 @@
     });
 
     function startExec() {
-      currentPlan.name = nameInput.value || '我的训练计划';
+      currentPlan.name = planName(nameInput.value, '我的训练计划');
       execState = { idx: 0, remaining: currentPlan.steps[0].minutes * 60, paused: false };
       const panel = $('#execPanel');
       panel.style.display = 'block';

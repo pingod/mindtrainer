@@ -498,7 +498,21 @@ a.mt-card:hover { border-color: var(--line-2); box-shadow: var(--sh-2); transfor
 /* ------------------------------------------------------------ home hero -- */
 /* Asymmetric split. DESIGN_VARIANCE 6: off-centre, but still legible as a
    product page rather than a poster. */
-.mt-hero { padding-top: clamp(40px, 6vw, 76px); padding-bottom: clamp(48px, 7vw, 88px); }
+.mt-hero {
+  position: relative;
+  isolation: isolate;
+  padding-top: clamp(40px, 6vw, 76px); padding-bottom: clamp(48px, 7vw, 88px);
+}
+/* 氛围：右上暖光 + 左上极淡冷光。暖色 hue 来自插画系统（#d97a48 一族），
+   低透明度在亮色是日光感、在暗色是余烬感；冷光走 --accent，跟随主题。 */
+.mt-hero::before {
+  content: '';
+  position: absolute; inset: 0; z-index: -1;
+  background:
+    radial-gradient(52% 46% at 82% 26%, rgba(217, 122, 72, .09), transparent 72%),
+    radial-gradient(40% 36% at 6% 4%, color-mix(in srgb, var(--accent) 5%, transparent), transparent 70%);
+  pointer-events: none;
+}
 .mt-hero-grid {
   display: grid;
   grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr);
@@ -538,6 +552,29 @@ a.mt-card:hover { border-color: var(--line-2); box-shadow: var(--sh-2); transfor
   font-variant-numeric: tabular-nums;
 }
 .mt-try-hint { font-size: 14px; opacity: .8; max-width: 30ch; }
+
+/* 层次：320px 的舞台不靠留白撑。光晕与细环都用 currentColor，
+   wait 琥珀 / go 绿 / early 红 / done 蓝自动跟随，无需按状态写四份。 */
+.mt-try::before {
+  content: '';
+  position: absolute; inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(44% 40% at 50% 54%, color-mix(in srgb, currentColor 9%, transparent), transparent 76%);
+  pointer-events: none;
+}
+.mt-try::after {
+  content: '';
+  position: absolute; inset: 13px;
+  border-radius: calc(var(--r-stage) - 9px);
+  border: 1px solid color-mix(in srgb, currentColor 24%, transparent);
+  pointer-events: none;
+  transition: border-color .2s var(--ease);
+}
+/* idle 时细环缓慢呼吸，提示可点；尊重减少动态偏好 */
+@media (prefers-reduced-motion: no-preference) {
+  .mt-try[data-state="idle"]::after { animation: mt-try-breathe 2.8s ease-in-out infinite; }
+}
+@keyframes mt-try-breathe { 0%, 100% { opacity: .45; } 50% { opacity: 1; } }
 
 .mt-try[data-state="wait"] {
   background: color-mix(in srgb, var(--sig-wait) 12%, var(--surface));
@@ -739,16 +776,32 @@ a.mt-card:hover { border-color: var(--line-2); box-shadow: var(--sh-2); transfor
 }
 
 /* -------------------------------------------------------------- cta band -- */
+/* 终章：墨色面板把页面收住，暖光与 hero 同族、首尾呼应。
+   面板用 var(--ink)/var(--bg) 而非硬编码，深色主题下面板与按钮一起反转。 */
 .mt-cta {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   display: flex; align-items: center; justify-content: space-between;
   gap: 28px; flex-wrap: wrap;
   padding: clamp(32px, 4vw, 52px);
   border-radius: var(--r-card);
-  background: var(--surface-2);
-  border: 1px solid var(--line);
+  background: var(--ink);
+  border: 1px solid color-mix(in srgb, var(--bg) 12%, transparent);
+  color: var(--bg);
 }
-.mt-cta h2 { font-size: clamp(1.375rem, 1.1rem + 1.2vw, 1.875rem); max-width: 20ch; }
-.mt-cta p { margin-top: 8px; color: var(--ink-2); max-width: 46ch; }
+.mt-cta::before {
+  content: '';
+  position: absolute; inset: 0; z-index: -1;
+  background: radial-gradient(48% 60% at 88% 18%, rgba(217, 122, 72, .22), transparent 72%);
+  pointer-events: none;
+}
+/* h1-h4 基础样式显式写了 color: var(--ink)，在墨色面板上必须覆盖回浅色 */
+.mt-cta h2 { font-size: clamp(1.375rem, 1.1rem + 1.2vw, 1.875rem); max-width: 20ch; color: var(--bg); }
+.mt-cta p { margin-top: 8px; color: color-mix(in srgb, var(--bg) 68%, transparent); max-width: 46ch; }
+/* 面板上的主按钮对反转：亮主题给浅按钮，暗主题自动变成深按钮 */
+.mt-cta .mt-btn-primary { background: var(--bg); color: var(--ink); }
+.mt-cta .mt-btn-primary:hover { background: var(--surface); color: var(--ink); }
 
 /* ==========================================================================
    TEST PAGES

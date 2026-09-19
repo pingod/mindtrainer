@@ -8,7 +8,10 @@ const TARGET = process.argv[2] || 'sr-basic.js';
 const EXPECT = parseInt(process.argv[3] || '0', 10);
 
 function mockCtx() {
-  const target = {};
+  const target = {
+    createImageData(w, h) { return { data: new Uint8ClampedArray(w * h * 4) }; },
+    getImageData(x, y, w, h) { return { data: new Uint8ClampedArray(w * h * 4) }; },
+  };
   return new Proxy(target, {
     get(t, prop) {
       if (prop in t) return t[prop];
@@ -32,20 +35,28 @@ function mockCanvas() {
 
 function mockEl(tag) {
   const listeners = {};
-  return {
+  const attributes = {};
+  const el = {
     tagName: tag || 'DIV', style: {}, dataset: {}, children: [],
-    innerHTML: '', textContent: '',
+    textContent: '',
     classList: { add() {}, remove() {}, contains() { return false; } },
     appendChild(c) { this.children.push(c); return c; },
     addEventListener(type, fn) { listeners[type] = fn; },
     click() { if (listeners.click) listeners.click({ preventDefault() {}, clientX: 10, clientY: 10, target: {} }); },
     querySelector: () => null,
     querySelectorAll: () => [],
-    setAttribute() {}, getAttribute: () => null,
+    setAttribute(name, value) { attributes[name] = String(value); },
+    getAttribute(name) { return attributes[name] || null; },
+    removeAttribute(name) { delete attributes[name]; },
     getBoundingClientRect: () => ({ width: 800, height: 500 }),
     closest: () => null,
     _listeners: listeners,
   };
+  Object.defineProperty(el, 'innerHTML', {
+    get() { return this._innerHTML || ''; },
+    set(value) { this._innerHTML = String(value); this.children.length = 0; }
+  });
+  return el;
 }
 
 const elements = {};
@@ -80,11 +91,24 @@ elements.trainList.querySelector = function (sel) {
 };
 elements.trainList.querySelectorAll = function () { return trainButtons; };
 
+class MockImage {
+  constructor() {
+    this.complete = true;
+    this.naturalWidth = 100;
+    this.naturalHeight = 100;
+  }
+  set src(value) {
+    this._src = value;
+    if (this.onload) this.onload();
+  }
+  get src() { return this._src; }
+}
+
 const documentMock = {
   readyState: 'complete',
   querySelector: q,
   querySelectorAll: (sel) => (sel === '.sr-train-item' ? trainButtons : []),
-  createElement: (tag) => mockEl(tag),
+  createElement: (tag) => (tag === 'canvas' ? mockCanvas() : mockEl(tag)),
   addEventListener: () => {},
   removeEventListener: () => {},
 };
@@ -110,7 +134,7 @@ const sandbox = {
   localStorage: windowMock.localStorage, performance,
   console, setTimeout, clearTimeout,
   requestAnimationFrame: windowMock.requestAnimationFrame,
-  ResizeObserver: windowMock.ResizeObserver, navigator: {},
+  ResizeObserver: windowMock.ResizeObserver, navigator: {}, Image: MockImage,
   URLSearchParams, location: { search: '' },
 };
 sandbox.globalThis = sandbox;

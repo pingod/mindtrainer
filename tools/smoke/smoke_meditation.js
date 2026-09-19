@@ -59,6 +59,12 @@ elements.wavePanel.querySelector = function (sel) {
   return null;
 };
 
+class MockAudio {
+  constructor(src) { this.src = src; this.loop = false; this.preload = ''; this.volume = 1; }
+  play() { return Promise.resolve(); }
+  pause() {}
+}
+
 // 模拟 AudioContext（带 resume/close）
 function MockAudioContext() {
   const state = { value: 'running' };
@@ -98,7 +104,8 @@ const sandbox = {
   localStorage: windowMock.localStorage, performance,
   console, setTimeout, clearTimeout,
   requestAnimationFrame: windowMock.requestAnimationFrame,
-  ResizeObserver: windowMock.ResizeObserver, navigator: {},
+  cancelAnimationFrame: windowMock.cancelAnimationFrame,
+  ResizeObserver: windowMock.ResizeObserver, navigator: {}, Audio: MockAudio,
 };
 sandbox.globalThis = sandbox;
 vm.createContext(sandbox);

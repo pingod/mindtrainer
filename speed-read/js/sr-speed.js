@@ -474,24 +474,46 @@
 
         const clipBtn = document.createElement('button');
         clipBtn.type = 'button';
-        clipBtn.className = 'sr-btn';
+        clipBtn.className = 'sr-btn sr-article-clip';
         clipBtn.textContent = '📋 读取剪贴板';
+        const clipStatus = document.createElement('p');
+        clipStatus.className = 'sr-article-status';
+        clipStatus.setAttribute('role', 'status');
+        clipStatus.setAttribute('aria-live', 'polite');
+        const setClipStatus = (message, isError) => {
+          clipStatus.textContent = message;
+          clipStatus.classList.toggle('is-error', !!isError);
+        };
         clipBtn.addEventListener('click', async () => {
+          if (!navigator.clipboard || typeof navigator.clipboard.readText !== 'function') {
+            setClipStatus('当前环境无法读取剪贴板，请直接粘贴文本。', true);
+            SR.Sound.err();
+            return;
+          }
           try {
             const text = await navigator.clipboard.readText();
-            if (text) {
-              sel.value = 'custom';
-              textarea.style.display = '';
-              textarea.value = text;
-              trainer.setCustomText(text);
-              if (!trainer.running) trainer.draw();
-              SR.Sound.ok();
+            if (!text.trim()) {
+              setClipStatus('剪贴板中没有可用文本。', true);
+              SR.Sound.err();
+              return;
             }
+            sel.value = 'custom';
+            textarea.style.display = '';
+            textarea.value = text;
+            trainer.setCustomText(text);
+            if (!trainer.running) trainer.draw();
+            setClipStatus('已读取剪贴板内容，可直接开始训练。');
+            SR.Sound.ok();
           } catch (e) {
+            const message = window.isSecureContext === false
+              ? '读取剪贴板需要 HTTPS 或 localhost，请直接粘贴文本。'
+              : '无法读取剪贴板，请检查授权后重试或直接粘贴文本。';
+            setClipStatus(message, true);
             SR.Sound.err();
           }
         });
         articlePanel.appendChild(clipBtn);
+        articlePanel.appendChild(clipStatus);
       }
     });
   }

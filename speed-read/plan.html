@@ -5,10 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>训练计划 – 飞克视读训练中心</title>
     <meta name="description" content="自定义训练计划：添加训练步骤与时长，一键按序执行整套训练教程。">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/icons/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/icons/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/icons/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest?v=20260919">
+    <meta name="theme-color" content="#fafaf9">
     <script>try{var t=localStorage.getItem('mt-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
-    <link rel="stylesheet" href="/assets/css/mt.css?v=20260915">
+    <link rel="stylesheet" href="/assets/css/mt.css?v=20260919">
     <link rel="stylesheet" href="css/speed-read.css?v=20260915">
     <style>
         /* plan builder, on the shared token system */
@@ -39,6 +42,8 @@
         .sr-plan-step-ops { display: flex; gap: 6px; }
         .sr-btn-mini { height: 30px; padding-inline: 11px; font-size: 12px; }
         .sr-plan-total { margin-top: 10px; font-size: 13px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+        .sr-plan-status { min-height: 1.5em; margin: 0; color: var(--ink-3); font-size: 13px; line-height: 1.5; }
+        .sr-plan-status.is-error { color: var(--sig-error); }
 
         #execPanel { display: none; }
         .exec-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; flex-wrap: wrap; }
@@ -63,7 +68,7 @@
         <div class="sr-plan-card">
             <h2>计划管理</h2>
             <div class="sr-plan-row">
-                <input type="text" id="planName" placeholder="计划名称" value="我的训练计划">
+                <input type="text" id="planName" placeholder="计划名称" value="我的训练计划" maxlength="40">
                 <select id="planSel"></select>
                 <button type="button" class="sr-btn" id="savePlanBtn">💾 保存</button>
                 <button type="button" class="sr-btn" id="deletePlanBtn">🗑 删除</button>
@@ -71,6 +76,7 @@
                 <button type="button" class="sr-btn" id="importPlanBtn">⬆ 导入</button>
                 <input type="file" id="importFile" accept="application/json" hidden>
             </div>
+            <p class="sr-plan-status" id="planStatus" role="status" aria-live="polite"></p>
         </div>
 
         <div class="sr-plan-card">
@@ -108,7 +114,7 @@
 <footer></footer>
 
 <script src="js/sr-common.js?v=20260915" defer></script>
-<script src="js/sr-plan.js?v=20260915" defer></script>
-<script src="/assets/js/feedback-marker.js?v=20260915" defer></script>
+<script src="js/sr-plan.js?v=20260919" defer></script>
+<script src="/assets/js/feedback-marker.js?v=20260919" defer></script>
 </body>
 </html>

@@ -305,12 +305,10 @@
     copyAll.style.cssText = 'background:linear-gradient(135deg,#6d28d9,#8b5cf6);color:#fff;';
     copyAll.onclick = () => {
       const txt = items.map((it, i) => `【${i + 1}】${it.time}  ${it.url}\n内容: ${it.text || it.summary || ''}\n位置: (${it.x},${it.y})  尺寸: ${it.w}×${it.h}\n选择器: ${it.selector}\n问题: ${it.question}`).join('\n\n');
-      navigator.clipboard.writeText(txt).then(() => {
-        save([]);
-        clearMarked();
-        closeAll();
-        toast('✅ 已复制 ' + items.length + ' 条反馈并清空');
-      }, () => toast('复制失败——请手动选择'));
+      navigator.clipboard.writeText(txt).then(
+        () => toast('已复制 ' + items.length + ' 条反馈，记录已保留'),
+        () => toast('复制失败——请手动选择')
+      );
     };
     head.appendChild(copyAll);
     list.appendChild(head);
